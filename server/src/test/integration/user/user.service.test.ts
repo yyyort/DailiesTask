@@ -1,8 +1,8 @@
 import { afterAll, beforeEach, describe, expect, it } from "vitest";
-import { db } from "../../db/db";
-import { UserCreateType, UserReturnType } from "../../model/user.model";
-import { userCreateService, userDeleteService, userGetService, userSignInService, userUpdateService } from "../../service/user.service";
-import { usersTable } from "../../db/schema";
+import { db } from "../../../db/db";
+import { UserCreateType, UserReturnType } from "../../../model/user.model";
+import { userCreateService, userDeleteService, userGetService, userSignInService, userUpdateService } from "../../../service/user.service";
+import { usersTable } from "../../../db/schema";
 import { eq } from "drizzle-orm";
 import { v4 as uuidv4 } from "uuid";
 

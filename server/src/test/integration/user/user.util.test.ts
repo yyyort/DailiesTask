@@ -1,10 +1,10 @@
 import { afterAll, beforeEach, describe, expect, it, vi } from "vitest";
-import { UserModelType } from "../../model/user.model";
-import { db } from "../../db/db";
-import { usersTable } from "../../db/schema";
-import { eq } from "drizzle-orm";
-import { doesUserExist } from "../../util/user.util";
 import { v4 as uuidv4 } from "uuid";
+import { UserModelType } from "../../../model/user.model";
+import { usersTable } from "../../../db/schema";
+import { db } from "../../../db/db";
+import { eq } from "drizzle-orm";
+import { doesUserExist } from "../../../util/user.util";
 
 describe("doesUserExist integration test", () => {
     const testUser: UserModelType = {
@@ -61,7 +61,7 @@ describe("doesUserExist integration test", () => {
     it("should throw an error when the database encounters an error", async () => {
         vi.spyOn(db, "select").mockImplementationOnce(() => {
             throw new Error("Database error");
-        })
+        });
 
         await expect(doesUserExist(testUser.email)).rejects.toThrowError("Database error");
     });

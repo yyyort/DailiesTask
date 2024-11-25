@@ -11,6 +11,14 @@ services:
     depends_on:
       db:
         condition: service_healthy
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB:?}
+      - POSTGRES_USER=${POSTGRES_USER:?}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:?}
+      - PORT=4000
+      - NODE_ENV=development
+      - ACCESS_TOKEN_SECRET=${ACCESS_TOKEN_SECRET:?}
+      - REFRESH_TOKEN_SECRET=${REFRESH_TOKEN_SECRET:?}
   db:
     image: postgres
     restart: always
