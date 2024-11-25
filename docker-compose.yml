@@ -1,0 +1,35 @@
+services:
+  server:
+    container_name: dailiestask-server
+    build:
+      context: ./server
+      target: dev
+    ports:
+      - "4000:4000"
+    volumes:
+      - ./server/src:/home/node/app/src
+    depends_on:
+      db:
+        condition: service_healthy
+  db:
+    image: postgres
+    restart: always
+    ports:
+      - "5434:5434"
+    expose:
+      - 5434
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:?}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?}
+      POSTGRES_DB: ${POSTGRES_DB:?}
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    command: ['postgres', '-p', '5434']
+    healthcheck:
+      test:
+        ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:?} -d ${POSTGRES_DB:?} -p 5434"]
+      interval: 5s
+      timeout: 5s
+      retries: 5 
+volumes:
+  db-data:
