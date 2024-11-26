@@ -9,6 +9,11 @@ import { Button } from "../ui/button";
 import { PasswordInput } from "../ui/password-input";
 import SocialAuth from "./social-auth";
 import Link from "next/link";
+import Image from "next/image";
+
+import loadingSpinner from "@/assets/logo/loading-spinner.svg";
+import { SignUpApi } from "@/service/userServiceModel";
+import { useToast } from "@/hooks/use-toast";
 
 export default function SignUpForm() {
   const form = useForm<UserCreateType>({
@@ -20,11 +25,28 @@ export default function SignUpForm() {
     },
   });
 
+  const { toast } = useToast();
+
   const onSubmit: SubmitHandler<UserCreateType> = async (data) => {
     try {
-      console.log(data);
+      const res = await SignUpApi(data);
+
+      toast({
+        title: "Sign up successful",
+        description: `Welcome, ${res.user.email}`,
+      });
     } catch (error: unknown) {
       console.error(error);
+      form.setError("root", {
+        message: error instanceof Error ? error.message : "An error occurred",
+      });
+
+      toast({
+        title: "Sign in failed",
+        variant: "destructive",
+        description:
+          error instanceof Error ? error.message : "An error occurred",
+      });
     }
   };
   return (
@@ -135,6 +157,14 @@ export default function SignUpForm() {
             </div>
           )}
         />
+
+        {/* error */}
+        {form.formState.errors.root && (
+          <div className="text-red-600 text-end bg-white">
+            {form.formState.errors.root?.message}
+          </div>
+        )}
+
         <div className="flex flex-col">
           <Button
             type="submit"
@@ -145,6 +175,14 @@ export default function SignUpForm() {
           border-b-4 border-r-2 border-slate-500
         "
           >
+            {form.formState.isSubmitting && (
+              <Image
+                src={loadingSpinner}
+                alt="loading spinner"
+                width={20}
+                height={20}
+              />
+            )}
             sign up
           </Button>
 
@@ -160,7 +198,7 @@ export default function SignUpForm() {
           hover:underline
           "
           >
-            <Link href="/signin">Sign In</Link>
+            <Link href="/signin">Already have a account? Sign In</Link>
           </Button>
         </div>
       </form>

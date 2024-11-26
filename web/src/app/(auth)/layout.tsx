@@ -22,7 +22,7 @@ export default function Layout({
     <div
       className="
      h-full w-screen
-    phone-sm:px-10 phone-sm:flex phone-sm:flex-col phone-sm:justify-center
+    phone-sm:px-10 phone-sm:flex phone-sm:flex-col phone-sm:justify-center phone-sm:mt-20
     tablet:px-32
     desktop:flex-row-reverse desktop:flex desktop:items-start desktop:mt-20 desktop:px40
     2k:px-56 2k:mt-36

@@ -26,7 +26,7 @@ const PasswordInput = React.forwardRef<
       <Button
         variant="ghost"
         type="button"
-        className="flex justify-center items-center absolute right-2"
+        className="flex justify-center items-center absolute right-2 bottom-2 z-20"
         onClick={() => setShowPassword((prev) => !prev)}
       >
         {showPassword ? (

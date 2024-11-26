@@ -9,6 +9,10 @@ import { Button } from "../ui/button";
 import { PasswordInput } from "../ui/password-input";
 import SocialAuth from "./social-auth";
 import Link from "next/link";
+import loadingSpinner from "@/assets/logo/loading-spinner.svg";
+import Image from "next/image";
+import { SignInApi } from "@/service/userServiceModel";
+import { useToast } from "@/hooks/use-toast";
 
 export default function SignInForm() {
   const form = useForm<UserSignInType>({
@@ -19,11 +23,28 @@ export default function SignInForm() {
     },
   });
 
+  const { toast } = useToast();
+
   const onSubmit: SubmitHandler<UserSignInType> = async (data) => {
     try {
-      console.log(data);
+      const res = await SignInApi(data);
+
+      toast({
+        title: "Sign in successful",
+        description: `Welcome back, ${res.user.email}`,
+      });
     } catch (error: unknown) {
       console.error(error);
+      form.setError("root", {
+        message: error instanceof Error ? error.message : "An error occurred",
+      });
+
+      toast({
+        title: "Sign in failed",
+        variant: "destructive",
+        description:
+          error instanceof Error ? error.message : "An error occurred",
+      });
     }
   };
   return (
@@ -56,7 +77,11 @@ export default function SignInForm() {
               </FormItem>
 
               {/* error */}
-              {fieldState.error && <div className="text-red-600 text-end bg-white">{fieldState.error.message}</div>}
+              {fieldState.error && (
+                <div className="text-red-600 text-end bg-white">
+                  {fieldState.error.message}
+                </div>
+              )}
             </div>
           )}
         />
@@ -87,10 +112,21 @@ export default function SignInForm() {
               </FormItem>
 
               {/* error */}
-              {fieldState.error && <div className="text-red-600 text-end bg-white">{fieldState.error.message}</div>}
+              {fieldState.error && (
+                <div className="text-red-600 text-end bg-white">
+                  {fieldState.error.message}
+                </div>
+              )}
             </div>
           )}
         />
+
+        {/* error */}
+        {form.formState.errors.root && (
+          <div className="text-red-600 text-end bg-white">
+            {form.formState.errors.root?.message}
+          </div>
+        )}
 
         <div className="flex flex-col">
           <Button
@@ -102,6 +138,14 @@ export default function SignInForm() {
           border-b-4 border-r-2 border-slate-500
         "
           >
+            {form.formState.isSubmitting && (
+              <Image
+                src={loadingSpinner}
+                alt="loading spinner"
+                width={20}
+                height={20}
+              />
+            )}
             sign in
           </Button>
 
@@ -117,7 +161,7 @@ export default function SignInForm() {
           hover:underline
           "
           >
-            <Link href="/signup">sign up</Link>
+            <Link href="/signup">dont have an account? sign up</Link>
           </Button>
         </div>
       </form>

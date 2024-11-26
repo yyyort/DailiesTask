@@ -8,15 +8,15 @@ export default {
 		"./src/app/**/*.{js,ts,jsx,tsx,mdx}",
 	],
 	theme: {
-		screens: {
-			'phone-sm': '320px',
-			'phone': '480px',
-			'tablet': '640px',
-			'laptop': '1024px',
-			'desktop': '1280px',
-			'2k': '1440px',
-		},
 		extend: {
+			screens: {
+				'phone-sm': '320px',
+				'phone': '480px',
+				'tablet': '640px',
+				'laptop': '1024px',
+				'desktop': '1280px',
+				'2k': '1440px',
+			},
 			colors: {
 				background: 'hsl(var(--background))',
 				foreground: 'hsl(var(--foreground))',

@@ -15,7 +15,8 @@ export const UserCreateSchema = UserModelSchema.pick({ email: true, password: tr
     data => data.password === data.confirmPassword,
     {
         message: "Passwords do not match",
-    }
+        path: ["confirmPassword"],
+    },
 );
 export const UserSignInSchema = UserModelSchema.pick({ email: true, password: true });
 export const UserUpdateSchema = z.object({
