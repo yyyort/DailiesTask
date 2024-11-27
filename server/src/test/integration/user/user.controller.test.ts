@@ -1,5 +1,5 @@
 
-import { afterEach, describe, expect, it } from "vitest";
+import { afterAll, afterEach, describe, expect, it } from "vitest";
 import request from "supertest";
 import { db } from "../../../db/db";
 import { usersTable } from "../../../db/schema";
@@ -19,6 +19,12 @@ describe("user controller integration test", () => {
             password: "password",
             confirmPassword: "password"
         }
+
+        afterAll(async () => {
+            await db.delete(usersTable).where(
+                eq(usersTable.email, userTest.email)
+            );
+        });
 
         //clean ups
         beforeEach(async () => {
@@ -194,6 +200,13 @@ describe("user controller integration test", () => {
         const token = response.body.accessToken;
         const userId = response.body.user.id;
 
+        //clean ups
+        afterAll(async () => {
+            await db.delete(usersTable).where(
+                eq(usersTable.email, authUserTest.email)
+            );
+        });
+
 
         //get user test
         describe("GET /api/user/:id", () => {
@@ -312,7 +325,7 @@ describe("user controller integration test", () => {
             );
         }
         );
-
+        
         describe("GET /api/user/:id", () => {
             it('should return 401', async () => {
                 const res = await req

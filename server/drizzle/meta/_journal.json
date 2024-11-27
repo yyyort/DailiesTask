@@ -8,6 +8,13 @@
       "when": 1732459445534,
       "tag": "0000_petite_proudstar",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1732708112470,
+      "tag": "0001_jittery_rocket_raccoon",
+      "breakpoints": true
     }
   ]
 }

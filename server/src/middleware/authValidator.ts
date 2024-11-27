@@ -1,10 +1,11 @@
 import { NextFunction, Request, Response } from "express";
 import { verifyToken } from "../util/jwt.util";
+import { ApiError } from "../util/apiError";
 
 export const authValidator = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const authHeader = req.headers['authorization'];
-    
+
         if (!authHeader?.startsWith('Bearer ')) {
             res.status(401).send('Unauthorized')
             return;
@@ -20,6 +21,13 @@ export const authValidator = async (req: Request, res: Response, next: NextFunct
 
         next();
     } catch (error: unknown) {
-        res.status(400).json({ message: (error as Error).message });
+        console.error((error as Error).message);
+        console.error(error);
+        if (error instanceof ApiError) {
+            res.status(error.status).json({ message: error.message });
+            return;
+        }
+
+        res.status(500).json({ message: (error as Error).message });
     }
 }

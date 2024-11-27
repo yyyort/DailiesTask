@@ -7,6 +7,7 @@ import helmet from 'helmet';
 import morgan from 'morgan';
 
 import UserRoutes from './route/user.route';
+import TaskRoutes from './route/task.route';
 
 /* config */
 dotenv.config();
@@ -27,6 +28,7 @@ app.get('/', (_: Request, res: Response) => {
 });
 
 app.use('/api', UserRoutes);
+app.use('/api', TaskRoutes);
 
 /* server */
 app.listen(PORT, () => {
