@@ -9,6 +9,8 @@ import { ThemedButton } from "../ui/ThemedButton";
 import { Colors } from "@/lib/constants/Colors";
 import SocialAuth from "./socialAuth";
 import { Link } from "expo-router";
+import Toast from "react-native-toast-message";
+import { SignInApi } from "@/service/userUserService";
 
 export default function SignInForm() {
   const {
@@ -24,11 +26,29 @@ export default function SignInForm() {
     },
   });
 
-  const onSubmit: SubmitHandler<UserSignInType> = (data) => {
+  const onSubmit: SubmitHandler<UserSignInType> = async (data) => {
     try {
-      console.log(data);
-    } catch (error) {
+      const res = await SignInApi(data);
+
+      Toast.show({
+        type: "success",
+        text1: "Success",
+        text2: `Welcome back ${res.user.email}`,
+        text1Style: { fontSize: 20 },
+        text2Style: { fontSize: 15 },
+      });
+    } catch (error: unknown) {
       console.error(error);
+      Toast.show({
+        type: "error",
+        text1: "Error",
+        text2: error instanceof Error ? error.message : "Something went wrong",
+        text1Style: { fontSize: 20 },
+        text2Style: { fontSize: 15 },
+      });
+      setError("root", 
+        { message: error instanceof Error ? error.message : "Something went wrong" }
+      );
     }
   };
 

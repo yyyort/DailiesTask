@@ -70,6 +70,7 @@ export function ThemedTextInput({
         style={{
           position: "relative",
           cursor: "pointer",
+          zIndex: 10,
         }}
         onPress={() => {
           if (type === "password") {
@@ -79,19 +80,12 @@ export function ThemedTextInput({
       >
         {type === "password" ? (
           showPassword ? (
-            <Ionicons
-              name="eye"
-              size={24}
-              color={color}
-              onPress={() => setShowPassword(true)}
-              style={styles.eye}
-            />
+            <Ionicons name="eye" size={24} color={color} style={styles.eye} />
           ) : (
             <Ionicons
               name="eye-off"
               size={24}
               color={color}
-              onPress={() => setShowPassword(false)}
               style={styles.eye}
             />
           )
