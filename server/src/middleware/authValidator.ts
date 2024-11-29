@@ -4,7 +4,9 @@ import { ApiError } from "../util/apiError";
 
 export const authValidator = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const authHeader = req.headers['authorization'];
+        const authHeader = req.headers.authorization;
+
+        console.log(authHeader);
 
         if (!authHeader?.startsWith('Bearer ')) {
             res.status(401).send('Unauthorized')
@@ -13,7 +15,9 @@ export const authValidator = async (req: Request, res: Response, next: NextFunct
 
         const token = authHeader!.split(' ')[1];
 
-        const payload = await verifyToken(token);
+        console.log(token);
+
+        const payload = await verifyToken(token, 'access');            
 
         const { id } = payload;
 

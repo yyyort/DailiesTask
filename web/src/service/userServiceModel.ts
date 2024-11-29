@@ -1,3 +1,4 @@
+"use server";
 import { UserCreateType, UserSignInType } from "@/model/userModel";
 import { config } from "dotenv";
 
@@ -13,6 +14,7 @@ export const SignUpApi = async (data: UserCreateType) => {
 
     const res = await fetch(api + "/api/user/signup", {
       method: "POST",
+      credentials: "include",
       headers: {
         "Content-Type": "application/json",
       },
@@ -44,6 +46,7 @@ export const SignInApi = async (data: UserSignInType) => {
 
     const res = await fetch(api + "/api/user/signin", {
       method: "POST",
+      credentials: "include",
       headers: {
         "Content-Type": "application/json",
       },

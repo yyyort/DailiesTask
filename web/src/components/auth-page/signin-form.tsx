@@ -13,6 +13,7 @@ import loadingSpinner from "@/assets/logo/loading-spinner.svg";
 import Image from "next/image";
 import { SignInApi } from "@/service/userServiceModel";
 import { useToast } from "@/hooks/use-toast";
+import { useRouter } from "next/navigation";
 
 export default function SignInForm() {
   const form = useForm<UserSignInType>({
@@ -24,6 +25,7 @@ export default function SignInForm() {
   });
 
   const { toast } = useToast();
+  const router = useRouter(); 
 
   const onSubmit: SubmitHandler<UserSignInType> = async (data) => {
     try {
@@ -33,6 +35,9 @@ export default function SignInForm() {
         title: "Sign in successful",
         description: `Welcome back, ${res.user.email}`,
       });
+
+      //redirect to the tasks page
+      router.push("/tasks");
     } catch (error: unknown) {
       console.error(error);
       form.setError("root", {

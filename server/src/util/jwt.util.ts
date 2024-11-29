@@ -1,16 +1,45 @@
 import jwt, { JwtPayload } from 'jsonwebtoken';
 import { ApiError } from './apiError';
 import dotenv from 'dotenv';
+import { userGetService } from '../service/user.service';
 
 dotenv.config();
 
 
-export async function verifyToken(token: string): Promise<JwtPayload> {
+export async function verifyToken(token: string, type: 'refresh' | 'access'): Promise<
+    {
+        id: string,
+        email: string
+        accessToken: string
+    }> {
+    
+    const secret = type === 'refresh' ? process.env.REFRESH_TOKEN_SECRET! as string : process.env.ACCESS_TOKEN_SECRET! as string;
 
     try {
-        const payload = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET as string);
+        const decoded = jwt.verify(
+            token,
+            secret
+        ) as JwtPayload;
 
-        return payload as JwtPayload;
+        const payload = decoded as { id: string, email: string };
+
+        const user = await userGetService(payload.id);
+
+        const accessToken = jwt.sign(
+            {
+                id: user.id,
+                email: user.email
+            },
+            process.env.ACCESS_TOKEN_SECRET! as string,
+            {
+                expiresIn: '15m',
+            });
+
+        return {
+            id: user.id,
+            email: user.email,
+            accessToken: accessToken
+        }
     } catch (error: unknown) {
         if (error instanceof jwt.TokenExpiredError) {
             throw new ApiError(401, 'Token expired', error);
@@ -18,6 +47,8 @@ export async function verifyToken(token: string): Promise<JwtPayload> {
             throw new ApiError(401, 'Invalid token', error);
         } else if (error instanceof jwt.NotBeforeError) {
             throw new ApiError(401, 'Token not active', error);
+        } else if (error instanceof ApiError) {
+            throw error;
         } else {
             throw new Error((error as Error).message);
         }

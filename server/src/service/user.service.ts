@@ -7,7 +7,6 @@ import { UserCreateType, UserUpdateType, UserReturnType, UserSignInType } from "
 import { doesUserExist } from "../util/user.util";
 import { ApiError } from "../util/apiError";
 
-
 /* 
     Create a new user
 */
