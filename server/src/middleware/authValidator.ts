@@ -6,18 +6,14 @@ export const authValidator = async (req: Request, res: Response, next: NextFunct
     try {
         const authHeader = req.headers.authorization;
 
-        console.log(authHeader);
-
         if (!authHeader?.startsWith('Bearer ')) {
-            res.status(401).send('Unauthorized')
+            throw new ApiError(401, 'Unauthorized', {});
             return;
         }
 
         const token = authHeader!.split(' ')[1];
 
-        console.log(token);
-
-        const payload = await verifyToken(token, 'access');            
+        const payload = await verifyToken(token, 'access');
 
         const { id } = payload;
 

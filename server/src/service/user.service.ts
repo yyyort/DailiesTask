@@ -109,7 +109,7 @@ export async function userGetService(id: string): Promise<UserReturnType> {
 
         //if user is not found
         if (user.length <= 0) {
-            throw new ApiError(400, "No user found with that id", {});
+            throw new ApiError(404, "User not found", {});
         }
 
         return user[0];
@@ -128,28 +128,54 @@ export async function userGetService(id: string): Promise<UserReturnType> {
 */
 export async function userUpdateService(id: string, data: UserUpdateType): Promise<UserReturnType> {
     try {
+        // if id undefined or invalid
+        if (!id) {
+            throw new ApiError(400, "Invalid id", {});
+        }
+
+
         //if password is provided hash it
         if (data?.password) {
             const saltRounds = parseInt(process.env.SALT_ROUNDS as string);
-            data.password = await bcrypt.hash(data.password, saltRounds);
+            const encryptedPassword = await bcrypt.hash(data.password, saltRounds);
+
+            //update user
+            const user: UserReturnType[] = await db
+                .update(usersTable)
+                .set({
+                    email: data?.email,
+                    password: encryptedPassword,
+                })
+                .where(eq(usersTable.id, id))
+                .returning();
+
+            console.log("user find me", user);
+
+            //if user is not found
+            if (user.length <= 0) {
+                throw new ApiError(404, "User not found", {});
+            }
+
+            return user[0];
+        } else {
+            //update user
+            const user: UserReturnType[] = await db
+                .update(usersTable)
+                .set({
+                    email: data?.email,
+                })
+                .where(eq(usersTable.id, id))
+                .returning();
+
+            //if user is not found
+            if (user.length <= 0) {
+                throw new ApiError(404, "User not found", {});
+            }
+
+            return user[0];
         }
 
-        //update user
-        const user: UserReturnType[] = await db
-            .update(usersTable)
-            .set({
-                email: data?.email,
-                password: data?.password,
-            })
-            .where(eq(usersTable.id, id))
-            .returning();
 
-        //if user is not found
-        if (user.length <= 0) {
-            throw new ApiError(400, "No user found with that id", {});
-        }
-
-        return user[0];
     } catch (error: unknown) {
         console.error((error as Error));
         if (error instanceof ApiError) {
@@ -177,7 +203,7 @@ export async function userDeleteService(id: string): Promise<UserReturnType> {
 
         //if user is not found
         if (user.length <= 0) {
-            throw new ApiError(400, "No user found with that id", {});
+            throw new ApiError(404, "User not found", {});
         }
 
         return user[0];

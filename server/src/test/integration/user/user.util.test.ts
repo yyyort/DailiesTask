@@ -3,7 +3,6 @@ import { v4 as uuidv4 } from "uuid";
 import { UserModelType } from "../../../model/user.model";
 import { usersTable } from "../../../db/schema";
 import { db } from "../../../db/db";
-import { eq } from "drizzle-orm";
 import { doesUserExist } from "../../../util/user.util";
 
 describe("doesUserExist integration test", () => {
@@ -16,16 +15,13 @@ describe("doesUserExist integration test", () => {
     }
 
     beforeEach(async () => {
-        await db.delete(usersTable).where(
-            eq(usersTable.email, testUser.email)
-        )
+        await db.delete(usersTable)
     })
 
 
     afterAll(async () => {
         // Final cleanup
         await db.delete(usersTable)
-            .where(eq(usersTable.email, testUser.email))
     })
 
     // Test if user exists

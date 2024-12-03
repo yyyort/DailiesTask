@@ -1,7 +1,7 @@
 import { and, eq } from "drizzle-orm";
 import { db } from "../db/db";
 import { taskTable } from "../db/schema";
-import { TaskCreateType, TaskReturnType, TaskUpdateType, } from "../model/task.model";
+import { TaskCreateType, TaskReturnType, TaskStatusType, TaskUpdateType, } from "../model/task.model";
 import { ApiError } from "../util/apiError";
 import { taskConvertFromDb, tasksConvertFromDb } from "../util/task.util";
 
@@ -106,19 +106,21 @@ export async function taskCreateService(
             throw new ApiError(400, "Invalid status", {});
         }
 
-        //convert TaskCreateType to values needed for insert
-        const converted = {
-            timeToDo: data.timeToDo ? new Date(data.timeToDo) : null,
-            deadline: new Date(data.deadline)
+        /* const converted = {
+            //convert timeToDo time string to Date
+            timeToDo: data.timeToDo ? new Date(data.timeToDo).toDateString() : "",
+            //convert deadline string to Date
+            deadline: data.deadline ? new Date(data.deadline).toDateString() : ""
         };
+ */
 
         const task = await db.insert(taskTable).values({
             userId: userId,
             title: data.title,
             description: data.description,
             status: data.status,
-            timeToDo: converted.timeToDo,
-            deadline: converted.deadline ?? undefined
+            timeToDo: data.timeToDo,
+            deadline: data.deadline
         }).returning({
             id: taskTable.id,
             title: taskTable.title,
@@ -127,6 +129,8 @@ export async function taskCreateService(
             timeToDo: taskTable.timeToDo,
             deadline: taskTable.deadline
         })
+
+
 
         //convert data to TaskReturnType
         const taskData = await taskConvertFromDb(task[0]);
@@ -165,19 +169,13 @@ export async function taskUpdateService(
             throw new ApiError(400, "Invalid status", {});
         }
 
-        //convert date string to Date
-        const converted = {
-            timeToDo: data.timeToDo ? new Date(data.timeToDo) : undefined,
-            deadline: data.deadline ? new Date(data.deadline) : undefined
-        };
-
         const task = await db.update(taskTable)
             .set({
                 title: data.title,
                 description: data.description,
                 status: data.status,
-                timeToDo: converted.timeToDo,
-                deadline: converted.deadline
+                timeToDo: data.timeToDo,
+                deadline: data.deadline
             })
             .where(
                 and(
@@ -209,6 +207,67 @@ export async function taskUpdateService(
         }
 
         throw error;
+    }
+}
+
+//task status update
+export async function taskUpdateStatusService(
+    userId: string,
+    id: number,
+    status: TaskStatusType
+): Promise<TaskReturnType> {
+    try {
+        if (!id) {
+            console.error("Id is required");
+            throw new ApiError(400, "Id is required", {});
+        }
+
+        if (!userId) {
+            console.error("User Id is required");
+            throw new ApiError(400, "User Id is required", {});
+        }
+
+        if (status !== "todo" && status !== "done" && status !== "overdue") {
+            console.error("Invalid status");
+            throw new ApiError(400, "Invalid status", {});
+        }
+
+        const task = await db.update(taskTable)
+            .set({
+                status: status
+            })
+            .where(
+                and(
+                    eq(taskTable.userId, userId),
+                    eq(taskTable.id, id)
+                )
+            )
+            .returning({
+                id: taskTable.id,
+                title: taskTable.title,
+                description: taskTable.description,
+                status: taskTable.status,
+                timeToDo: taskTable.timeToDo,
+                deadline: taskTable.deadline
+            });
+
+        if (task.length <= 0) {
+            console.error("No task found with that id");
+            throw new ApiError(404, "No task found with that id", {});
+        }
+
+        //convert data to TaskReturnType
+        const taskData = await taskConvertFromDb(task[0]);
+
+        return taskData;
+    } catch (error: unknown) {
+        console.error((error as Error));
+        if (error instanceof ApiError) {
+            throw error;
+        }
+
+        throw new Error((error as Error).message);
+
     }
 }
 

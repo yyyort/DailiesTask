@@ -40,7 +40,7 @@ export const userSignUpController = async (req: Request, res: Response): Promise
 
         res.status(201).json({ message: "User created successfully", user: user, accessToken: accessToken });
     } catch (error: unknown) {
-        console.log(error);
+        console.error(error);
         if (error instanceof ApiError) {
             res.status(error.status).json({ message: error.message, error: error.error });
         } else {
@@ -79,6 +79,13 @@ export const userSignInController = async (req: Request, res: Response): Promise
             maxAge: 7 * 24 * 60 * 60 * 1000 // 7 day,
         });
 
+        //throw server error if token is undefined
+        if (!accessToken || !refreshToken) {
+            throw new ApiError(500, "Internal Server Error", {
+                message: "Token is undefined"
+            });
+        }
+
         res.status(200).json({ message: "User signed in successfully", user: user, accessToken: accessToken });
     } catch (error: unknown) {
         console.error(error);
@@ -96,6 +103,13 @@ export const userSignInController = async (req: Request, res: Response): Promise
 export const userGetController = async (req: Request, res: Response): Promise<void> => {
     try {
         const { id } = req.params;
+
+        //if id is undefined or not a uuid
+        if (!id || id.length !== 36) {
+            throw new ApiError(400, "Invalid id", {
+                message: "Invalid id"
+            });
+        }
 
         const user = await userGetService(id);
 
@@ -118,6 +132,13 @@ export const userUpdateController = async (req: Request, res: Response): Promise
         const { id } = req.params;
         const { email, password } = req.body;
 
+        //if id is undefined or not a uuid
+        if (!id || id.length !== 36) {
+            throw new ApiError(400, "Invalid id", {
+                message: "Invalid id"
+            });
+        }
+        
         const data = { email, password };
 
         const user = await userUpdateService(id, data);
@@ -140,6 +161,13 @@ export const userUpdateController = async (req: Request, res: Response): Promise
 export const userDeleteController = async (req: Request, res: Response): Promise<void> => {
     try {
         const { id } = req.params;
+
+        //if id is undefined or not a uuid
+        if (!id || id.length !== 36) {
+            throw new ApiError(400, "Invalid id", {
+                message: "Invalid id"
+            });
+        }
 
         const user = await userDeleteService(id);
 

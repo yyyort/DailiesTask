@@ -10,8 +10,8 @@ describe("task utils test", () => {
             title: "Test Task",
             description: "Test Description",
             status: "todo",
-            timeToDo: new Date("2023-10-01"),
-            deadline: new Date("2023-10-10")
+            timeToDo: new Date("2023-10-01").toDateString(),
+            deadline: new Date("2023-10-10").toDateString()
         };
 
         const expectedTask: TaskReturnType = {
@@ -34,7 +34,7 @@ describe("task utils test", () => {
             description: null,
             status: "todo",
             timeToDo: null,
-            deadline: new Date("2023-11-10")
+            deadline: new Date("2023-11-10").toDateString()
         };
 
         const expectedTask: TaskReturnType = {
@@ -59,8 +59,8 @@ describe("task utils test", () => {
                     title: "Test Task 1",
                     description: "Test Description 1",
                     status: "todo",
-                    timeToDo: new Date("2023-10-01"),
-                    deadline: new Date("2023-10-10")
+                    timeToDo: new Date("2023-10-01").toDateString(),
+                    deadline: new Date("2023-10-10").toDateString()
                 },
                 {
                     id: 2,
@@ -68,7 +68,7 @@ describe("task utils test", () => {
                     description: null,
                     status: "overdue",
                     timeToDo: null,
-                    deadline: new Date("2023-11-10")
+                    deadline: new Date("2023-11-10").toDateString()
                 }
             ];
 
