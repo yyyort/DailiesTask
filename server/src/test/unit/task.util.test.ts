@@ -10,7 +10,7 @@ describe("task utils test", () => {
             title: "Test Task",
             description: "Test Description",
             status: "todo",
-            timeToDo: new Date("2023-10-01").toDateString(),
+            timeToDo: new Date("00:00:00").toLocaleTimeString(),
             deadline: new Date("2023-10-10").toDateString()
         };
 
@@ -33,7 +33,7 @@ describe("task utils test", () => {
             title: "Test Task 2",
             description: null,
             status: "todo",
-            timeToDo: null,
+            timeToDo: new Date("00:00:00").toLocaleTimeString(),
             deadline: new Date("2023-11-10").toDateString()
         };
 
@@ -59,7 +59,7 @@ describe("task utils test", () => {
                     title: "Test Task 1",
                     description: "Test Description 1",
                     status: "todo",
-                    timeToDo: new Date("2023-10-01").toDateString(),
+                    timeToDo: new Date("00:00:00").toLocaleTimeString(),
                     deadline: new Date("2023-10-10").toDateString()
                 },
                 {
@@ -67,7 +67,7 @@ describe("task utils test", () => {
                     title: "Test Task 2",
                     description: null,
                     status: "overdue",
-                    timeToDo: null,
+                    timeToDo: new Date("00:00:00").toLocaleTimeString(),
                     deadline: new Date("2023-11-10").toDateString()
                 }
             ];

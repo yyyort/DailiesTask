@@ -22,6 +22,7 @@ export async function middleware(request: NextRequest) {
 
     if (isProtectedRoute) {
         return validateToken(request)
+        //return NextResponse.next()
     }
     return NextResponse.next()
 }
@@ -29,9 +30,7 @@ export async function middleware(request: NextRequest) {
 
 // middleware to check if the user is authenticated
 export async function validateToken(request: NextRequest) {
-    const refreshToken = request.cookies.get('refreshToken')?.value
-
-    console.log(refreshToken)
+    const refreshToken = request.cookies.get('refreshToken')?.value;
 
     if (!refreshToken) {
         //redirect to the signin page
@@ -47,7 +46,7 @@ export async function validateToken(request: NextRequest) {
                 'Content-Type': 'application/json',
                 'Cookie': `refreshToken=${refreshToken}`
             },
-            cache: 'force-cache',
+            cache: 'no-cache',
             next: {
                 // revalidate for 15 minutes as the access token expires in 15 minutes
                 revalidate: 15 * 60
@@ -68,6 +67,7 @@ export async function validateToken(request: NextRequest) {
             //redirect to the requested page
             return NextResponse.next()
         } else {
+        
             return NextResponse.redirect(new URL('/signin', request.url))
         }
     } catch (error) {

@@ -1,6 +1,6 @@
-"use server";
 import { UserCreateType, UserSignInType } from "@/model/userModel";
 import { config } from "dotenv";
+
 
 config();
 const api = process.env.SERVER_URL ||

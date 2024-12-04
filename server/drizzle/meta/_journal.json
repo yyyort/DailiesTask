@@ -15,6 +15,13 @@
       "when": 1732987021308,
       "tag": "0001_charming_blindfold",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1733284838775,
+      "tag": "0002_worried_sunfire",
+      "breakpoints": true
     }
   ]
 }

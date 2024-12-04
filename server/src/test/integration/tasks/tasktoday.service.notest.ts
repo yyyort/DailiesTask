@@ -104,7 +104,8 @@ describe("TaskTodayService", async () => {
                 title: "test task 3",
                 description: "test description",
                 status: "done",
-                deadline: new Date("2021-01-01").toLocaleDateString()
+                timeToDo: new Date().toLocaleTimeString(),
+                deadline: new Date("2021-01-01").toLocaleDateString(),
             });
 
             const taskToday3 = await taskTodayCreateService(
@@ -140,6 +141,7 @@ describe("TaskTodayService", async () => {
                 title: "test task 4",
                 description: "test description",
                 status: "todo",
+                timeToDo: new Date().toLocaleTimeString(),
                 deadline: "2021-01-01"
             });
 
@@ -147,6 +149,7 @@ describe("TaskTodayService", async () => {
                 title: "test task 5",
                 description: "test description",
                 status: "todo",
+                timeToDo: new Date().toLocaleTimeString(),
                 deadline: "2025-12-12"
             });
 
@@ -230,6 +233,7 @@ describe("TaskTodayService", async () => {
                     title: "test task 3",
                     description: "test description",
                     status: "done",
+                    timeToDo: new Date().toLocaleTimeString(),
                     deadline: new Date("2021-01-01").toLocaleDateString()
                 }
             );
@@ -238,6 +242,7 @@ describe("TaskTodayService", async () => {
                     title: "test task 4",
                     description: "test description",
                     status: "done",
+                    timeToDo: new Date().toLocaleTimeString(),
                     deadline: new Date("2021-01-01").toLocaleDateString()
                 }
             );

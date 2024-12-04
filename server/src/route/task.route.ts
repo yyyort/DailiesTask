@@ -3,8 +3,13 @@ import { taskCreateController, taskDeleteController, taskGetAllController, taskG
 import { authValidator } from "../middleware/authValidator";
 import { schemaValidator } from "../middleware/schemaValidator";
 import { TaskCreateSchema, taskStatusSchema, TaskUpdateSchema } from "../model/task.model";
+import { taskTodayGetController } from "../controller/taskTodayController";
 
 const router =  Router();
+
+//task today
+router.get('/task/today', authValidator, taskTodayGetController);
+
 
 router.get('/task/:id', authValidator, taskGetController);
 router.get('/task', authValidator, taskGetAllController);
@@ -12,5 +17,6 @@ router.post('/task', authValidator, schemaValidator(TaskCreateSchema), taskCreat
 router.put('/task/:id', authValidator, schemaValidator(TaskUpdateSchema), taskUpdateController);
 router.patch('/task/:id', authValidator, schemaValidator(taskStatusSchema), taskUpdateStatusController);
 router.delete('/task/:id', authValidator, taskDeleteController);
+
 
 export default router;

@@ -1,0 +1,1 @@
+ALTER TABLE "task_table" ALTER COLUMN "time_to_do" SET NOT NULL;

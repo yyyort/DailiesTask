@@ -76,8 +76,11 @@ export const userSignInController = async (req: Request, res: Response): Promise
             secure: true,
             sameSite: 'none',
             path: '/',
+            domain: 'localhost',
             maxAge: 7 * 24 * 60 * 60 * 1000 // 7 day,
         });
+
+        //res.header('Set-Cookie', `refreshToken=${refreshToken}; HttpOnly; Secure; SameSite=None; Path=/; Max-Age=604800`);
 
         //throw server error if token is undefined
         if (!accessToken || !refreshToken) {
@@ -85,6 +88,7 @@ export const userSignInController = async (req: Request, res: Response): Promise
                 message: "Token is undefined"
             });
         }
+
 
         res.status(200).json({ message: "User signed in successfully", user: user, accessToken: accessToken });
     } catch (error: unknown) {
@@ -234,12 +238,16 @@ export const userRevalidateTokenController = async (req: Request, res: Response)
         }
 
         const accessToken = decodedData.accessToken;
-
         res.status(200).json({ message: "Token revalidated successfully", user: user, accessToken: accessToken });
     } catch (error: unknown) {
         console.error(error);
         if (error instanceof ApiError) {
             res.status(error.status).json({ message: error.message });
+
+            //revoked token
+            if (error.status === 401) {
+                res.clearCookie('refreshToken');
+            }
         } else {
             res.status(500).json({ message: "Internal Server Error", error: (error as Error).message });
         }

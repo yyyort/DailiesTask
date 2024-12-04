@@ -156,17 +156,23 @@ export async function taskUpdateService(
     try {
         if (!id) {
             console.error("Id is required");
-            throw new ApiError(400, "Id is required", {});
+            throw new ApiError(400, "Id is required", {
+                id: "Id is required"
+            });
         }
 
         if (!userId) {
             console.error("User Id is required");
-            throw new ApiError(400, "User Id is required", {});
+            throw new ApiError(400, "User Id is required", {
+                userId: "User Id is required"
+            });
         }
 
         if (data.status && data.status !== "todo" && data.status !== "done" && data.status !== "overdue") {
             console.error("Invalid status");
-            throw new ApiError(400, "Invalid status", {});
+            throw new ApiError(400, "Invalid status", {
+                status: "Invalid status"
+            });
         }
 
         const task = await db.update(taskTable)

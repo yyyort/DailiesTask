@@ -23,7 +23,15 @@ export async function verifyToken(token: string, type: 'refresh' | 'access'): Pr
 
         const payload = decoded as { id: string, email: string };
 
+        if (!payload.id || !payload.email) {
+            throw new ApiError(401, 'Invalid token payload', {});
+        }
+
         const user = await userGetService(payload.id);
+
+        if (!user) {
+            throw new ApiError(401, 'User not found', {});
+        }
 
         const accessToken = jwt.sign(
             {

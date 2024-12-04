@@ -1,4 +1,4 @@
-import { and, eq, exists, lt, max, notExists, sql, } from "drizzle-orm";
+import { and, asc, eq, exists, lt, max, notExists, sql, } from "drizzle-orm";
 import { db } from "../db/db";
 import { taskTable, taskTodayTable } from "../db/schema";
 import { TaskReturnType, TaskTodayReturnType, TaskTodayType } from "../model/task.model";
@@ -21,7 +21,7 @@ export const taskTodayGetService = async (userId: string): Promise<TaskTodayRetu
             .from(taskTodayTable)
             .where(eq(taskTodayTable.userId, userId))
             .innerJoin(taskTable, eq(taskTodayTable.taskId, taskTable.id))
-            .orderBy(taskTodayTable.order);
+            .orderBy(asc(taskTodayTable.order));
 
         //convert data to TaskReturnType
         const tasks: TaskTodayReturnType[] = res.map(task => {
@@ -30,8 +30,8 @@ export const taskTodayGetService = async (userId: string): Promise<TaskTodayRetu
                 title: task.title,
                 description: task.description ?? "",
                 status: task.status,
-                timeToDo: new Date(task?.timeToDo ?? '').toLocaleTimeString(),
-                deadline: new Date(task.deadline).toLocaleDateString(),
+                timeToDo: task.timeToDo,
+                deadline: task.deadline,
                 order: task.order
             }
         })
@@ -129,10 +129,10 @@ export const taskTodaySetNewTask = async (): Promise<void> => {
                     eq(taskTable.deadline, new Date().toLocaleDateString()), //today's date
                     notExists(
                         db
-                        .select()
-                        .from(taskTodayTable)
-                        .where(eq(taskTable.id, taskTodayTable.taskId))
-                        .limit(1)
+                            .select()
+                            .from(taskTodayTable)
+                            .where(eq(taskTable.id, taskTodayTable.taskId))
+                            .limit(1)
                     )
                 )
                 //q: why do i get error missing from clause entry for table "task_table"?
@@ -156,14 +156,14 @@ export const taskTodaySetNewTask = async (): Promise<void> => {
                     .where(
                         exists(
                             db
-                            .select()
-                            .from(taskTable)
-                            .where(
-                                and(
-                                    eq(taskTable.deadline, new Date().toLocaleDateString()),
-                                    eq(taskTable.id, taskTodayTable.taskId)
+                                .select()
+                                .from(taskTable)
+                                .where(
+                                    and(
+                                        eq(taskTable.deadline, new Date().toLocaleDateString()),
+                                        eq(taskTable.id, taskTodayTable.taskId)
+                                    )
                                 )
-                            )
                         )
                     )
                     .groupBy(taskTodayTable.userId);

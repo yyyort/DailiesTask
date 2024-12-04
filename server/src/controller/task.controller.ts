@@ -22,6 +22,7 @@ export const taskGetController = async (req: Request, res: Response): Promise<vo
         }
     }
 }
+
 //get all tasks of a user
 export const taskGetAllController = async (req: Request, res: Response): Promise<void> => {
     try {
@@ -79,7 +80,13 @@ export const taskUpdateController = async (req: Request, res: Response): Promise
 
         if (!title && !description && !status && !timeToDo && !deadline) {
             console.error("No data provided to update");
-            throw new ApiError(400, "No data provided to update", {});
+            throw new ApiError(400, "No data provided to update", {
+                title: "Title is required",
+                description: "Description is required",
+                status: "Status is required",
+                timeToDo: "Time to do is required",
+                deadline: "Deadline is required"
+            });
         }
         
         const data: TaskUpdateType = {

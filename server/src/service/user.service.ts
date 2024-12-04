@@ -1,4 +1,3 @@
-import { eq } from "drizzle-orm";
 import { db } from "../db/db";
 
 import { usersTable } from "../db/schema";
@@ -6,6 +5,7 @@ import bcrypt from "bcrypt";
 import { UserCreateType, UserUpdateType, UserReturnType, UserSignInType } from "../model/user.model";
 import { doesUserExist } from "../util/user.util";
 import { ApiError } from "../util/apiError";
+import { eq } from "drizzle-orm";
 
 /* 
     Create a new user
@@ -24,7 +24,7 @@ export async function userCreateService(data: UserCreateType): Promise<UserRetur
         const hashedPassword = await bcrypt.hash(data.password, saltRounds);
 
         //create user
-        const user: UserReturnType[] = await db
+        const user = await db
             .insert(usersTable)
             .values({
                 email: data.email,
@@ -97,15 +97,21 @@ export async function userSignInService(data: UserSignInType): Promise<UserRetur
 */
 export async function userGetService(id: string): Promise<UserReturnType> {
     try {
+
+        // if id undefined or invalid
+        if (!id || id.length !== 36) {
+            throw new ApiError(400, "Invalid id", {
+                message: "Invalid id"
+            });
+        }
+
         //get user
-        const user: UserReturnType[] = await db
-            .select({
+        const user = await db.selectDistinct(
+            {
                 id: usersTable.id,
-                email: usersTable.email
-            })
-            .from(usersTable)
-            .where(eq(usersTable.id, id))
-            .limit(1);
+                email: usersTable.email,
+            }
+        ).from(usersTable).where(eq(usersTable.id, id)).limit(1);
 
         //if user is not found
         if (user.length <= 0) {
@@ -129,10 +135,11 @@ export async function userGetService(id: string): Promise<UserReturnType> {
 export async function userUpdateService(id: string, data: UserUpdateType): Promise<UserReturnType> {
     try {
         // if id undefined or invalid
-        if (!id) {
-            throw new ApiError(400, "Invalid id", {});
+        if (!id || id.length !== 36) {
+            throw new ApiError(400, "Invalid id", {
+                message: "Invalid id"
+            });
         }
-
 
         //if password is provided hash it
         if (data?.password) {
@@ -147,9 +154,12 @@ export async function userUpdateService(id: string, data: UserUpdateType): Promi
                     password: encryptedPassword,
                 })
                 .where(eq(usersTable.id, id))
-                .returning();
-
-            console.log("user find me", user);
+                .returning(
+                    {
+                        id: usersTable.id,
+                        email: usersTable.email,
+                    }
+                );
 
             //if user is not found
             if (user.length <= 0) {

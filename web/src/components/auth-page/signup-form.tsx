@@ -12,7 +12,7 @@ import Link from "next/link";
 import Image from "next/image";
 
 import loadingSpinner from "@/assets/logo/loading-spinner.svg";
-import { SignUpApi } from "@/service/userServiceModel";
+import { SignUpApi } from "@/service/userService";
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
 

@@ -24,7 +24,7 @@ export const taskTable = pgTable("task_table", {
     title: text('title').notNull(),
     description: text('description'),
     status: taskStatus('status').default('todo').notNull(),
-    timeToDo: time('time_to_do'),
+    timeToDo: time('time_to_do').notNull(),
     deadline: date('deadline').notNull(),
     createdAt: timestamp('created_at').defaultNow().notNull(),
     updatedAt: timestamp('updated_at').defaultNow().notNull().$onUpdate(() => new Date()),

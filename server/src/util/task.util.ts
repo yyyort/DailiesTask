@@ -8,8 +8,8 @@ export const taskConvertFromDb = async (task: TaskTableReturnType): Promise<Task
         title: task.title,
         description: task.description ?? "",
         status: task.status,
-        timeToDo: task.timeToDo ?? "",
-        deadline: task.deadline ?? ""
+        timeToDo: new Date(task.timeToDo).toLocaleTimeString(),
+        deadline: new Date(task.deadline).toLocaleDateString()
     }
 };
 
@@ -20,8 +20,8 @@ export const tasksConvertFromDb = async (tasks: TaskTableReturnType[]): Promise<
             title: task.title,
             description: task.description ?? "",
             status: task.status,
-            timeToDo: task.timeToDo ?? "",
-            deadline: task.deadline ?? ""
+            timeToDo: new Date(task.timeToDo).toLocaleTimeString(),
+            deadline: new Date(task.deadline).toLocaleDateString()
         }
     });
 };

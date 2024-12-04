@@ -5,9 +5,18 @@ import { cookies } from "next/headers";
 export const setAccessToken = async (token: string) => {
     (await cookies()).set('accessToken', token, {
         httpOnly: true,
-        sameSite: 'strict',
+        sameSite: 'none',
         secure: true,
         maxAge: 15 * 60  // 15 minutes
+    })
+};
+
+export const setRefreshToken = async (token: string) => {
+    (await cookies()).set('refreshToken', token, {
+        httpOnly: true,
+        sameSite: 'none',
+        secure: true,
+        maxAge: 7 * 24 * 60 * 60  // 7 days
     })
 };
 
@@ -17,6 +26,10 @@ export const getAccessToken = async () => {
 
 export const removeAccessToken = async () => {
     (await cookies()).delete('accessToken');
+}
+
+export const removeRefreshToken = async () => {
+    (await cookies()).delete('refreshToken');
 }
 
 export const authenticatedFetch = async (

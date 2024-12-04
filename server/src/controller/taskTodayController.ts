@@ -1,3 +1,4 @@
+import { TaskTodayReturnType } from "../model/task.model";
 import { taskTodayGetService } from "../service/taskToday.service";
 import { ApiError } from "../util/apiError";
 import { Request, Response } from "express";
@@ -6,7 +7,7 @@ export const taskTodayGetController = async (req: Request, res: Response): Promi
     try {
         const userId = req.body.userId;
 
-        const tasks = await taskTodayGetService(userId);
+        const tasks: TaskTodayReturnType[] = await taskTodayGetService(userId);
 
         res.status(200).json({ message: "Tasks retrieved successfully", tasks: tasks });
 
