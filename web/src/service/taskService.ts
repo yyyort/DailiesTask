@@ -1,9 +1,12 @@
 "use server"
-import { TaskCreateType, TaskReturnType, TaskStatusType, TaskTodayReturnType } from "@/model/task.model";
+import { TaskCreateType, TaskReturnType, TaskStatusType, TaskTodayReturnType, TaskUpdateType } from "@/model/task.model";
 import { getAccessToken } from "./authService";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 
+/* 
+    get all tasks
+*/
 export const taskGetService = async (): Promise<TaskReturnType[]> => {
     try {
         const accessToken = await getAccessToken();
@@ -47,6 +50,10 @@ export const taskGetService = async (): Promise<TaskReturnType[]> => {
     }
 }
 
+
+/* 
+    get all today tasks
+*/
 export const taskTodayGetService = async (): Promise<TaskTodayReturnType[]> => {
     try {
         const accessToken = await getAccessToken();
@@ -58,6 +65,7 @@ export const taskTodayGetService = async (): Promise<TaskTodayReturnType[]> => {
                 'Content-Type': 'application/json',
                 Authorization: `Bearer ${accessToken}`
             },
+            cache: 'force-cache'
         });
 
         if (!res.ok) {
@@ -91,6 +99,10 @@ export const taskTodayGetService = async (): Promise<TaskTodayReturnType[]> => {
     }
 };
 
+
+/* 
+    create a task
+*/
 export const taskCreateService = async (data: TaskCreateType): Promise<void> => {
     try {
         const accessToken = await getAccessToken();
@@ -129,6 +141,54 @@ export const taskCreateService = async (data: TaskCreateType): Promise<void> => 
     }
 };
 
+
+/* 
+    update task
+*/
+export const taskUpdateService = async (id: number, data: TaskUpdateType): Promise<void> => {
+    try {
+        const accessToken = await getAccessToken();
+
+        const response = await fetch(`http://localhost:4000/api/task/${id}`, {
+            method: 'PUT',
+            credentials: "include",
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${accessToken}`
+            },
+            body: JSON.stringify(data),
+            cache: 'no-cache'
+        })
+
+
+        if (!response.ok) {
+            console.error(response.json());
+            if (response.status === 401) {
+                throw new Error('Unauthorized');
+            }
+        }
+
+        // revalidate the tasks
+        revalidatePath('/tasks');
+
+    } catch (error: unknown) {
+        console.error(error);
+        if (error instanceof Error) {
+            console.error(error);
+
+            if (error.message === 'Unauthorized') {
+                redirect('/signin');
+            } else {
+                console.error(error);
+            }
+        }
+    }
+}
+
+
+/* 
+    update task status
+*/
 export const taskUpdateStatusService = async (id: number, status: TaskStatusType): Promise<void> => {
     try {
         const accessToken = await getAccessToken();
@@ -156,6 +216,47 @@ export const taskUpdateStatusService = async (id: number, status: TaskStatusType
         // revalidate the tasks
         revalidatePath('/tasks');
 
+    } catch (error: unknown) {
+        console.error(error);
+        if (error instanceof Error) {
+            console.error(error);
+
+            if (error.message === 'Unauthorized') {
+                redirect('/signin');
+            } else {
+                console.error(error);
+            }
+        }
+    }
+}
+
+/* 
+    delete a task
+*/
+export const taskDeleteService = async (id: number): Promise<void> => {
+    try {
+        const accessToken = await getAccessToken();
+
+        const response = await fetch(`http://localhost:4000/api/task/${id}`,
+            {
+                method: 'DELETE',
+                credentials: "include",
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${accessToken}`
+                }
+            }
+        )
+
+        if (!response.ok) {
+            console.error(response.json());
+            if (response.status === 401) {
+                throw new Error('Unauthorized');
+            }
+        }
+
+        // revalidate the tasks
+        revalidatePath('/tasks');
     } catch (error: unknown) {
         console.error(error);
         if (error instanceof Error) {

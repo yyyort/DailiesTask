@@ -16,14 +16,9 @@ export default async function Tasks() {
     phone-sm:px-10 phone-sm:py-10
     "
     >
-      <h1
-        className="font-extrabold
-        phone-sm:text-4xl
-      "
-      >
-        Tasks
-      </h1>
-
+      {/* 
+        task today / tasks header
+      */}
       <div className="flex flex-col">
         <div className="flex flex-col ml-auto">
           <h1 className="text-2xl text-slate-800 text-end">task today</h1>
@@ -46,15 +41,24 @@ export default async function Tasks() {
           </div>
         </div>
 
+        {/* 
+          tasks filter
+        */}
+
+        {/* 
+          tasks container
+        */}
         <div className="flex flex-col gap-4 mt-3">
           <Suspense fallback={<div>Loading...</div>}>
             {tasks.map((task) => (
-              <TaskContainer {...task} key={task.id} />
+              <TaskContainer key={task.id} task={task} />
             ))}
           </Suspense>
         </div>
 
-        {/* action button for mobile: adding task */}
+        {/* 
+        action button for mobile: adding task 
+        */}
         <TaskAddButton />
       </div>
     </div>

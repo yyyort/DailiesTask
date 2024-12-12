@@ -1,22 +1,13 @@
 import Sidebar from "@/components/sidebar/sidebar";
 
 export default async function Layout({
-    children,
+  children,
 }: {
-    children: React.ReactNode,
+  children: React.ReactNode;
 }) {
-
   return (
-    <div className="flex flex-row">
-      <div
-        className="
-        phone-sm:hidden
-        tablet:block
-        "
-      >
-        <Sidebar />
-      </div>
-
+    <div className="flex flex-row gap-2">
+      <Sidebar />
       <div className="flex flex-col">
         <div>{children}</div>
       </div>
