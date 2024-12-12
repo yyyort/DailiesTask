@@ -54,19 +54,21 @@ export const taskGetService = async (): Promise<TaskReturnType[]> => {
 /* 
     get all today tasks
 */
-export const taskTodayGetService = async (): Promise<TaskTodayReturnType[]> => {
+export const taskTodayGetService = async (filter?: TaskStatusType[]): Promise<TaskTodayReturnType[]> => {
     try {
         const accessToken = await getAccessToken();
 
-        const res = await fetch('http://localhost:4000/api/task/today', {
-            method: 'GET',
-            credentials: 'include',
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${accessToken}`
-            },
-            cache: 'force-cache'
-        });
+        const res = await fetch(
+            'http://localhost:4000/api/task/today' + (filter ? `?filter=${filter.join(' ')}` : '')
+            , {
+                method: 'GET',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${accessToken}`
+                },
+                cache: 'force-cache'
+            });
 
         if (!res.ok) {
             if (res.status === 401) {

@@ -1,13 +1,53 @@
-import { and, asc, eq, exists, lt, max, notExists, sql, } from "drizzle-orm";
+import { and, asc, eq, exists, lt, max, notExists, or, sql, } from "drizzle-orm";
 import { db } from "../db/db";
 import { taskTable, taskTodayTable } from "../db/schema";
-import { TaskReturnType, TaskTodayReturnType, TaskTodayType } from "../model/task.model";
+import { TaskReturnType, TaskStatusType, TaskTodayReturnType, TaskTodayType } from "../model/task.model";
 import { ApiError } from "../util/apiError";
 import cron from "node-cron";
 
 
-export const taskTodayGetService = async (userId: string): Promise<TaskTodayReturnType[]> => {
+export const taskTodayGetService = async (userId: string, filter?: TaskStatusType[]): Promise<TaskTodayReturnType[]> => {
     try {
+        if (filter) {
+            const res = await db
+                .select({
+                    id: taskTable.id,
+                    title: taskTable.title,
+                    description: taskTable.description,
+                    status: taskTable.status,
+                    timeToDo: taskTable.timeToDo,
+                    deadline: taskTable.deadline,
+                    order: taskTodayTable.order
+                })
+                .from(taskTodayTable)
+                .where(
+                    and(
+                        eq(taskTodayTable.userId, userId),
+                        or(
+                            ...filter.map(status => eq(taskTable.status, status))
+                        )
+                    )
+                )
+                .innerJoin(taskTable, eq(taskTodayTable.taskId, taskTable.id))
+                .orderBy(asc(taskTodayTable.order));
+
+
+            //convert data to TaskReturnType
+            const tasks: TaskTodayReturnType[] = res.map(task => {
+                return {
+                    id: task.id,
+                    title: task.title,
+                    description: task.description ?? "",
+                    status: task.status,
+                    timeToDo: task.timeToDo,
+                    deadline: task.deadline,
+                    order: task.order
+                }
+            })
+
+            return tasks;
+        }
+
         const res = await db
             .select({
                 id: taskTable.id,
