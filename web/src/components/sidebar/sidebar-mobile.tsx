@@ -8,8 +8,9 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "../ui/sheet";
+import SidebarLinks from "./sidebar-links";
 
-export default function Sidebar() {
+export default function SidebarMobile() {
   return (
     <div
       className="fixed top-10 mx-2
@@ -33,10 +34,7 @@ export default function Sidebar() {
           <SheetHeader className="flex flex-col gap-5 justify-start items-start">
             <SheetTitle>DailiesTask</SheetTitle>
             <div className="flex flex-col gap-5">
-              <h1>Dashboard</h1>
-              <h1>Tasks</h1>
-              <h1>Calendar</h1>
-              <h1>Settings</h1>
+              <SidebarLinks />
             </div>
           </SheetHeader>
 

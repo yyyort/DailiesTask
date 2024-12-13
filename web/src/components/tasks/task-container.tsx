@@ -2,22 +2,29 @@ import { TaskReturnType } from "@/model/task.model";
 import { Checkbox } from "../ui/checkbox";
 import { taskUpdateStatusService } from "@/service/taskService";
 import TaskPopOver from "./task-popover";
+import { cn } from "@/lib/utils";
 
-export default function TaskContainer({
-  task,
-}: {
-  task: TaskReturnType,
-}) {
+export default function TaskContainer({ task }: { task: TaskReturnType }) {
   return (
-    <div className="bg-slate-100 rounded-md p-4 shadow-md border-b-2 border-r-2 border-slate-200 backdrop-blur-md backdrop-filter flex flex-row">
+    <div
+      className={cn(`bg-slate-100 rounded-md p-4 shadow-md border-b-2 border-r-2 border-slate-200 backdrop-blur-md backdrop-filter flex flex-row
+      laptop:mb-4
+    `, task.status === "overdue" && "bg-red-300 bg-opacity-80")}
+    >
       <div className="flex ml-[-1rem] items-start">
-        <TaskPopOver
-          task={task}
-        />
+        <TaskPopOver task={task} />
       </div>
       <div className="flex flex-col w-full gap-2">
         <div className="flex justify-between">
-          <h1 className="text-2xl font-semibold">{task.title}</h1>
+          <div className="flex flex-col w-full overflow-auto">
+            <h1 className="text-2xl font-semibold">{task.title}</h1>
+            <p className="text-slate-600 text-sm w-full overflow-auto">
+              {(task.description ?? "").length > 100
+                ? task.description?.slice(0, 100) + "..."
+                : task.description}
+            </p>
+          </div>
+
           <div>
             <Checkbox
               checked={task.status === "done"}

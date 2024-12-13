@@ -1,9 +1,7 @@
-"use client"
+"use client";
 
 import React from "react";
 import { Button } from "../ui/button";
-import plusWhite from "@/assets/logo/plus-white.svg";
-import Image from "next/image";
 import {
   Sheet,
   SheetContent,
@@ -12,38 +10,35 @@ import {
   SheetTrigger,
 } from "../ui/sheet";
 import TaskAddForm from "./task-add-form";
+import { PlusIcon } from "@radix-ui/react-icons";
+import useWindowSize from "@/hooks/useWindow";
 
 export default function TaskAddButton() {
   const [sheetOpen, setSheetOpen] = React.useState(false);
+  const size = useWindowSize();
+
+  console.log(size);
 
   return (
     <>
-      <Sheet
-        open={sheetOpen}
-       onOpenChange={setSheetOpen}
-      >
-        <SheetTrigger asChild
-          
-        >
-          <div className="absolute right-5 bottom-20">
+      <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
+        <SheetTrigger asChild>
+          <div className="">
             {/* action button for mobile: adding task */}
-            <Button className="rounded-full size-20"
+            <Button
+              className="flex flex-row items-center gap-2 p-7 text-2xl"
               onClick={() => setSheetOpen(true)}
             >
-              <Image
-                src={plusWhite}
-                alt="plus"
-                width={50}
-                height={50}
-                className=""
-              />
+              <PlusIcon className="size-full" />
+              <p>Add task</p>
             </Button>
           </div>
         </SheetTrigger>
-        <SheetContent
-          side={"bottom"}
-          className="h-1/2 flex flex-col justify-around"
-        >
+        <SheetContent side={
+          size.width ?? 0 > 640 ? "right" : "bottom"
+        } className="flex flex-col
+          tablet:max-w-[30rem]
+        ">
           <SheetHeader>
             <SheetTitle className="text-start text-2xl font-bold">
               Add Task
@@ -51,9 +46,7 @@ export default function TaskAddButton() {
           </SheetHeader>
 
           {/* form */}
-          <TaskAddForm
-            setSheetOpen={setSheetOpen}
-          />
+          <TaskAddForm setSheetOpen={setSheetOpen} />
         </SheetContent>
       </Sheet>
     </>

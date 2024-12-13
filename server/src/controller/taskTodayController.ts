@@ -6,11 +6,7 @@ import { Request, Response } from "express";
 export const taskTodayGetController = async (req: Request, res: Response): Promise<void> => {
     try {
         const userId = req.body.userId;
-        const query = req.query;
-        const filter = query.filter;
-
-        console.log("filter", filter);
-        console.log("query", query);
+        const filter = req.query.filter;
 
         if (filter) {
             const splitFilter: TaskStatusType[] = (filter as string).split(" ") as TaskStatusType[];

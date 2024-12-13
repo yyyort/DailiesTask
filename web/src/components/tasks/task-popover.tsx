@@ -14,9 +14,11 @@ import {
 import { TaskReturnType } from "@/model/task.model";
 import TaskEditForm from "./task-edit-form";
 import { taskDeleteService } from "@/service/taskService";
+import useWindowSize from "@/hooks/useWindow";
 
 export default function TaskPopOver({ task }: { task: TaskReturnType }) {
   const [sheetOpen, setSheetOpen] = React.useState(false);
+  const size = useWindowSize();
 
   return (
     <>
@@ -24,7 +26,10 @@ export default function TaskPopOver({ task }: { task: TaskReturnType }) {
         <PopoverTrigger>
           <EllipsisVerticalIcon className="size-7" />
         </PopoverTrigger>
-        <PopoverContent className="flex flex-col gap-2 w-32">
+        <PopoverContent className="flex flex-col gap-2 w-32 
+        phone-sm:mx-10
+        laptop:ml-20
+        ">
           <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
             <SheetTrigger asChild>
               <Button variant={"outline"} onClick={() => {}}>
@@ -33,8 +38,10 @@ export default function TaskPopOver({ task }: { task: TaskReturnType }) {
             </SheetTrigger>
 
             <SheetContent
-              side={"bottom"}
-              className="h-1/2 flex flex-col justify-around"
+              side={
+                size.width ?? 0 > 640 ? "right" : "bottom"
+              }
+              className="flex flex-col"
             >
               <SheetHeader>
                 <SheetTitle className="text-start text-2xl font-bold">

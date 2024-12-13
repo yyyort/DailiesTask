@@ -1,27 +1,30 @@
 "use server";
 
 import TaskAddButton from "@/components/tasks/task-add-button";
-import TaskContainer from "@/components/tasks/task-container";
 import TaskFilter from "@/components/tasks/task-filter";
 
 import { TaskReturnType, TaskStatusType } from "@/model/task.model";
 import { taskTodayGetService } from "@/service/taskService";
+import TaskMobile from "./tasks-mobile";
 import { Suspense } from "react";
+import TasksLaptop from "./tasks-laptop";
 
 type SearchParams = Promise<{ [key: string]: string | string[] | undefined }>;
 
-export default async function Tasks(
-  props: { searchParams: SearchParams }
-) {
-  const searchParams =  await props.searchParams;
+export default async function Tasks(props: { searchParams: SearchParams }) {
+  const searchParams = await props.searchParams;
 
-  const filter: TaskStatusType[] = (Array.isArray(searchParams.filter) ? searchParams.filter : [searchParams.filter]).filter(Boolean) as TaskStatusType[];
+  const filter: TaskStatusType[] = (
+    Array.isArray(searchParams.filter)
+      ? searchParams.filter
+      : [searchParams.filter]
+  ).filter(Boolean) as TaskStatusType[];
 
   const tasks: TaskReturnType[] = await taskTodayGetService(filter);
 
   return (
     <div
-      className="h-screen w-screen flex flex-col
+      className="h-screen w-full flex flex-col
     phone-sm:px-10 phone-sm:py-10
     "
     >
@@ -29,20 +32,32 @@ export default async function Tasks(
         task today / tasks header
       */}
       <div className="flex flex-col">
-        <div className="flex flex-col ml-auto">
-          <h1 className="text-2xl text-slate-800 text-end">task today</h1>
-          <div className="flex flex-row items-center gap-2 text-slate-600">
-            {/* date today */}
-            <h3
-              className="
+        <div className="
+          phone-sm:flex phone-sm:flex-col phone-sm:gap-4 phone-sm:items-end
+        laptop:flex laptop:flex-row-reverse laptop:justify-between laptop:w-full laptop:pb-4">
+          <div
+            className="
+            phone-sm:hidden
+            laptop:block
+            "
+          >
+            <TaskAddButton />
+          </div>
+          <div className="flex flex-col">
+            <h1 className="text-2xl text-slate-800 text-end">task today</h1>
+            <div className="flex flex-row items-center gap-2 text-slate-600">
+              {/* date today */}
+              <h3
+                className="
                 phone-sm:text-sm
               "
-            >
-              {new Date().toLocaleString("en-US", {
-                month: "long",
-                day: "numeric",
-              })}
-            </h3>
+              >
+                {new Date().toLocaleString("en-US", {
+                  month: "long",
+                  day: "numeric",
+                })}
+              </h3>
+            </div>
           </div>
         </div>
 
@@ -51,6 +66,8 @@ export default async function Tasks(
         */}
         <div className="flex justify-between items-center">
           <TaskFilter />
+
+          {/* task count */}
           <h3 className="text-2xl text-slate-600">
             {tasks.filter((task) => task.status === "done").length} /{" "}
             {tasks.length}
@@ -60,18 +77,39 @@ export default async function Tasks(
         {/* 
           tasks container
         */}
-        <div className="flex flex-col gap-4 mt-3">
+
+        {/* mobile */}
+        <div
+          className="
+            phone-sm:flex phone-sm:flex-col phone-sm:gap-4
+            laptop:hidden
+          "
+        >
           <Suspense fallback={<div>Loading...</div>}>
-            {tasks.map((task) => (
-              <TaskContainer key={task.id} task={task} />
-            ))}
+            <TaskMobile tasks={tasks} />
           </Suspense>
+
+          <div
+            className="
+            laptop:hidden
+            phone-sm:absolute phone-sm:bottom-14 phone-sm:right-5 phone-sm:mb-5
+          "
+          >
+            <TaskAddButton />
+          </div>
         </div>
 
-        {/* 
-        action button for mobile: adding task 
-        */}
-        <TaskAddButton />
+        {/* laptop */}
+        <div
+          className="
+            phone-sm:hidden
+            laptop:grid
+          "
+        >
+          <Suspense fallback={<div>Loading...</div>}>
+            <TasksLaptop tasks={tasks} />
+          </Suspense>
+        </div>
       </div>
     </div>
   );
