@@ -4,6 +4,7 @@ import { z } from 'zod';
 export const TaskSchema = z.object({
     id: z.number(),
     user_id: z.string(),
+    routineId: z.string().optional().nullable(),
     title: z.string().refine(data => data.length > 0, {
         message: "Title is required"
     }),
@@ -17,9 +18,10 @@ export const TaskSchema = z.object({
 
 export const TaskReturnSchema = TaskSchema.omit({ user_id: true, createdAt: true, updatedAt: true });
 
-export const TaskCreateSchema = TaskSchema.pick({ title: true, description: true, status: true, timeToDo: true, deadline: true })
+export const TaskCreateSchema = TaskSchema.pick({ title: true, description: true, status: true, timeToDo: true, deadline: true, routineId: true });
 
 export const TaskUpdateSchema = z.object({
+    routineId: z.string().optional().nullable(),
     title: z.string().optional(),
     description: z.string().optional(),
     status: z.enum(["todo", "done", "overdue"]).optional(),
@@ -49,5 +51,4 @@ export const TaskTodaySchema = z.object({
 })
 
 export type TaskTodayType = z.infer<typeof TaskTodaySchema>;
-
 

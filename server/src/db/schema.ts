@@ -21,6 +21,10 @@ export const taskTable = pgTable("task_table", {
         onDelete: 'cascade',
         onUpdate: 'cascade',
     }),
+    routineId: uuid('routine_id').references(() => routineTable.id, {
+        onDelete: 'cascade',
+        onUpdate: 'cascade',
+    }),
     title: text('title').notNull(),
     description: text('description'),
     status: taskStatus('status').default('todo').notNull(),
@@ -42,6 +46,19 @@ export const taskTodayTable = pgTable("task_today_table", {
     }).unique(),
     order: integer('order').notNull(),
 })
+
+export const routineTable = pgTable("routine_table", {
+    id: uuid('id').primaryKey().defaultRandom().unique().notNull(),
+    userId: uuid('user_id').notNull().references(() => usersTable.id, {
+        onDelete: 'cascade',
+        onUpdate: 'cascade',
+    }),
+    title: text('title').notNull(),
+    description: text('description'),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+    updatedAt: timestamp('updated_at').defaultNow().notNull().$onUpdate(() => new Date()),
+})
+
 
 export type InsertTask = typeof taskTable.$inferInsert;
 export type SelectTask = typeof taskTable.$inferSelect;

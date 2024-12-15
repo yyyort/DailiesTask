@@ -298,23 +298,27 @@ export const taskTodaySetOverdue = async (): Promise<void> => {
     }
 };
 
-export const taskTodayCronService = async (): Promise<void> => {
-    //every day at 00:00
-    cron.schedule('0 0 * * *', async () => {
-        try {
-            await taskTodaySetOverdue();
+export const taskTodayCronService = cron.schedule('0 49 6 * * * ', async () => {
+    try {
+        await taskTodaySetOverdue();
 
-            await taskTodayCleanUp();
+        await taskTodayCleanUp();
 
-            await taskTodaySetNewTask();
-        } catch (error: unknown) {
-            console.error((error as Error));
-            if (error instanceof ApiError) {
-                throw error;
-            }
+        await taskTodaySetNewTask();
 
-            throw new Error((error as Error).message);
+        console.log('taskTodayCronService done');
+    } catch (error: unknown) {
+        console.error((error as Error));
+        if (error instanceof ApiError) {
+            throw error;
         }
-    });
 
-};
+        throw new Error((error as Error).message);
+    }
+},
+    {
+        scheduled: true,
+        timezone: 'Asia/Manila'
+    }
+);
+

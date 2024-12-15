@@ -16,6 +16,7 @@ export async function taskGetAllService(
         const res = await db
             .select({
                 id: taskTable.id,
+                routineId: taskTable.routineId,
                 title: taskTable.title,
                 description: taskTable.description,
                 status: taskTable.status,
@@ -51,6 +52,7 @@ export async function taskGetService(
         const res = await db
             .select({
                 id: taskTable.id,
+                routineId: taskTable.routineId,
                 title: taskTable.title,
                 description: taskTable.description,
                 status: taskTable.status,
@@ -116,6 +118,7 @@ export async function taskCreateService(
 
         const task = await db.insert(taskTable).values({
             userId: userId,
+            routineId: data.routineId,
             title: data.title,
             description: data.description,
             status: data.status,
@@ -123,6 +126,7 @@ export async function taskCreateService(
             deadline: data.deadline
         }).returning({
             id: taskTable.id,
+            routineId: taskTable.routineId,
             title: taskTable.title,
             description: taskTable.description,
             status: taskTable.status,
@@ -181,7 +185,8 @@ export async function taskUpdateService(
                 description: data.description,
                 status: data.status,
                 timeToDo: data.timeToDo,
-                deadline: data.deadline
+                deadline: data.deadline,
+                routineId: data.routineId
             })
             .where(
                 and(
@@ -191,6 +196,7 @@ export async function taskUpdateService(
             )
             .returning({
                 id: taskTable.id,
+                routineId: taskTable.routineId,
                 title: taskTable.title,
                 description: taskTable.description,
                 status: taskTable.status,
@@ -250,6 +256,7 @@ export async function taskUpdateStatusService(
             )
             .returning({
                 id: taskTable.id,
+                routineId: taskTable.routineId,
                 title: taskTable.title,
                 description: taskTable.description,
                 status: taskTable.status,
@@ -292,6 +299,7 @@ export async function taskDeleteService(
             )
             .returning({
                 id: taskTable.id,
+                routineId: taskTable.routineId,
                 title: taskTable.title,
                 description: taskTable.description,
                 status: taskTable.status,

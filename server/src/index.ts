@@ -9,6 +9,8 @@ import cookieParser from 'cookie-parser';
 
 import UserRoutes from './route/user.route';
 import TaskRoutes from './route/task.route';
+import RoutineRoutes from './route/routine.route';
+import { taskTodayCronService } from './service/taskToday.service';
 
 /* config */
 dotenv.config();
@@ -39,6 +41,13 @@ app.get('/', (_: Request, res: Response) => {
 
 app.use('/api', UserRoutes);
 app.use('/api', TaskRoutes);
+app.use('/api', RoutineRoutes);
+/* 
+  cron job
+*/
+taskTodayCronService.start();
+
+
 
 /* server */
 app.listen(PORT, () => {

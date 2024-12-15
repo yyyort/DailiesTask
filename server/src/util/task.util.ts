@@ -17,6 +17,7 @@ export const tasksConvertFromDb = async (tasks: TaskTableReturnType[]): Promise<
     return tasks.map(task => {
         return {
             id: task.id,
+            routineId: task.routineId,
             title: task.title,
             description: task.description ?? "",
             status: task.status,
