@@ -4,6 +4,7 @@ import { z } from 'zod';
 export const TaskSchema = z.object({
     id: z.number(),
     user_id: z.string(),
+    routineId: z.string().optional().nullable(),
     title: z.string().refine(data => data.length > 0, {
         message: "Title is required"
     }),
@@ -17,30 +18,15 @@ export const TaskSchema = z.object({
 
 export const TaskReturnSchema = TaskSchema.omit({ user_id: true, createdAt: true, updatedAt: true });
 
-export const TaskCreateSchema = TaskSchema.pick({ title: true, description: true, status: true, timeToDo: true, deadline: true })
+export const TaskCreateSchema = TaskSchema.pick({ title: true, description: true, status: true, timeToDo: true, deadline: true, routineId: true });
 
 export const TaskUpdateSchema = z.object({
+    routineId: z.string().optional().nullable(),
     title: z.string().optional(),
     description: z.string().optional(),
     status: z.enum(["todo", "done", "overdue"]).optional(),
-    timeToDo: z.string().time().optional().refine(
-        data => {
-            if (data) {
-                return new Date(data).toLocaleTimeString()
-            } else {
-                return;
-            }
-        }
-    ),
-    deadline: z.string().date().optional().refine(
-        data => {
-            if (data) {
-                return new Date(data).toLocaleDateString()
-            } else {
-                return;
-            }
-        }
-    ),
+    timeToDo: z.string().time().optional(),
+    deadline: z.string().date().optional()
 })
 
 export type TaskType = z.infer<typeof TaskSchema>;
@@ -65,5 +51,4 @@ export const TaskTodaySchema = z.object({
 })
 
 export type TaskTodayType = z.infer<typeof TaskTodaySchema>;
-
 

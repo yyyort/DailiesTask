@@ -34,7 +34,7 @@ export default function SidebarMobile() {
           <SheetHeader className="flex flex-col gap-5 justify-start items-start">
             <SheetTitle>DailiesTask</SheetTitle>
             <div className="flex flex-col gap-5">
-              <SidebarLinks />
+              <SidebarLinks expanded={false}/>
             </div>
           </SheetHeader>
 

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { setAccessToken } from "./service/authService";
+import { setAccessToken, setUserData } from "./service/authService";
 
 export const config = {
     matcher: [
@@ -55,11 +55,11 @@ export async function validateToken(request: NextRequest) {
 
         if (res.ok) {
             //set the new access token in the header
-            const { accessToken } = await res.json()
-
+            const { accessToken, user } = await res.json()
 
             //set the new access token in the cookie
             await setAccessToken(accessToken);
+            await setUserData(user);
 
             request.headers.set('Authorization', `Bearer ${accessToken}`)     
         

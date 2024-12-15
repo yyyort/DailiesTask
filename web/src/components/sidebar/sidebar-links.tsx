@@ -1,5 +1,8 @@
+"use client";
 import { HouseIcon, ListTodoIcon } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+
 import React from "react";
 
 type Sidebarlinks = {
@@ -9,17 +12,21 @@ type Sidebarlinks = {
   onClick?: () => void;
 };
 
-export default function SidebarLinks() {
+export default function SidebarLinks({ expanded }: { expanded: boolean }) {
+  const router = useRouter();
+
   const links: Sidebarlinks[] = [
     {
       name: "home",
       href: "/",
       icon: <HouseIcon />,
+      onClick: () => router.push("/"),
     },
     {
       name: "Tasks",
       href: "/tasks",
       icon: <ListTodoIcon />,
+      onClick: () => router.push("/tasks"),
     },
   ];
 
@@ -29,10 +36,13 @@ export default function SidebarLinks() {
         <Link
           key={link.name}
           href={link.href}
-          className="flex items-center justify-center w-10 h-10 bg-slate-200 hover:bg-slate-300"
+          className="flex items-center justify-center bg-slate-200 hover:bg-slate-300 rounded-md"
           onClick={link.onClick}
         >
-          {link.icon}
+          <div className="flex p-2 gap-2">
+            {link.icon}
+            {expanded && <p>{link.name}</p>}
+          </div>
         </Link>
       ))}
     </>
