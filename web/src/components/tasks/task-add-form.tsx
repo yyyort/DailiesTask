@@ -21,7 +21,13 @@ export default function TaskAddForm({
       title: "",
       description: "",
       status: "todo",
-      timeToDo: new Date().toISOString().split("T")[1].split(".")[0], //hh:mm format
+      timeToDo: new Date().toLocaleTimeString(
+        navigator.language,
+        {
+          hour: "2-digit",
+          minute: "2-digit",
+        }
+      ).split(" ")[0], //hh:mm format
       deadline: new Date().toISOString().split("T")[0],
     },
   });

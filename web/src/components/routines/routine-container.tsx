@@ -7,7 +7,9 @@ export default function RoutineContainer({
 }: {
   routine: RoutineReturnType;
 }) {
-  const taskDone = routine.tasks?.filter((task) => task.status === "done").length;
+  const taskDone = routine.tasks?.filter(
+    (task) => task.status === "done"
+  ).length;
   const taskTotal = routine.tasks?.length;
 
   return (
@@ -22,14 +24,16 @@ export default function RoutineContainer({
       <div className="flex justify-between items-center">
         <h1 className="font-bold text-2xl">{routine.title}</h1>
         {/* count */}
-        <h3
-          className="font-thin text-lg text-slate-500"
-        >{ taskDone } / { taskTotal }</h3>
+        <h3 className="font-thin text-lg text-slate-500">
+          {taskDone} / {taskTotal}
+        </h3>
       </div>
 
-      {routine.tasks?.map((task) => (
-        <TaskContainer key={task.id} task={task} variant="routine" />
-      ))}
+      <div className="flex flex-col gap-3">
+        {routine.tasks?.map((task) => (
+          <TaskContainer key={task.id} task={task} variant="routine" />
+        ))}
+      </div>
     </div>
   );
 }

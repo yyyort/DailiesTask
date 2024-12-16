@@ -172,6 +172,7 @@ export const taskUpdateService = async (id: number, data: TaskUpdateType): Promi
 
         // revalidate the tasks
         revalidatePath('/tasks');
+        revalidatePath('/routines');
 
     } catch (error: unknown) {
         console.error(error);

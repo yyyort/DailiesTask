@@ -45,7 +45,11 @@ export default async function Routines() {
       {/* 
           routines container
       */}
-      <div>
+      <div className="grid gap-4
+      phone-sm:grid-cols-1
+      tablet:grid-cols-2
+      laptop:grid-cols-3 laptop:gap-6
+      ">
         {routines.map((routine) => (
           <RoutineContainer key={routine.id} routine={routine} />
         ))}

@@ -1,5 +1,5 @@
 "use client";
-import { HouseIcon, ListTodoIcon } from "lucide-react";
+import { HouseIcon, ListCheckIcon, SquareCheckBigIcon } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
@@ -25,8 +25,13 @@ export default function SidebarLinks({ expanded }: { expanded: boolean }) {
     {
       name: "Tasks",
       href: "/tasks",
-      icon: <ListTodoIcon />,
+      icon: <SquareCheckBigIcon />,
       onClick: () => router.push("/tasks"),
+    },
+    {
+      name: "Routines",
+      href: "/routines",
+      icon: <ListCheckIcon />,
     },
   ];
 
