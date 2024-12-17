@@ -1,17 +1,35 @@
-import { StyleSheet, Text, View } from "react-native";
-import { Redirect } from "expo-router";
+import { StyleSheet, Text, Touchable, TouchableOpacity, View } from "react-native";
+import { Link, Redirect, router } from "expo-router";
 import { ThemedView } from "@/components/ui/ThemedView";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { ThemedText } from "@/components/ui/ThemedText";
 
-export default function Index() {
-  const user = null;
+import { useAuth } from "@/hooks/useAuth";
 
-  if (!user) {
+
+export default function Index() {
+  const { isAuthenticated, isLoading } = useAuth();
+
+  /* if (!isAuthenticated) {
     return <Redirect href="/(auth)/signIn" />;
-  }
+  } */
 
   const inset = useSafeAreaInsets();
+
+  if (isLoading) {
+    return (
+      <ThemedView
+        style={{
+          flex: 1,
+          top: inset.top,
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <ThemedText>Loading...</ThemedText>
+      </ThemedView>
+    );
+  }
 
   return (
     <ThemedView
@@ -23,7 +41,13 @@ export default function Index() {
       }}
     >
       <ThemedView>
-        <ThemedText style={styles.title} type="title">DailiesTask</ThemedText>
+        <ThemedText style={styles.title} type="title">
+          DailiesTask
+        </ThemedText>
+
+        <Link href="/(home)/(tasks)">
+          <ThemedText>Tasks</ThemedText>
+        </Link>
       </ThemedView>
     </ThemedView>
   );

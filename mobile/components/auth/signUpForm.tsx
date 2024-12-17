@@ -14,10 +14,13 @@ import { ThemedButton } from "../ui/ThemedButton";
 import { Colors } from "@/lib/constants/Colors";
 import SocialAuth from "./socialAuth";
 import { Link, useRouter } from "expo-router";
-import { SignUpApi } from "@/service/userUserService";
+import { SignUpApi } from "@/service/online/userService";
 import Toast from "react-native-toast-message";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function SignUpForm() {
+  const { signUp } = useAuth();
+
   const {
     control,
     handleSubmit,
@@ -36,12 +39,12 @@ export default function SignUpForm() {
 
   const onSubmit: SubmitHandler<UserCreateType> = async (data) => {
     try {
-      const res = await SignUpApi(data);
+      const res = await signUp(data);
 
       Toast.show({
         type: "success",
         text1: "Success",
-        text2: `Welcome back ${res.user.email}`,
+        text2: `Welcome back ${res?.email}`,
         text1Style: { fontSize: 20 },
         text2Style: { fontSize: 15 },
       });

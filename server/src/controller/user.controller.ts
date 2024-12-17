@@ -245,9 +245,9 @@ export const userRevalidateTokenController = async (req: Request, res: Response)
             res.status(error.status).json({ message: error.message });
 
             //revoked token
-            if (error.status === 401) {
+            /* if (error.status === 401) {
                 res.clearCookie('refreshToken');
-            }
+            } */
         } else {
             res.status(500).json({ message: "Internal Server Error", error: (error as Error).message });
         }

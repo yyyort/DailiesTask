@@ -8,11 +8,15 @@ import { StyleSheet, TouchableOpacity } from "react-native";
 import { ThemedButton } from "../ui/ThemedButton";
 import { Colors } from "@/lib/constants/Colors";
 import SocialAuth from "./socialAuth";
-import { Link } from "expo-router";
+import { Link, useRouter } from "expo-router";
 import Toast from "react-native-toast-message";
-import { SignInApi } from "@/service/userUserService";
+import { SignInApi } from "@/service/online/userService";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function SignInForm() {
+  const { signIn } = useAuth();
+  const router = useRouter();
+
   const {
     control,
     handleSubmit,
@@ -28,15 +32,18 @@ export default function SignInForm() {
 
   const onSubmit: SubmitHandler<UserSignInType> = async (data) => {
     try {
-      const res = await SignInApi(data);
+      const res = await signIn(data);
 
       Toast.show({
         type: "success",
         text1: "Success",
-        text2: `Welcome back ${res.user.email}`,
+        text2: `Welcome back ${res?.email}`,
         text1Style: { fontSize: 20 },
         text2Style: { fontSize: 15 },
       });
+
+      // redirect to home page
+      router.replace("/");
     } catch (error: unknown) {
       console.error(error);
       Toast.show({
@@ -46,9 +53,10 @@ export default function SignInForm() {
         text1Style: { fontSize: 20 },
         text2Style: { fontSize: 15 },
       });
-      setError("root", 
-        { message: error instanceof Error ? error.message : "Something went wrong" }
-      );
+      setError("root", {
+        message:
+          error instanceof Error ? error.message : "Something went wrong",
+      });
     }
   };
 

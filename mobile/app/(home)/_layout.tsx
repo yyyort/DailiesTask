@@ -1,9 +1,11 @@
 import { ThemedView } from "@/components/ui/ThemedView";
+import { Tabs } from "expo-router";
 
-export default function Layout({ children }: { children: React.ReactNode }) {
+export default function TabLayout() {
     return (
-        <ThemedView>
-            {children}
-        </ThemedView>
+        <Tabs>
+            <Tabs.Screen name="(tasks)"/>
+            <Tabs.Screen name="(home)"/>
+        </Tabs>
     )
 } 
