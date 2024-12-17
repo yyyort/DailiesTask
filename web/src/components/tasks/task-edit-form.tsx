@@ -162,7 +162,12 @@ export default function TaskEditForm({
                     <Input
                       {...field}
                       type="time"
-                      value={field.value ?? ""}
+                      value={
+                        //transform timeToDo if format is hh:mm to hh:mm:ss
+                        field.value?.length === 5
+                            ? field.value + ":00"
+                            : field.value
+                      }
                       onChange={field.onChange}
                       className="
                       shadow-md fill-white z-10 bg-white bg-opacity-80 backdrop-filter backdrop-blur-sm

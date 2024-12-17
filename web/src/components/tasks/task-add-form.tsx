@@ -15,20 +15,23 @@ export default function TaskAddForm({
 }: {
   setSheetOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
+  const localTime = new Date()
+    .toLocaleTimeString(navigator.language, {
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+    })
+    .split(" ")[0]; //hh:mm format
+  const localDate = new Date().toISOString().split("T")[0];
+
   const form = useForm<TaskCreateType>({
     resolver: zodResolver(TaskCreateSchema),
     defaultValues: {
       title: "",
       description: "",
       status: "todo",
-      timeToDo: new Date().toLocaleTimeString(
-        navigator.language,
-        {
-          hour: "2-digit",
-          minute: "2-digit",
-        }
-      ).split(" ")[0], //hh:mm format
-      deadline: new Date().toISOString().split("T")[0],
+      timeToDo: localTime, //hh:mm format
+      deadline: localDate,
     },
   });
 
@@ -116,7 +119,12 @@ export default function TaskAddForm({
                     <Input
                       {...field}
                       type="time"
-                      value={field.value ?? ""}
+                      value={
+                        //transform timeToDo if format is hh:mm to hh:mm:ss
+                        field.value?.length === 5
+                            ? field.value + ":00"
+                            : field.value
+                      }
                       onChange={field.onChange}
                       className="
                       shadow-md fill-white z-10 bg-white bg-opacity-80 backdrop-filter backdrop-blur-sm

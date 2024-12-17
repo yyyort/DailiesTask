@@ -4,14 +4,14 @@ import RoutineFilter from "@/components/routines/routine-filters";
 import { RoutineReturnType } from "@/model/routine.model";
 import { routineGetService } from "@/service/routineService";
 
-import React from "react";
+import React, { Suspense } from "react";
 
 export default async function Routines() {
   const routines: RoutineReturnType[] = await routineGetService();
 
   return (
     <div
-      className="h-screen w-full flex flex-col
+      className="h-screen w-full flex flex-col overflow-auto
     phone-sm:px-10 phone-sm:py-10"
     >
       {/* 
@@ -24,10 +24,8 @@ export default async function Routines() {
       {/* 
           add routine
       */}
-      <div
-      className="ml-auto my-2"
-      >
-        <RoutineAddButton/>
+      <div className="ml-auto my-2">
+        <RoutineAddButton />
       </div>
 
       {/* 
@@ -39,20 +37,24 @@ export default async function Routines() {
         phone-sm:mr-auto
         "
       >
-        <RoutineFilter/>
+        <RoutineFilter />
       </div>
 
       {/* 
           routines container
       */}
-      <div className="grid gap-4
+      <div
+        className="grid gap-4
       phone-sm:grid-cols-1
       tablet:grid-cols-2
       laptop:grid-cols-3 laptop:gap-6
-      ">
-        {routines.map((routine) => (
-          <RoutineContainer key={routine.id} routine={routine} />
-        ))}
+      "
+      >
+        <Suspense fallback={<div>Loading...</div>}>
+          {routines.map((routine) => (
+            <RoutineContainer key={routine.id} routine={routine} />
+          ))}
+        </Suspense>
       </div>
     </div>
   );

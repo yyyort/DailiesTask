@@ -1,6 +1,7 @@
 import { RoutineReturnType } from "@/model/routine.model";
 import React from "react";
 import TaskContainer from "../tasks/task-container";
+import RoutinePopOver from "./routine-popever";
 
 export default function RoutineContainer({
   routine,
@@ -22,7 +23,11 @@ export default function RoutineContainer({
       "
     >
       <div className="flex justify-between items-center">
+        <div className="flex items-center gap-2">
+        <RoutinePopOver routine={routine} />
         <h1 className="font-bold text-2xl">{routine.title}</h1>
+        </div>
+        
         {/* count */}
         <h3 className="font-thin text-lg text-slate-500">
           {taskDone} / {taskTotal}

@@ -1,7 +1,6 @@
 "use client";
 
-import { RoutineAddSchema, RoutineCreateType } from "@/model/routine.model";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { RoutineReturnType, RoutineUpdateType } from "@/model/routine.model";
 import React from "react";
 import { SubmitHandler, useFieldArray, useForm } from "react-hook-form";
 import { Form, FormControl, FormField, FormItem, FormLabel } from "../ui/form";
@@ -15,12 +14,14 @@ import {
 } from "../ui/accordion";
 import { Textarea } from "../ui/textarea";
 import { Plus, X } from "lucide-react";
-import { routineAddService } from "@/service/routineService";
+import { routineUpdateService } from "@/service/routineService";
 
-export default function RoutineAddForm({
+export default function RoutineEditForm({
   setSheetOpen,
+  routine,
 }: {
   setSheetOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  routine: RoutineReturnType;
 }) {
   const localTime = new Date()
     .toLocaleTimeString(navigator.language, {
@@ -31,25 +32,20 @@ export default function RoutineAddForm({
     .split(" ")[0]; //hh:mm format
   const localDate = new Date().toISOString().split("T")[0];
 
-  const form = useForm<RoutineCreateType>({
-    resolver: zodResolver(RoutineAddSchema),
+  const form = useForm<RoutineUpdateType>({
     defaultValues: {
-      title: "",
-      description: "",
-      tasks: [
-        {
-          title: "",
-          deadline: localDate,
-          timeToDo: localTime, //hh:mm format
-          status: "todo",
-        },
-      ],
+      title: routine.title,
+      description: routine.description,
+      tasks: routine.tasks,
     },
   });
 
-  const onSubmit: SubmitHandler<RoutineCreateType> = async (data) => {
+  const onSubmit: SubmitHandler<RoutineUpdateType> = async (
+    data: RoutineUpdateType
+  ) => {
     try {
-      await routineAddService(data);
+      // call the service to update a routine
+      await routineUpdateService(data, routine.id);
 
       form.reset();
 
@@ -232,8 +228,8 @@ export default function RoutineAddForm({
                               value={
                                 //transform timeToDo if format is hh:mm to hh:mm:ss
                                 field.value?.length === 5
-                                    ? field.value + ":00"
-                                    : field.value
+                                  ? field.value + ":00"
+                                  : field.value
                               }
                               onChange={field.onChange}
                               className="
@@ -282,7 +278,7 @@ export default function RoutineAddForm({
 
           {/* submit button */}
           <Button type="submit" className="text-2xl py-7 mt-auto">
-            Add Routine
+            Update Routine
           </Button>
         </form>
       </Form>

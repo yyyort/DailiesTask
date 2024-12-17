@@ -10,7 +10,7 @@ export const TaskSchema = z.object({
     }),
     description: z.string().optional(),
     status: z.enum(["todo", "done", "overdue"]),
-    timeToDo: z.string().time(),
+    timeToDo: z.string().time().optional(),
     deadline: z.string().date().refine(data => new Date(data).toLocaleDateString()),
     createdAt: z.date(),
     updatedAt: z.date(),

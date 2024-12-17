@@ -17,8 +17,6 @@ export default function TaskAddButton() {
   const [sheetOpen, setSheetOpen] = React.useState(false);
   const size = useWindowSize();
 
-  console.log(size);
-
   return (
     <>
       <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>

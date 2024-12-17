@@ -3,7 +3,8 @@ import { db } from "../db/db";
 import { routineTable, taskTable } from "../db/schema";
 import { RoutineCreateType, RoutineReturnType, RoutineUpdateType } from "../model/routine.model";
 import { TaskCreateType, TaskReturnType } from "../model/task.model";
-import { taskCreateService } from "./task.service";
+import { taskCreateService, taskUpdateService } from "./task.service";
+
 
 /* 
     create routine
@@ -109,10 +110,6 @@ export async function routineGetAllService(userId: string): Promise<RoutineRetur
             }
         }))
 
-        console.log(userId)
-        console.log(resRoutines)
-        console.log(routines)
-
         return routines;
 
     } catch (error) {
@@ -199,6 +196,69 @@ export async function routineUpdateService(userId: string, id: string, data: Rou
         const routineData = {
             title: data.title,
             description: data.description
+        }
+
+        if (data.tasks) {
+            //updating tasks
+            const updatingTasks = data.tasks.filter(task => task.id !== undefined && task.id !== null);
+
+            if (updatingTasks.length > 0) {
+                console.log("updating tasks", updatingTasks);
+
+                const updatingTasksData = updatingTasks.map(task => {
+                    return {
+                        id: task.id,
+                        title: task.title,
+                        description: task.description ?? "",
+                        status: task.status,
+                        timeToDo: task.timeToDo,
+                        deadline: task.deadline
+                    }
+                })
+
+                await Promise.all(updatingTasksData.map(async task => {
+
+                    if (task.id) {
+                        await taskUpdateService(userId, Number(task.id), {
+                            title: task.title,
+                            description: task.description,
+                            status: task.status,
+                            timeToDo: task.timeToDo,
+                            deadline: task.deadline,
+                            routineId: id
+                        });
+                    }
+                })).catch(error => {
+                    throw error;
+                })
+            }
+
+
+
+            //new tasks
+            const newTasks = data.tasks.filter(task => task.id === undefined && task.id === null);
+
+            const newTasksData: TaskCreateType[] = newTasks.map(task => {
+                return {
+                    userId: userId,
+                    routineId: id,
+                    title: task.title,
+                    description: task.description ?? "",
+                    status: task.status,
+                    timeToDo: task.timeToDo,
+                    deadline: task.deadline
+                }
+            })
+
+            //create tasks
+            await Promise.all(newTasksData.map(async task => {
+                await taskCreateService(userId, task);
+            })
+            ).catch(
+                error => {
+                    throw error;
+                }
+            )
         }
 
         //update routine

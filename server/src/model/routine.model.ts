@@ -23,6 +23,9 @@ export const RoutineReturnSchema = RoutineSchema.omit({ userId: true, createdAt:
 export const RoutineUpdateSchema = z.object({
     title: z.string().optional(),
     description: z.string().optional(),
+    tasks: z.array(TaskCreateSchema.extend({
+        id: z.number().optional().nullable()
+    })).optional().nullable()
 })
 
 export type RoutineType = z.infer<typeof RoutineSchema>;

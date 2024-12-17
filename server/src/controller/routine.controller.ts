@@ -67,11 +67,12 @@ export const routineUpdateController = async (req: Request, res: Response): Prom
         const userId = req.body.userId;
         const id = req.params.id;
 
-        const { title, description } = req.body;
+        const { title, description, tasks } = req.body;
 
         const data: RoutineUpdateType = {
             title,
-            description
+            description,
+            tasks
         }
 
         //update routine

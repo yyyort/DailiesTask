@@ -39,7 +39,7 @@ export default function TaskContainer({
             {variant === "routine" ? (
               <div className="">
                 <p className="text-slate-600 text-sm w-full overflow-auto">
-                  {task.timeToDo.slice(0, 5)}
+                  {task.timeToDo?.slice(0, 5)}
                 </p>
               </div>
             ) : (
@@ -81,7 +81,7 @@ export default function TaskContainer({
                 }
               </h3>
               <h3 className="text-slate-600 text-sm font-mono">
-                {task.timeToDo.slice(0, 5)}
+                {task.timeToDo?.slice(0, 5)}
               </h3>
             </div>
           </div>
