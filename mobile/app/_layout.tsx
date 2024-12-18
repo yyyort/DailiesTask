@@ -12,10 +12,13 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import Toast from "react-native-toast-message";
 import * as SQLite from "expo-sqlite";
 import { drizzle } from "drizzle-orm/expo-sqlite";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 const expo = SQLite.openDatabaseSync("db.db");
 
 export const db = drizzle(expo);
+
+const queryClient = new QueryClient();
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -40,19 +43,21 @@ export default function RootLayout() {
   return (
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
       <AuthProvider>
-        <SafeAreaProvider>
-          <Stack
-            screenOptions={{
-              headerShown: false,
-            }}
-          >
-            <Stack.Screen name="(home)" />
-            <Stack.Screen name="(auth)" />
-            <Stack.Screen name="+not-found" />
-            <Stack.Screen name="index" />
-          </Stack>
-          <Toast />
-        </SafeAreaProvider>
+        <QueryClientProvider client={queryClient}>
+          <SafeAreaProvider>
+            <Stack
+              screenOptions={{
+                headerShown: false,
+              }}
+            >
+              <Stack.Screen name="(protected)" />
+              <Stack.Screen name="(auth)" />
+              <Stack.Screen name="+not-found" />
+              <Stack.Screen name="index" />
+            </Stack>
+            <Toast />
+          </SafeAreaProvider>
+        </QueryClientProvider>
       </AuthProvider>
     </ThemeProvider>
   );

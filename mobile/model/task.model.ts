@@ -10,7 +10,26 @@ export const TaskSchema = z.object({
     }),
     description: z.string().optional(),
     status: z.enum(["todo", "done", "overdue"]),
-    timeToDo: z.string().time(),
+    timeToDo: z.preprocess(
+        (data: unknown) => {
+            //add '0' to the front of the time if it is less than 10
+            const time = new Date(String(data)).toLocaleTimeString().split(':')
+
+            const hour = time[0];
+            const minute = time[1];
+            const second = '00';
+
+            if (hour.length === 1) {
+                return `0${hour}:${minute}:${second}`;
+            }
+            const formattedTime = `${hour}:${minute}:${second}`;
+
+            console.log('from model', formattedTime);
+
+            return formattedTime;
+        },
+        z.string().time()
+    ),
     deadline: z.string().date().refine(data => new Date(data).toLocaleDateString()),
     createdAt: z.date(),
     updatedAt: z.date(),
@@ -25,7 +44,26 @@ export const TaskUpdateSchema = z.object({
     title: z.string().optional(),
     description: z.string().optional(),
     status: z.enum(["todo", "done", "overdue"]).optional(),
-    timeToDo: z.string().time().optional(),
+    timeToDo: z.preprocess(
+        (data: unknown) => {
+            //add '0' to the front of the time if it is less than 10
+            const time = new Date(String(data)).toLocaleTimeString().split(':')
+
+            const hour = time[0];
+            const minute = time[1];
+            const second = '00';
+
+            if (hour.length === 1) {
+                return `0${hour}:${minute}:${second}`;
+            }
+            const formattedTime = `${hour}:${minute}:${second}`;
+
+            console.log('from model', formattedTime);
+
+            return formattedTime;
+        },
+        z.string().time().optional()
+    ),
     deadline: z.string().date().optional()
 })
 

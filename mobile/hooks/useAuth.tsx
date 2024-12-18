@@ -28,7 +28,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       try {
           await revalidateToken();
       } catch (error) {
-        console.log(error);
+        console.error(error);
         // redirect to sign in page
         router.replace("/(auth)/signIn");
       }      
@@ -59,7 +59,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
       return JSON.parse(user);
     } catch (error) {
-      console.log(error);
+      console.error(error);
       throw error;
     }
   };
@@ -79,7 +79,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
       return JSON.parse(user);
     } catch (error) {
-      console.log(error);
+      console.error(error);
       throw error;
     }
   };

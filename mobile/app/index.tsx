@@ -45,7 +45,7 @@ export default function Index() {
           DailiesTask
         </ThemedText>
 
-        <Link href="/(home)/(tasks)">
+        <Link href="/(protected)/(tasks)">
           <ThemedText>Tasks</ThemedText>
         </Link>
       </ThemedView>
