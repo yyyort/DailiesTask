@@ -10,9 +10,11 @@ import { useAuth } from "@/hooks/useAuth";
 export default function Index() {
   const { isAuthenticated, isLoading } = useAuth();
 
-  /* if (!isAuthenticated) {
-    return <Redirect href="/(auth)/signIn" />;
-  } */
+  if (!isAuthenticated) {
+    return <Redirect href="/(protected)/(routine)" />;
+  }
+
+  
 
   const inset = useSafeAreaInsets();
 

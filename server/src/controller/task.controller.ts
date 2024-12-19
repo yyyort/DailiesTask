@@ -2,7 +2,6 @@ import { Request, Response } from "express";
 import { ApiError } from "../util/apiError";
 import { taskCreateService, taskDeleteService, taskGetAllService, taskGetService, taskUpdateService, taskUpdateStatusService } from "../service/task.service";
 import { TaskCreateType, TaskUpdateType } from "../model/task.model";
-import { taskTodayCreateService } from "../service/taskToday.service";
 
 //read
 export const taskGetController = async (req: Request, res: Response): Promise<void> => {
@@ -56,9 +55,6 @@ export const taskCreateController = async (req: Request, res: Response): Promise
         };
 
         const task = await taskCreateService(userId, data);
-
-        //insert task to today
-        await taskTodayCreateService(userId, task);
 
         res.status(201).json({ message: "Task created successfully", task: task });
     } catch (error: unknown) {

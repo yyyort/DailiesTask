@@ -4,6 +4,7 @@ import { taskTable } from "../db/schema";
 import { TaskCreateType, TaskReturnType, TaskStatusType, TaskUpdateType, } from "../model/task.model";
 import { ApiError } from "../util/apiError";
 import { taskConvertFromDb, tasksConvertFromDb } from "../util/task.util";
+import { taskTodayCreateService } from "./taskToday.service";
 
 //read
 /* 
@@ -138,6 +139,9 @@ export async function taskCreateService(
 
         //convert data to TaskReturnType
         const taskData = await taskConvertFromDb(task[0]);
+
+        await taskTodayCreateService(userId, taskData);
+
 
         return taskData;
 

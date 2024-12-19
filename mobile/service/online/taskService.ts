@@ -7,7 +7,7 @@ const api = 'http://192.168.5.139:4000'; // change this to your server url
 /* 
     GET tasks
 */
-export const taskTodayGetService = async (): Promise<TaskTodayReturnType[]> => {
+export const taskTodayGetService = async (filter?: TaskStatusType[]): Promise<TaskTodayReturnType[]> => {
     try {
         //get access token from secure store
         const accessToken = await SecureStore.getItemAsync('accessToken');
@@ -16,14 +16,20 @@ export const taskTodayGetService = async (): Promise<TaskTodayReturnType[]> => {
             throw new Error('Server url not found');
         }
 
-        const res = await fetch(api + '/api/task/today', {
-            method: 'GET',
-            credentials: 'include',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${accessToken}`,
-            },
-        });
+        //join filter in into one string
+        const filterStr = filter ? filter.join(' ') : null;
+
+
+        const res = await fetch(api + '/api/task/today'
+            + (filterStr ? `?filter=${filterStr}` : '')
+            , {
+                method: 'GET',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${accessToken}`,
+                },
+            });
 
         if (!res.ok) {
             const errorMess = await res.json();

@@ -1,93 +1,21 @@
+import useRoutine from "@/hooks/useRoutine";
+import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
+
 import React, { useRef, useState } from "react";
-import { ThemedView } from "../ui/ThemedView";
-import { TaskReturnType, TaskTodayReturnType } from "@/model/task.model";
+import { Animated, Modal, TouchableOpacity, View } from "react-native";
 import { ThemedText } from "../ui/ThemedText";
-import {
-  Animated,
-  Modal,
-  Touchable,
-  TouchableOpacity,
-  TouchableOpacityProps,
-  View,
-} from "react-native";
-import CheckBox from "expo-checkbox";
-import useTasks from "@/hooks/useTask";
-import Toast from "react-native-toast-message";
-import Entypo from "@expo/vector-icons/Entypo";
 import AntDesign from "@expo/vector-icons/AntDesign";
-import TaskEditForm from "./taskEditForm";
+import { ThemedView } from "../ui/ThemedView";
+import Toast from "react-native-toast-message";
+import { RoutineReturnType } from "@/model/routine.model";
+import RoutineEditForm from "./routineEditForm";
 
-export default function TaskContainer({ task }: { task: TaskTodayReturnType }) {
-  const { updateStutus } = useTasks();
-
-  return (
-    <ThemedView
-      style={{
-        flexDirection: "row",
-        justifyContent: "space-between",
-        alignItems: "center",
-        padding: 10,
-        borderRadius: 10,
-        backgroundColor: "white",
-        marginVertical: 5,
-      }}
-    >
-      {/* menu */}
-      <TaskPopOverMenu task={task} />
-
-      <View
-        style={{
-          flexDirection: "row",
-          justifyContent: "space-between",
-          width: "80%",
-        }}
-      >
-        <ThemedText
-          style={{
-            textDecorationLine:
-              task.status === "done" ? "line-through" : "none",
-            color: task.status === "done" ? "gray" : "black",
-            fontSize: 20,
-          }}
-        >
-          {
-            //limit the title to 20 characters
-            task.title.length > 20
-              ? task.title.slice(0, 20) + "..."
-              : task.title
-          }
-        </ThemedText>
-        <ThemedText>{task.timeToDo.slice(0, 5)}</ThemedText>
-      </View>
-
-      {/* 
-            checkbox
-        */}
-      <CheckBox
-        value={task.status === "done"}
-        onValueChange={async (value) => {
-          try {
-            const res = await updateStutus(task.id, value ? "done" : "todo");
-
-            //toast
-            Toast.show({
-              type: "success",
-              text1: "Success",
-              text2: `successfully updated task ${res.title}`,
-              text1Style: { fontSize: 20 },
-              text2Style: { fontSize: 15 },
-            });
-          } catch (error) {
-            console.error(error);
-          }
-        }}
-      />
-    </ThemedView>
-  );
-}
-
-export function TaskPopOverMenu({ task }: { task: TaskReturnType }) {
-  const { deleteTask } = useTasks();
+export default function RoutineMenu({
+  routine,
+}: {
+  routine: RoutineReturnType;
+}) {
+  const { deleteRoutine } = useRoutine();
 
   const [open, setOpen] = React.useState(false);
   const [buttonPosition, setButtonPosition] = useState({
@@ -130,9 +58,9 @@ export function TaskPopOverMenu({ task }: { task: TaskReturnType }) {
 
   return (
     <TouchableOpacity ref={buttonRef} onPress={showPopover}>
-      <Entypo name="dots-two-vertical" size={24} color="black" />
+      <MaterialCommunityIcons name="menu-down" size={24} color="black" />
 
-      {/* pop over menu modal */}
+      {/* menu */}
       <Modal
         transparent={true}
         visible={open}
@@ -159,7 +87,7 @@ export function TaskPopOverMenu({ task }: { task: TaskReturnType }) {
                 opacity: fadeAnim,
               }}
             >
-              <TaskMenuButton
+              <MenuButton
                 title="edit"
                 onPress={() => {
                   hidePopover();
@@ -175,17 +103,17 @@ export function TaskPopOverMenu({ task }: { task: TaskReturnType }) {
                   marginVertical: 2,
                 }}
               />
-              <TaskMenuButton
+              <MenuButton
                 title="delete"
                 onPress={async () => {
                   try {
-                    const res = await deleteTask(task.id);
+                    await deleteRoutine(routine.id);
 
                     //toast
                     Toast.show({
                       type: "success",
                       text1: "Success",
-                      text2: `successfully delete task ${res.title}`,
+                      text2: `successfully delete routine`,
                       text1Style: { fontSize: 20 },
                       text2Style: { fontSize: 15 },
                     });
@@ -230,7 +158,7 @@ export function TaskPopOverMenu({ task }: { task: TaskReturnType }) {
             padding: 20,
             borderTopLeftRadius: 20,
             borderTopRightRadius: 20,
-            height: "70%",
+            height: "80%",
             zIndex: 2,
           }}
         >
@@ -242,7 +170,7 @@ export function TaskPopOverMenu({ task }: { task: TaskReturnType }) {
               paddingBottom: 10,
             }}
           >
-            <ThemedText type="title">Edit Task</ThemedText>
+            <ThemedText type="title">Edit Routine</ThemedText>
             <AntDesign
               name="close"
               size={32}
@@ -252,14 +180,14 @@ export function TaskPopOverMenu({ task }: { task: TaskReturnType }) {
           </View>
 
           {/* form */}
-          <TaskEditForm task={task} setModalOpen={setOpenEdit} />
+          <RoutineEditForm routine={routine} setModalOpen={setOpenEdit} />
         </ThemedView>
       </Modal>
     </TouchableOpacity>
   );
 }
 
-export function TaskMenuButton({
+export function MenuButton({
   title,
   onPress,
 }: {

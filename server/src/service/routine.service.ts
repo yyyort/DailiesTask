@@ -198,6 +198,8 @@ export async function routineUpdateService(userId: string, id: string, data: Rou
             description: data.description
         }
 
+        console.log("data", data);
+
         if (data.tasks) {
             //updating tasks
             const updatingTasks = data.tasks.filter(task => task.id !== undefined && task.id !== null);
@@ -236,29 +238,31 @@ export async function routineUpdateService(userId: string, id: string, data: Rou
 
 
             //new tasks
-            const newTasks = data.tasks.filter(task => task.id === undefined && task.id === null);
+            const newTasks = data.tasks.filter(task => task.id === undefined || task.id === null);
 
-            const newTasksData: TaskCreateType[] = newTasks.map(task => {
-                return {
-                    userId: userId,
-                    routineId: id,
-                    title: task.title,
-                    description: task.description ?? "",
-                    status: task.status,
-                    timeToDo: task.timeToDo,
-                    deadline: task.deadline
-                }
-            })
+            if (newTasks.length > 0) {
+                const newTasksData: TaskCreateType[] = newTasks.map(task => {
+                    return {
+                        userId: userId,
+                        routineId: id,
+                        title: task.title,
+                        description: task.description ?? "",
+                        status: task.status,
+                        timeToDo: task.timeToDo,
+                        deadline: task.deadline
+                    }
+                })
 
-            //create tasks
-            await Promise.all(newTasksData.map(async task => {
-                await taskCreateService(userId, task);
-            })
-            ).catch(
-                error => {
-                    throw error;
-                }
-            )
+                //create tasks
+                await Promise.all(newTasksData.map(async task => {
+                    await taskCreateService(userId, task);
+                })
+                ).catch(
+                    error => {
+                        throw error;
+                    }
+                )
+            }
         }
 
         //update routine

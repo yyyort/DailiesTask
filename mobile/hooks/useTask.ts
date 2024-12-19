@@ -13,10 +13,11 @@ import {
   taskUpdateStatusService,
 } from "@/service/online/taskService";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import Toast from "react-native-toast-message";
+
 
 type useTaskType = {
   getTask: () => TaskTodayReturnType[];
+  filterTask: (filter: TaskStatusType[]) => void;
   postTask: (data: TaskCreateType) => Promise<TaskReturnType>;
   updateStutus: (id: number, status: TaskStatusType) => Promise<TaskReturnType>;
   updatedTask: (id: number, task: TaskUpdateType) => Promise<TaskReturnType>;
@@ -51,12 +52,51 @@ export default function useTasks(): useTaskType {
     }
   };
 
+
+  /* 
+    todo: filterTask
+  */
+  const filterTask = (filter: TaskStatusType[]) => {
+    try {
+      console.log(filter);
+
+
+      /* 
+        todo
+      */
+      /* queryClient.setQueryData(
+        ["tasks"],
+        (oldData: TaskTodayReturnType[]) => {
+          if (filter.length > 0) {
+            const newData = oldData.filter((task) => filter.includes(task.status));
+            return newData;
+          }
+
+          return oldData;
+        }
+      ) */
+
+
+      /*  queryClient.invalidateQueries({
+         queryKey: ["tasks"],
+       }); */
+
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  }
+
   const postTask = async (data: TaskCreateType): Promise<TaskReturnType> => {
     try {
       const res = await taskCreateService(data);
 
       queryClient.invalidateQueries({
         queryKey: ["tasks"],
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: ["routines"],
       });
 
       return res;
@@ -72,6 +112,10 @@ export default function useTasks(): useTaskType {
 
       queryClient.invalidateQueries({
         queryKey: ["tasks"],
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: ["routines"],
       });
 
       if (!res) {
@@ -93,6 +137,10 @@ export default function useTasks(): useTaskType {
         queryKey: ["tasks"],
       });
 
+      queryClient.invalidateQueries({
+        queryKey: ["routines"],
+      });
+
       return res;
     } catch (error) {
       console.error(error);
@@ -109,6 +157,10 @@ export default function useTasks(): useTaskType {
         queryKey: ["tasks"],
       });
 
+      queryClient.invalidateQueries({
+        queryKey: ["routines"],
+      });
+
       return res;
     } catch (error) {
       console.error(error);
@@ -118,6 +170,7 @@ export default function useTasks(): useTaskType {
 
   return {
     getTask,
+    filterTask,
     postTask,
     updateStutus,
     updatedTask,
