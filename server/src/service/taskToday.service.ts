@@ -1,9 +1,10 @@
-import { and, asc, eq, exists, lt, max, notExists, or, sql, } from "drizzle-orm";
+import { and, asc, eq, exists, inArray, isNotNull, isNull, lt, max, notExists, or, } from "drizzle-orm";
 import { db } from "../db/db";
 import { taskTable, taskTodayTable } from "../db/schema";
 import { TaskReturnType, TaskStatusType, TaskTodayReturnType, TaskTodayType } from "../model/task.model";
 import { ApiError } from "../util/apiError";
 import cron from "node-cron";
+import { contributionCreateService } from "./contribution.service";
 
 
 export const taskTodayGetService = async (userId: string, filter?: TaskStatusType[]): Promise<TaskTodayReturnType[]> => {
@@ -133,26 +134,6 @@ export const taskTodayCreateService = async (userId: string, task: TaskReturnTyp
 export const taskTodaySetNewTask = async (): Promise<void> => {
     try {
         //get all tasks that are today's date and not in task_today_table
-        /* const res = await db
-            .select({
-                id: taskTable.id,
-                userId: taskTable.userId,
-                title: taskTable.title,
-                description: taskTable.description,
-                status: taskTable.status,
-                timeToDo: taskTable.timeToDo,
-                deadline: taskTable.deadline
-            })
-            .from(taskTable)
-            .where(
-                and(
-                    eq(taskTable.deadline, new Date().toLocaleDateString()), //today's date
-                    //check if task is not in task_today_table
-                    
-                    sql`NOT EXISTS (SELECT FROM ${taskTodayTable} WHERE ${taskTodayTable.taskId} = ${taskTable.id})`,
-                )
-            )
- */
         const res = await db
             .select({
                 id: taskTable.id,
@@ -175,10 +156,6 @@ export const taskTodaySetNewTask = async (): Promise<void> => {
                             .limit(1)
                     )
                 )
-                //q: why do i get error missing from clause entry for table "task_table"?
-                //a: i forgot to add from clause in notExists
-                //q: how to fix it?
-                //a: add from clause in notExists
             )
 
         console.log('taskTodaySetNewTask getting tasks today', res);
@@ -246,20 +223,33 @@ export const taskTodaySetNewTask = async (): Promise<void> => {
 //job for deleting previous day's task
 export const taskTodayCleanUp = async (): Promise<void> => {
     try {
-        //delete all done tasks that are not today's date
-        await db
-            .delete(taskTodayTable)
-            .where(
-                and(
-                    sql`EXISTS (
-                    SELECT 1
-                    FROM ${taskTable} 
-                    WHERE ${taskTable.id} = ${taskTodayTable.taskId} 
-                    AND ${taskTable.status} = 'done' 
-                    AND ${taskTable.deadline} < ${new Date().toLocaleDateString()}
-                    )`,
+        //remove all tasks that has deadline of yesterday or before, and have status of done, except for tasks that has routineId
+        await db.transaction(async (tx) => {
+            //get all tasks that are yesterday's date and not in task_today_table
+            const res = await tx
+                .select({
+                    id: taskTodayTable.id
+                })
+                .from(taskTodayTable)
+                .where(
+                    and(
+                        lt(taskTable.deadline, new Date().toLocaleDateString()), //yesterday's date
+                        eq(taskTable.status, 'done'),
+                        isNull(taskTable.routineId)
+                    )
                 )
-            )
+                .innerJoin(taskTable, eq(taskTodayTable.taskId, taskTable.id));
+
+            console.log('taskTodayCleanUp getting tasks yesterday', res);
+
+            //bulk delete
+            if (res.length > 0) {
+                await tx
+                    .delete(taskTodayTable)
+                    .where(inArray(taskTodayTable.id, res.map(task => task.id)));
+            }
+
+        })
 
     } catch (error: unknown) {
         console.error((error as Error));
@@ -274,7 +264,7 @@ export const taskTodayCleanUp = async (): Promise<void> => {
 //job for making the tasks that is past the deadline overdue
 export const taskTodaySetOverdue = async (): Promise<void> => {
     try {
-        //update all tasks that are past the deadline and not done
+        //update all tasks that are past the deadline
         await db
             .update(taskTable)
             .set({
@@ -286,8 +276,6 @@ export const taskTodaySetOverdue = async (): Promise<void> => {
                     lt(taskTable.deadline, new Date().toLocaleDateString())
                 ),
             )
-
-
     } catch (error: unknown) {
         console.error((error as Error));
         if (error instanceof ApiError) {
@@ -298,12 +286,42 @@ export const taskTodaySetOverdue = async (): Promise<void> => {
     }
 };
 
-export const taskTodayCronService = cron.schedule('0 49 6 * * * ', async () => {
+//job for recyling the tasks that are in routine
+export const taskTodayRecycleRoutine = async (): Promise<void> => {
     try {
+        await db
+            .update(taskTable)
+            .set({
+                status: 'todo',
+                deadline: new Date().toLocaleDateString()
+            })
+            .where(
+                isNotNull(taskTable.routineId),
+            )
+    } catch (error: unknown) {
+        console.error((error as Error));
+        if (error instanceof ApiError) {
+            throw error;
+        }
+        throw new Error((error as Error).message);
+    }
+};
+
+export const taskTodayCronService = cron.schedule('0 9 13 * * * ', async () => {
+    try {
+        //setting overdue tasks
         await taskTodaySetOverdue();
 
+        //set users contributions
+        await contributionCreateService();
+
+        //clean up previous day's task
         await taskTodayCleanUp();
 
+        //recycle routine tasks
+        await taskTodayRecycleRoutine();
+
+        //insert new tasks for today
         await taskTodaySetNewTask();
 
         console.log('taskTodayCronService done');

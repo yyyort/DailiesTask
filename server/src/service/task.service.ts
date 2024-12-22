@@ -140,8 +140,9 @@ export async function taskCreateService(
         //convert data to TaskReturnType
         const taskData = await taskConvertFromDb(task[0]);
 
-        await taskTodayCreateService(userId, taskData);
-
+        if (taskData.deadline === new Date().toLocaleDateString()) {
+            await taskTodayCreateService(userId, taskData);
+        }
 
         return taskData;
 

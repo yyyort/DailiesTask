@@ -60,6 +60,19 @@ export const routineTable = pgTable("routine_table", {
 })
 
 
+export const contributionTable = pgTable("contribution_table", {
+    id: uuid('id').primaryKey().defaultRandom().unique().notNull(),
+    userId: uuid('user_id').notNull().references(() => usersTable.id, {
+        onDelete: 'cascade',
+        onUpdate: 'cascade',
+    }),
+    tasksDone: integer('tasks_done').notNull(),
+    tasksTotal: integer('tasks_total').notNull(),
+    tasksMissed: integer('tasks_missed').notNull(),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+    updatedAt: timestamp('updated_at').defaultNow().notNull().$onUpdate(() => new Date()),
+});
+
 export type InsertTask = typeof taskTable.$inferInsert;
 export type SelectTask = typeof taskTable.$inferSelect;
 
