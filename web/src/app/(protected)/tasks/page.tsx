@@ -13,11 +13,10 @@ type SearchParams = Promise<{ [key: string]: string | string[] | undefined }>;
 
 export default async function Tasks(props: { searchParams: SearchParams }) {
   const searchParams = await props.searchParams;
+  const filterParams = searchParams.filter;
 
   const filter: TaskStatusType[] = (
-    Array.isArray(searchParams.filter)
-      ? searchParams.filter
-      : [searchParams.filter]
+    Array.isArray(filterParams) ? filterParams : [filterParams]
   ).filter(Boolean) as TaskStatusType[];
 
   const tasks: TaskReturnType[] = await taskTodayGetService(filter);
@@ -32,9 +31,11 @@ export default async function Tasks(props: { searchParams: SearchParams }) {
         task today / tasks header
       */}
       <div className="flex flex-col">
-        <div className="
+        <div
+          className="
           phone-sm:flex phone-sm:flex-col phone-sm:gap-4 phone-sm:items-end
-        laptop:flex laptop:flex-row-reverse laptop:justify-between laptop:w-full laptop:pb-4">
+        laptop:flex laptop:flex-row-reverse laptop:justify-between laptop:w-full laptop:pb-4"
+        >
           <div
             className="
             phone-sm:hidden

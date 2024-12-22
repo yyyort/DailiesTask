@@ -7,11 +7,17 @@ import { revalidatePath } from "next/cache";
 /* 
     get all tasks
 */
-export const taskGetService = async (): Promise<TaskReturnType[]> => {
+export const taskGetService = async (date?: string): Promise<TaskReturnType[]> => {
     try {
         const accessToken = await getAccessToken();
 
-        const response = await fetch('http://localhost:4000/api/task/', {
+        // check date correct format
+        /* if (date && !date.match(/^\d{2}-\d{2}-\d{4}$/)) {
+            console.error('Date format is incorrect');
+            throw new Error('Date format is incorrect');
+        } */
+
+        const response = await fetch('http://localhost:4000/api/task' + (date ? `?date=${date}` : ''), {
             method: 'GET',
             credentials: 'include',
             headers: {
@@ -49,6 +55,54 @@ export const taskGetService = async (): Promise<TaskReturnType[]> => {
         return [];
     }
 }
+
+export const taskGetEverythingService = async (): Promise<{id: string, date: Date}[]> => {
+    try {
+        const accessToken = await getAccessToken();
+
+        const response = await fetch('http://localhost:4000/api/task/everything', {
+            method: 'GET',
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${accessToken}`
+            },
+            cache: 'no-cache'
+        });
+
+        if (!response.ok) {
+            if (response.status === 401) {
+                throw new Error('Unauthorized');
+            }
+            return [];
+        }
+
+        const data: {
+            message: string;
+            tasks: {id: string, date: string}[];
+        } = await response.json();
+
+        return data.tasks.map(task => ({
+            id: task.id,
+            date: new Date(task.date)
+        }));
+    } catch (error: unknown) {
+        if (error instanceof Error) {
+            console.error(error);
+
+            if (error.message === 'Unauthorized') {
+                redirect('/signin');
+            } else {
+                console.error(error);
+                throw new Error('Failed to get tasks');
+            }
+        }
+
+        return [];
+    }
+}
+
+
 
 
 /* 
