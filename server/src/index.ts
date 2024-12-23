@@ -12,6 +12,7 @@ import TaskRoutes from './route/task.route';
 import RoutineRoutes from './route/routine.route';
 import { taskTodayCronService } from './service/taskToday.service';
 import ContributionRoutes from './route/contribution.route';
+import NotesRouter from './route/notes.route';
 
 /* config */
 dotenv.config();
@@ -44,6 +45,8 @@ app.use('/api', UserRoutes);
 app.use('/api', TaskRoutes);
 app.use('/api', RoutineRoutes);
 app.use('/api', ContributionRoutes);
+app.use('/api', NotesRouter);
+
 /* 
   cron job
 */

@@ -43,6 +43,13 @@
       "when": 1734931691734,
       "tag": "0005_youthful_hulk",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1734947181587,
+      "tag": "0006_faithful_microchip",
+      "breakpoints": true
     }
   ]
 }

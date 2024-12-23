@@ -1,5 +1,6 @@
 import { pgEnum } from 'drizzle-orm/pg-core';
 import { date } from 'drizzle-orm/pg-core';
+import { boolean } from 'drizzle-orm/pg-core';
 import { time } from 'drizzle-orm/pg-core';
 import { integer } from 'drizzle-orm/pg-core';
 import { serial } from 'drizzle-orm/pg-core';
@@ -73,6 +74,46 @@ export const contributionTable = pgTable("contribution_table", {
     createdAt: timestamp('created_at').defaultNow().notNull(),
     updatedAt: timestamp('updated_at').defaultNow().notNull().$onUpdate(() => new Date()),
 });
+
+export const notesTable = pgTable("notes_table", {
+    id: uuid('id').primaryKey().defaultRandom().unique().notNull(),
+    userId: uuid('user_id').notNull().references(() => usersTable.id, {
+        onDelete: 'cascade',
+        onUpdate: 'cascade',
+    }),
+    title: text('text').notNull(),
+    content: text('content').notNull(),
+    pinned: boolean('pinned').default(false).notNull(),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+    updatedAt: timestamp('updated_at').defaultNow().notNull().$onUpdate(() => new Date()),
+});
+
+export const notesGroupTable = pgTable("group_table", {
+    id: uuid('id').primaryKey().defaultRandom().unique().notNull(),
+    userId: uuid('user_id').notNull().references(() => usersTable.id, {
+        onDelete: 'cascade',
+        onUpdate: 'cascade',
+    }),
+    name: text('name').notNull(),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+    updatedAt: timestamp('updated_at').defaultNow().notNull().$onUpdate(() => new Date()),
+});
+
+export const notesGroupJunctionTable = pgTable("notes_group_junction_table", {
+    userId: uuid('user_id').notNull().references(() => usersTable.id, {
+        onDelete: 'cascade',
+        onUpdate: 'cascade',
+    }),
+    groupId: uuid('group_id').notNull().references(() => notesGroupTable.id, {
+        onDelete: 'cascade',
+        onUpdate: 'cascade',
+    }),
+    noteId: uuid('note_id').notNull().references(() => notesTable.id, {
+        onDelete: 'cascade',
+        onUpdate: 'cascade',
+    }),
+});
+
 
 export type InsertTask = typeof taskTable.$inferInsert;
 export type SelectTask = typeof taskTable.$inferSelect;
