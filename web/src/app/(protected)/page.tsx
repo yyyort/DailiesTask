@@ -22,23 +22,30 @@ export default async function Home(props: { searchParams: SearchParams }) {
 
   return (
     <div
-      className="w-full h-full max-w-full pt-20 px-10 gap-10 justify-center items-center
+      className="w-full h-full max-w-full pt-20 px-10 gap-10 justify-center items-start
     laptop:flex laptop:flex-row
     "
     >
       <div>
         <ContributionsHeatmap contributions={contributions} />
+      </div>
+      <div className="">
+        <div
+          className="
+        phone-sm:hidden
+        laptop:block
+        "
+        >
+          <HomeCalendar />
+        </div>
 
         <div className="flex flex-col gap-4 p-4">
-          <h3 className="text-2xl font-medium">
-            {totalTasksDone}/{totalTasks} tasks done
+          <h3 className="text-lg font-medium">
+            {totalTasksDone} / {totalTasks} tasks done
           </h3>
 
           <TasksHome tasks={tasks} />
         </div>
-      </div>
-      <div className="">
-        <HomeCalendar />
       </div>
     </div>
   );

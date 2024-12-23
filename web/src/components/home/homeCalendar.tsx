@@ -56,7 +56,7 @@ export default function HomeCalendar() {
         mode="single"
         selected={date ? new Date(date) : undefined}
         onSelect={onDateChange}
-        className="rounded-md border scale-150 w-fit"
+        className="rounded-md border scale-125 w-fit"
         modifiers={{ hasEvent: hasEvent }}
         modifiersStyles={{
           hasEvent: {

@@ -20,7 +20,7 @@ export default function TaskContainer({
         task.status === "overdue" && "bg-red-300 bg-opacity-80",
         variant === "routine" && "p-4",
         variant === "default" && "p-4",
-        variant === "minimal" && "p-3 items-center"
+        variant === "minimal" && "p-2 px-4 items-center"
       )}
     >
       {variant === "default" && (
@@ -33,20 +33,26 @@ export default function TaskContainer({
         <div className="flex justify-between">
           <div
             className={cn(
-              "flex flex-col w-full overflow-auto gap-2",
+              "flex flex-col w-full overflow-auto",
               variant === "routine" &&
-                "flex-row items-center justify-between pr-2"
+                "flex-row items-center justify-between pr-2  gap-2",
+              variant === "default" &&
+                "flex-row items-center justify-between pr-2  gap-2"
             )}
           >
+            {/* titles */}
             <h1
               className={cn(
                 "text-2xl font-semibold",
                 variant === "routine" && "text-xl",
-                variant === "minimal" && "text-md"
+                variant === "minimal" && "text-md",
+                task.status === "done" && "line-through"
               )}
             >
               {task.title}
             </h1>
+
+            {/* description */}
             {variant === "routine" && (
               <div className="">
                 <p className="text-slate-600 text-sm w-full overflow-auto">
@@ -80,6 +86,7 @@ export default function TaskContainer({
             />
           </div>
         </div>
+
         {variant === "routine" && (
           <div>
             <div className="w-full border-b-2 border-slate-200 mb-2"></div>
@@ -98,6 +105,7 @@ export default function TaskContainer({
             </div>
           </div>
         )}
+
         {variant === "default" && (
           <div>
             <div className="w-full border-b-2 border-slate-200 mb-2"></div>
