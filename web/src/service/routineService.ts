@@ -7,11 +7,11 @@ import { revalidatePath } from "next/cache";
 /* 
     get
 */
-export const routineGetService = async (): Promise<RoutineReturnType[]> => {
+export const routineGetService = async (filters?: string): Promise<RoutineReturnType[]> => {
     try {
         const accessToken = await getAccessToken();
 
-        const res = await fetch('http://localhost:4000/api/routine/',
+        const res = await fetch('http://localhost:4000/api/routine/' + (filters ? `?filter=${filters}` : ''),
             {
                 method: 'GET',
                 credentials: 'include',
@@ -33,6 +33,54 @@ export const routineGetService = async (): Promise<RoutineReturnType[]> => {
         const data: {
             message: string;
             routines: RoutineReturnType[];
+        } = await res.json();
+
+        return data.routines;
+    } catch (error: unknown) {
+        if (error instanceof Error) {
+            console.error(error);
+
+            if (error.message === 'Unauthorized') {
+                redirect('/signin');
+            } else {
+                console.error(error);
+                throw new Error('Failed to get tasks');
+            }
+        }
+
+        return [];
+    }
+}
+
+export const routineGetHeadersService = async (): Promise<{ id: string, title: string }[]> => {
+    try {
+        const accessToken = await getAccessToken();
+
+        const res = await fetch('http://localhost:4000/api/routine/headers',
+            {
+                method: 'GET',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${accessToken}`
+                },
+                cache: 'default'
+            }
+        );
+
+        if (!res.ok) {
+            if (res.status === 401) {
+                throw new Error('Unauthorized');
+            }
+            return [];
+        }
+
+        const data: {
+            message: string;
+            routines: {
+                id: string;
+                title: string;
+            }[];
         } = await res.json();
 
         return data.routines;

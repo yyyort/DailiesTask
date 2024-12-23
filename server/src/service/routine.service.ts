@@ -1,4 +1,4 @@
-import { and, eq } from "drizzle-orm";
+import { and, eq, inArray } from "drizzle-orm";
 import { db } from "../db/db";
 import { routineTable, taskTable } from "../db/schema";
 import { RoutineCreateType, RoutineReturnType, RoutineUpdateType } from "../model/routine.model";
@@ -61,8 +61,10 @@ export async function routineCreateService(userId: string, data: RoutineCreateTy
 /* 
     get all routines of a user
 */
-export async function routineGetAllService(userId: string): Promise<RoutineReturnType[]> {
+export async function routineGetAllService(userId: string, filters?: string[]): Promise<RoutineReturnType[]> {
     try {
+        console.log("filters in routine", filters);
+
         const resRoutines = await db
             .select({
                 id: routineTable.id,
@@ -70,9 +72,12 @@ export async function routineGetAllService(userId: string): Promise<RoutineRetur
                 description: routineTable.description,
             })
             .from(routineTable)
-            .where(eq(routineTable.userId, userId))
-
-
+            .where(
+                filters ? and(
+                    eq(routineTable.userId, userId),
+                    inArray(routineTable.title, filters)
+                ) : eq(routineTable.userId, userId)
+            )
 
         //post processing
         const routines: RoutineReturnType[] = await Promise.all(resRoutines.map(async routine => {
@@ -117,6 +122,28 @@ export async function routineGetAllService(userId: string): Promise<RoutineRetur
         throw new Error((error as Error).message);
     }
 }
+
+/* 
+    get all routines of a user, only the id and title
+*/
+export async function routineGetAllHeaders(userId: string): Promise<{ id: string, title: string }[]> {
+    try {
+        const resRoutines = await db
+            .select({
+                id: routineTable.id,
+                title: routineTable.title,
+            })
+            .from(routineTable)
+            .where(eq(routineTable.userId, userId))
+
+        return resRoutines;
+
+    } catch (error) {
+        console.error((error as Error));
+        throw new Error((error as Error).message);
+    }
+}
+
 
 /* 
     get a specific routine of a user

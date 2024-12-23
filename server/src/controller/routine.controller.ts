@@ -1,6 +1,6 @@
 import { Response, Request } from "express"
 import { RoutineCreateType, RoutineReturnType, RoutineUpdateType } from "../model/routine.model";
-import { routineCreateService, routineDeleteService, routineGetAllService, routineGetService, routineUpdateService } from "../service/routine.service";
+import { routineCreateService, routineDeleteService, routineGetAllHeaders, routineGetAllService, routineGetService, routineUpdateService } from "../service/routine.service";
 
 /* 
     GET all
@@ -8,6 +8,18 @@ import { routineCreateService, routineDeleteService, routineGetAllService, routi
 export const routineGetallController = async (req: Request, res: Response): Promise<void> => {
     try {
         const userId = req.body.userId;
+        const filters = req.query.filter as string;
+
+        console.log("in contoller", filters);
+
+        if (filters) {
+            const filtersArray = filters.split('-');
+
+            //get all routines with filters
+            const routines: RoutineReturnType[] = await routineGetAllService(userId, filtersArray);
+
+            res.status(200).json({ message: "Routines retrieved successfully", routines: routines });
+        }
 
         //get all routines
         const routines: RoutineReturnType[] = await routineGetAllService(userId);
@@ -17,6 +29,27 @@ export const routineGetallController = async (req: Request, res: Response): Prom
         console.error(error);
     }
 }
+
+
+/* 
+    GET all
+*/
+export const routineGetallHeadersController = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const userId = req.body.userId;
+
+        //get all routines
+        const routines: {
+            id: string,
+            title: string,
+        }[] = await routineGetAllHeaders(userId);
+
+        res.status(200).json({ message: "Routines retrieved successfully", routines: routines });
+    } catch (error) {
+        console.error(error);
+    }
+}
+
 
 /* 
     GET

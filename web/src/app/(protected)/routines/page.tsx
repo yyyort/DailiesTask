@@ -6,9 +6,15 @@ import { routineGetService } from "@/service/routineService";
 
 import React, { Suspense } from "react";
 
-export default async function Routines() {
-  const routines: RoutineReturnType[] = await routineGetService();
+type SearchParams = Promise<{ [key: string]: string | string[] | undefined }>;
 
+export default async function Routines(props: { searchParams: SearchParams }) {
+  const searchParams = await props.searchParams;
+  const filterParams = searchParams.filter as string;
+
+  console.log(filterParams);
+
+  const routines: RoutineReturnType[] = await routineGetService(filterParams);
   return (
     <div
       className="h-screen w-full flex flex-col overflow-auto
@@ -33,7 +39,7 @@ export default async function Routines() {
       */}
       <div
         className="
-        mt-4
+        mt-4 mb-3 overflow-x-auto
         phone-sm:mr-auto
         "
       >

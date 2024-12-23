@@ -3,6 +3,7 @@
 import React from "react";
 import { ToggleGroup, ToggleGroupItem } from "../ui/toggle-group";
 import { useRouter, useSearchParams } from "next/navigation";
+import { routineGetHeadersService } from "@/service/routineService";
 
 export type routineFilterT = {
   id: string;
@@ -13,20 +14,15 @@ export default function RoutineFilter() {
   const searchParams = useSearchParams();
   const router = useRouter();
 
-  const routines: routineFilterT[] = [
-    {
-      id: "1",
-      title: "routine 1",
-    },
-    {
-      id: "2",
-      title: "routine 2",
-    },
-    {
-      id: "3",
-      title: "routine 3",
-    },
-  ];
+  const [routines, setRoutines] = React.useState<routineFilterT[]>([]);
+
+  React.useEffect(() => {
+    const getRoutines = async () => {
+      const res = await routineGetHeadersService();
+      setRoutines(res);
+    };
+    getRoutines();
+  }, []);
 
   return (
     <>
@@ -34,12 +30,12 @@ export default function RoutineFilter() {
         type="multiple"
         defaultValue={
           searchParams.has("filter")
-            ? (searchParams.get("filter") || "").split(" ")
+            ? (searchParams.get("filter") || "").split("-")
             : ["all"]
         }
         value={
           searchParams.has("filter")
-            ? (searchParams.get("filter") || "").split(" ")
+            ? (searchParams.get("filter") || "").split("-")
             : ["all"]
         }
         onValueChange={
@@ -51,10 +47,10 @@ export default function RoutineFilter() {
             // if all is selected, remove the filter param
             if (value.includes("all") && searchParams.has("filter")) {
               newParams.delete("filter");
-            } else if (!value.includes("all") && value.length > 0) {
+            } else {
               const filterValue = value.filter((v) => v !== "all");
 
-              newParams.set("filter", filterValue.join(" "));
+              newParams.set("filter", filterValue.join("-"));
             }
 
             // navigate to the new url
@@ -75,11 +71,9 @@ export default function RoutineFilter() {
         {routines.map((routine) => {
           return (
             <ToggleGroupItem
-              value={routine.id}
+              value={routine.title}
               key={routine.id}
-              className="
-                        phone-sm:text-lg data-[state=on]:bg-black data-[state=on]:text-white
-                        "
+              className="phone-sm:text-lg data-[state=on]:bg-black data-[state=on]:text-white"
             >
               {routine.title}
             </ToggleGroupItem>
