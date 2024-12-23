@@ -5,7 +5,9 @@ import { setAccessToken, setUserData } from "./service/authService";
 export const config = {
     matcher: [
         '/',
-        '/tasks'
+        '/tasks',
+        '/routines',
+        '/notes'
     ],
 }
 
@@ -13,7 +15,9 @@ export const config = {
 export async function middleware(request: NextRequest) {
     const protectedRoutes = [
         '/',
-        '/tasks'
+        '/tasks',
+        '/routines',
+        '/notes'
     ];
 
     const isProtectedRoute = protectedRoutes.some(

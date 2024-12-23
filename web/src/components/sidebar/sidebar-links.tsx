@@ -1,6 +1,11 @@
 "use client";
 import { cn } from "@/lib/utils";
-import { HouseIcon, ListCheckIcon, SquareCheckBigIcon } from "lucide-react";
+import {
+  HouseIcon,
+  ListCheckIcon,
+  PenLineIcon,
+  SquareCheckBigIcon,
+} from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 
@@ -39,6 +44,11 @@ export default function SidebarLinks({
       href: "/routines",
       icon: <ListCheckIcon />,
     },
+    {
+      name: "Notes",
+      href: "/notes",
+      icon: <PenLineIcon />,
+    },
   ];
 
   return (
@@ -51,7 +61,7 @@ export default function SidebarLinks({
             "flex items-center hover:bg-slate-300 rounded-md",
             variant === "mobile" && "p-2 justify-start w-full",
             pathName === link.href && "underline",
-            pathName === link.href &&  expanded && "bg-slate-300"
+            pathName === link.href && expanded && "bg-slate-300"
           )}
           onClick={link.onClick}
         >
