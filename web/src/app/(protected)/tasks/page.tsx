@@ -23,7 +23,7 @@ export default async function Tasks(props: { searchParams: SearchParams }) {
 
   return (
     <div
-      className="h-screen w-full flex flex-col
+      className="h-screen w-full flex flex-col overflow-y-auto
     phone-sm:px-10 phone-sm:py-10
     "
     >

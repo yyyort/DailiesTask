@@ -11,9 +11,9 @@ import { verifyToken } from "../util/jwt.util";
 */
 export const userSignUpController = async (req: Request, res: Response): Promise<void> => {
     try {
-        const { email, password, confirmPassword } = req.body;
+        const { email, password, confirmPassword, name } = req.body;
 
-        const reqBody: UserCreateType = { email, password, confirmPassword };
+        const reqBody: UserCreateType = { email, password, confirmPassword, name };
 
         const user: UserReturnType = await userCreateService(reqBody);
 
@@ -134,7 +134,7 @@ export const userGetController = async (req: Request, res: Response): Promise<vo
 export const userUpdateController = async (req: Request, res: Response): Promise<void> => {
     try {
         const { id } = req.params;
-        const { email, password } = req.body;
+        const { email, password, name } = req.body;
 
         //if id is undefined or not a uuid
         if (!id || id.length !== 36) {
@@ -142,8 +142,8 @@ export const userUpdateController = async (req: Request, res: Response): Promise
                 message: "Invalid id"
             });
         }
-        
-        const data = { email, password };
+
+        const data = { email, password, name };
 
         const user = await userUpdateService(id, data);
 
@@ -234,7 +234,8 @@ export const userRevalidateTokenController = async (req: Request, res: Response)
 
         const user = {
             id: decodedData.id,
-            email: decodedData.email
+            email: decodedData.email,
+            name: decodedData.name
         }
 
         const accessToken = decodedData.accessToken;

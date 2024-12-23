@@ -22,7 +22,7 @@ export default async function Home(props: { searchParams: SearchParams }) {
 
   return (
     <div
-      className="w-full h-full max-w-full pt-20 px-10 gap-10 justify-center items-start
+      className="w-full h-screen max-w-full pt-20 px-10 gap-10 justify-center items-start max-h-screen overflow-auto
     laptop:flex laptop:flex-row
     "
     >
@@ -39,7 +39,7 @@ export default async function Home(props: { searchParams: SearchParams }) {
           <HomeCalendar />
         </div>
 
-        <div className="flex flex-col gap-4 p-4">
+        <div className="flex flex-col gap-4 p-4 overflow-auto">
           <h3 className="text-lg font-medium">
             {totalTasksDone} / {totalTasks} tasks done
           </h3>

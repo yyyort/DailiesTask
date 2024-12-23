@@ -61,13 +61,13 @@ export async function validateToken(request: NextRequest) {
             await setAccessToken(accessToken);
             await setUserData(user);
 
-            request.headers.set('Authorization', `Bearer ${accessToken}`)     
-        
+            request.headers.set('Authorization', `Bearer ${accessToken}`)
+
 
             //redirect to the requested page
             return NextResponse.next()
         } else {
-        
+
             return NextResponse.redirect(new URL('/signin', request.url))
         }
     } catch (error) {

@@ -21,6 +21,7 @@ export default function SignUpForm() {
     resolver: zodResolver(UserCreateSchema),
     defaultValues: {
       email: "",
+      name: "",
       password: "",
       confirmPassword: "",
     },
@@ -31,6 +32,8 @@ export default function SignUpForm() {
 
   const onSubmit: SubmitHandler<UserCreateType> = async (data) => {
     try {
+      console.log(data);
+
       const res = await SignUpApi(data);
 
       toast({
@@ -38,10 +41,8 @@ export default function SignUpForm() {
         description: `Welcome, ${res.user.email}`,
       });
 
-
       //redirect to the tasks page
       router.push("/tasks");
-
     } catch (error: unknown) {
       console.error(error);
       form.setError("root", {
@@ -77,6 +78,43 @@ export default function SignUpForm() {
                     {...field}
                     type="email"
                     placeholder="email@email.com"
+                    className="
+                      shadow-md fill-white z-10 bg-white bg-opacity-80 backdrop-filter backdrop-blur-sm
+                      phone-sm:text-2xl p-4 h-14
+                    "
+                  />
+                </FormControl>
+              </FormItem>
+
+              {/* error */}
+              {fieldState.error && (
+                <div className="text-red-600 text-end bg-white">
+                  {fieldState.error.message}
+                </div>
+              )}
+            </div>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="name"
+
+          render={({ field, fieldState }) => (
+            <div className="flex flex-col mb-4">
+              <FormItem>
+                <FormLabel
+                  className="
+                    phone-sm:text-xl
+                  "
+                >
+                  name
+                </FormLabel>
+                <FormControl>
+                  <Input
+                    {...field}
+                    type="text"
+                    placeholder="name"
                     className="
                       shadow-md fill-white z-10 bg-white bg-opacity-80 backdrop-filter backdrop-blur-sm
                       phone-sm:text-2xl p-4 h-14

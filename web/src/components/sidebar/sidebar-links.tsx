@@ -1,9 +1,8 @@
 "use client";
+import { cn } from "@/lib/utils";
 import { HouseIcon, ListCheckIcon, SquareCheckBigIcon } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-
-import React from "react";
+import { usePathname, useRouter } from "next/navigation";
 
 type Sidebarlinks = {
   name: string;
@@ -12,8 +11,15 @@ type Sidebarlinks = {
   onClick?: () => void;
 };
 
-export default function SidebarLinks({ expanded }: { expanded: boolean }) {
+export default function SidebarLinks({
+  expanded,
+  variant,
+}: {
+  expanded: boolean;
+  variant?: "mobile" | "desktop";
+}) {
   const router = useRouter();
+  const pathName = usePathname();
 
   const links: Sidebarlinks[] = [
     {
@@ -41,10 +47,21 @@ export default function SidebarLinks({ expanded }: { expanded: boolean }) {
         <Link
           key={link.name}
           href={link.href}
-          className="flex items-center justify-center bg-slate-200 hover:bg-slate-300 rounded-md"
+          className={cn(
+            "flex items-center hover:bg-slate-300 rounded-md",
+            variant === "mobile" && "p-2 justify-start w-full",
+            pathName === link.href && "underline",
+            pathName === link.href &&  expanded && "bg-slate-300"
+          )}
           onClick={link.onClick}
         >
-          <div className="flex p-2 gap-2">
+          <div
+            className={cn(
+              "flex p-2 gap-2",
+              variant === "mobile" && "w-full",
+              pathName === link.href && !expanded && "bg-slate-300 rounded-md"
+            )}
+          >
             {link.icon}
             {expanded && <p>{link.name}</p>}
           </div>

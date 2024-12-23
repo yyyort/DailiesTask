@@ -29,10 +29,12 @@ export async function userCreateService(data: UserCreateType): Promise<UserRetur
             .values({
                 email: data.email,
                 password: hashedPassword,
+                name: data.name,
             })
             .returning({
                 id: usersTable.id,
                 email: usersTable.email,
+                name: usersTable.name,
             });
 
         return user[0];
@@ -58,6 +60,7 @@ export async function userSignInService(data: UserSignInType): Promise<UserRetur
                 id: usersTable.id,
                 email: usersTable.email,
                 password: usersTable.password,
+                name: usersTable.name,
             })
             .from(usersTable)
             .where(eq(usersTable.email, data.email))
@@ -78,6 +81,7 @@ export async function userSignInService(data: UserSignInType): Promise<UserRetur
         return {
             id: user[0].id,
             email: user[0].email,
+            name: user[0].name,
         };
 
         //return user
@@ -110,6 +114,7 @@ export async function userGetService(id: string): Promise<UserReturnType> {
             {
                 id: usersTable.id,
                 email: usersTable.email,
+                name: usersTable.name,
             }
         ).from(usersTable).where(eq(usersTable.id, id)).limit(1);
 
@@ -152,12 +157,14 @@ export async function userUpdateService(id: string, data: UserUpdateType): Promi
                 .set({
                     email: data?.email,
                     password: encryptedPassword,
+                    name: data?.name,
                 })
                 .where(eq(usersTable.id, id))
                 .returning(
                     {
                         id: usersTable.id,
                         email: usersTable.email,
+                        name: usersTable.name,
                     }
                 );
 
@@ -209,6 +216,7 @@ export async function userDeleteService(id: string): Promise<UserReturnType> {
             .returning({
                 id: usersTable.id,
                 email: usersTable.email,
+                name: usersTable.name
             });
 
         //if user is not found

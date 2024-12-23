@@ -4,10 +4,29 @@ import { cn } from "@/lib/utils";
 import React from "react";
 import { Button } from "../ui/button";
 import SidebarLinks from "./sidebar-links";
-import { ChevronLeftIcon, ChevronRightIcon, LogOutIcon } from "lucide-react";
+import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
+import LogoutButton from "../auth-page/logout-button";
+import { ModeToggle } from "../ui/theme-mode-toggle";
+import { getUserData } from "@/service/authService";
+import { UserReturnType } from "@/model/userModel";
 
 export default function SidebarLaptop() {
   const [expanded, setExpanded] = React.useState(false);
+  const [user, setUser] = React.useState<UserReturnType>({} as UserReturnType);
+
+  React.useEffect(() => {
+    //fetch user
+    const user = async () => {
+      try {
+        const res = await getUserData();
+        setUser(res);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    user();
+  }, []);
 
   return (
     <div
@@ -20,21 +39,26 @@ export default function SidebarLaptop() {
       <div className="flex flex-col gap-20">
         {/* profile */}
         <div className="mt-10">
-          <div className="flex flex-row items-center gap-2">
-            <div className="flex items-center justify-center w-10 h-10 bg-slate-300 rounded-full border-2 border-slate-400" />
-            {expanded && <p>user</p>}
+          <div className="flex flex-row items-center gap-2 overflow-clip">
+            <p>{user.name}</p>
           </div>
 
-          <Button
-            onClick={() => setExpanded(!expanded)}
-            variant={"outline"}
-            className={cn(
-              "relative top-0 -right-10 bg-slate-200",
-              expanded ? "-right-24" : ""
-            )}
-          >
-            {expanded ? <ChevronLeftIcon /> : <ChevronRightIcon />}
-          </Button>
+          <div>
+            <Button
+              onClick={() => setExpanded(!expanded)}
+              variant={"outline"}
+              className={cn(
+                "relative top-8 -right-10 bg-slate-200",
+                expanded ? "-right-24" : ""
+              )}
+            >
+              {expanded ? <ChevronLeftIcon /> : <ChevronRightIcon />}
+            </Button>
+            {/* theme */}
+            <div className="mb-10">
+              <ModeToggle />
+            </div>
+          </div>
         </div>
 
         {/* body: links */}
@@ -45,10 +69,7 @@ export default function SidebarLaptop() {
 
       {/* footer */}
       <div className="mb-20">
-        <Button variant={"outline"}>
-          <LogOutIcon />
-          {expanded && <p>Logout</p>}
-        </Button>
+        <LogoutButton expanded={expanded} />
       </div>
     </div>
   );

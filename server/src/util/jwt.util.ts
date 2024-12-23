@@ -9,7 +9,8 @@ dotenv.config();
 export async function verifyToken(token: string, type: 'refresh' | 'access'): Promise<
     {
         id: string,
-        email: string
+        email: string,
+        name: string,
         accessToken: string
     }> {
     
@@ -46,6 +47,7 @@ export async function verifyToken(token: string, type: 'refresh' | 'access'): Pr
         return {
             id: user.id,
             email: user.email,
+            name: user.name,
             accessToken: accessToken
         }
     } catch (error: unknown) {
