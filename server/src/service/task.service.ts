@@ -1,4 +1,4 @@
-import { and, eq } from "drizzle-orm";
+import { and, eq, isNull } from "drizzle-orm";
 import { db } from "../db/db";
 import { taskTable } from "../db/schema";
 import { TaskCreateType, TaskReturnType, TaskStatusType, TaskUpdateType, } from "../model/task.model";
@@ -11,7 +11,8 @@ import { taskTodayCreateService } from "./taskToday.service";
     get all tasks of a user
 */
 export async function taskGetAllService(
-    userId: string
+    userId: string,
+    date?: string
 ): Promise<TaskReturnType[]> {
     try {
         const res = await db
@@ -25,7 +26,12 @@ export async function taskGetAllService(
                 deadline: taskTable.deadline
             })
             .from(taskTable)
-            .where(eq(taskTable.userId, userId));
+            .where(
+                and(
+                    eq(taskTable.userId, userId),
+                    date ? eq(taskTable.deadline, new Date(date).toLocaleDateString()) : eq(taskTable.deadline, new Date().toLocaleDateString())
+                )
+            );
 
         //convert data to TaskReturnType
         const tasks: TaskReturnType[] = await tasksConvertFromDb(res);
@@ -41,13 +47,45 @@ export async function taskGetAllService(
     }
 };
 
+export async function taskGetEverythingService(
+    userId: string,
+): Promise<{ id: number, date: string }[]> {
+    try {
+        const res = await db
+            .select({
+                id: taskTable.id,
+                date: taskTable.deadline
+            })
+            .from(taskTable)
+            .where(
+                and(
+                    isNull(taskTable.routineId),
+                    eq(taskTable.userId, userId)
+                )
+            );
+
+        //convert data to TaskReturnType
+        const tasks: { id: number, date: string }[] = res;
+
+        return tasks;
+    } catch (error: unknown) {
+        console.error((error as Error));
+        if (error instanceof ApiError) {
+            throw error;
+        }
+
+        throw new Error((error as Error).message);
+    }
+};
+
+
 //read
 /* 
     get a specific task of a user
 */
 export async function taskGetService(
     userId: string,
-    id: number
+    id: number,
 ): Promise<TaskReturnType> {
     try {
         const res = await db

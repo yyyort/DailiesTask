@@ -3,6 +3,7 @@ import { db } from "../db/db";
 import { contributionTable, taskTable, taskTodayTable, usersTable } from "../db/schema";
 import { ContributionCreateType, ContributionReturnType } from "../model/contribution.model";
 
+
 /* create */
 export async function contributionCreateService(): Promise<void> {
     try {
@@ -55,18 +56,36 @@ export async function contributionCreateService(): Promise<void> {
 }
 
 /* get */
-export async function contributionGetService(userId: string): Promise<ContributionReturnType> {
+export async function contributionGetService(userId: string): Promise<ContributionReturnType[]> {
     try {
         const res = await db.select({
             id: contributionTable.id,
             tasksDone: contributionTable.tasksDone,
             tasksTotal: contributionTable.tasksTotal,
             tasksMissed: contributionTable.tasksMissed,
+            createdAt: contributionTable.createdAt,
         })
             .from(contributionTable)
             .where(eq(contributionTable.userId, userId));
 
-        return res[0];
+        //post processing
+        const contribution: ContributionReturnType[] = res.reduce<ContributionReturnType[]>(
+            (acc, curr) => {
+                const newContribution: ContributionReturnType = {
+                    id: curr.id,
+                    tasksDone: curr.tasksDone,
+                    tasksMissed: curr.tasksMissed,
+                    tasksTotal: curr.tasksTotal,
+                    createdAt: curr.createdAt,
+                }
+                acc.push(newContribution);
+                return acc;
+            },
+            []
+        )
+
+
+        return contribution;
     } catch (error) {
         console.error((error as Error));
         throw new Error((error as Error).message);
