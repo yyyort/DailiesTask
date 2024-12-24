@@ -6,13 +6,17 @@ import { NoteCreateSchema, NoteUpdateSchema } from "../model/notes.model";
 
 const router = Router();
 
-router.get("/notes", authValidator, notesGetAllController);
-router.get("/notes/:id", authValidator, notesGetController);
-router.get("/notes/groups", authValidator, notesGetAllGroups);
 router.post("/notes", authValidator, schemaValidator(NoteCreateSchema), notesPostController);
+
+router.get("/notes", authValidator, notesGetAllController);
+router.get("/notes/groups", authValidator, notesGetAllGroups);
+router.get("/notes/:id", authValidator, notesGetController);
+
 router.put("/notes/:id", authValidator, schemaValidator(NoteUpdateSchema), notesPutController);
+
 router.patch("/notes/:id/pinned", authValidator, notesPutPinnedController);
 router.patch("/notes/:id/group", authValidator, notesPutGroupController);
+
 router.delete("/notes/:id", authValidator, notesDeleteController);
 
 export default router;

@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { ApiError } from '../util/apiError';
 import { noteCreateService, notesDeleteService, notesRead, notesReadAll, notesReadAllGroup, notesUpdateGroupService, notesUpdatePinnedService, notesUpdateService } from '../service/notes.service';
-import { NoteCreateType, NoteUpdateType } from '../model/notes.model';
+import { NoteCreateType, NoteGroupType, NoteUpdateType } from '../model/notes.model';
 
 /* 
     GET /api/notes
@@ -11,12 +11,24 @@ export const notesGetAllController = async (req: Request, res: Response): Promis
         const userId = req.body.userId;
         const groups = req.query.groups as string;
 
-        //process groups
-        const filterGroups = groups ? groups.split("-") : [];
+        if (groups) {
+            console.log('groups filter in controller', groups);
 
-        const notes = await notesReadAll(userId, filterGroups);
+            //process groups
+            const filterGroups = groups ? groups.split("-") : [];
 
-        res.status(200).json({ message: "Notes retrieved successfully", notes: notes });
+            console.log('filterGroups', filterGroups);
+            const notes = await notesReadAll(userId, filterGroups);
+
+            res.status(200).json({ message: "Notes retrieved successfully", notes: notes });
+        } else {
+
+            const notes = await notesReadAll(userId);
+
+            res.status(200).json({ message: "Notes retrieved successfully", notes: notes });
+        }
+
+
     } catch (error) {
         console.error((error as Error).message);
         if (error instanceof ApiError) {
@@ -56,9 +68,11 @@ export const notesGetAllGroups = async (req: Request, res: Response): Promise<vo
     try {
         const userId = req.body.userId;
 
+        console.log('userId', userId);
+
         const notesGroup = await notesReadAllGroup(userId);
 
-        res.status(200).json({ message: "Notes retrieved successfully", notesGroup: notesGroup });
+        res.status(200).json({ message: "Notes retrieved successfully", groups: notesGroup });
     } catch (error) {
         console.error((error as Error).message);
         if (error instanceof ApiError) {
@@ -83,6 +97,8 @@ export const notesPostController = async (req: Request, res: Response): Promise<
             pinned: pinned as boolean,
             group: group as string[],
         };
+
+        console.log('data in controller', data);
 
         const notes = await noteCreateService(userId, data);
 
@@ -110,7 +126,7 @@ export const notesPutController = async (req: Request, res: Response): Promise<v
             title: title as string,
             content: content as string,
             pinned: pinned as boolean,
-            group: group as string[],
+            group: group as NoteGroupType[],
         };
 
         const notes = await notesUpdateService(userId, noteId, data);
@@ -160,7 +176,7 @@ export const notesPutGroupController = async (req: Request, res: Response): Prom
         const noteId = req.params.id;
         const group = req.body.group;
 
-        const data = group as string[];
+        const data = group as NoteGroupType[];
 
         await notesUpdateGroupService(userId, noteId, data);
 

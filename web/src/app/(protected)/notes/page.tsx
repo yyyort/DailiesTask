@@ -1,9 +1,14 @@
 import NotesAddButton from "@/components/notes/notes-add-button";
 import NotesList from "@/components/notes/notes-container";
 import NotesFilter from "@/components/notes/notes-filters";
-import React from "react";
+import React, { Suspense } from "react";
 
-export default function Notes() {
+type SearchParams = Promise<{ [key: string]: string | string[] | undefined }>;
+
+export default async function Notes(props: { searchParams: SearchParams }) {
+  const searchParams = await props.searchParams;
+  const filterParams = searchParams.groups as string;
+
   return (
     <div
       className="h-screen w-full flex flex-col
@@ -44,7 +49,9 @@ export default function Notes() {
 
       {/* notes */}
       <div className="h-full w-full overflow-y-auto pt-6">
-        <NotesList />
+        <Suspense fallback={<div>Loading...</div>}>
+          <NotesList groups={filterParams} />
+        </Suspense>
       </div>
     </div>
   );

@@ -2,6 +2,7 @@
 import React from "react";
 import { ToggleGroup, ToggleGroupItem } from "../ui/toggle-group";
 import { useRouter, useSearchParams } from "next/navigation";
+import { notesGetGroupsService } from "@/service/noteService";
 
 type NotesFilterType = {
   id: string;
@@ -9,22 +10,27 @@ type NotesFilterType = {
 };
 
 export default function NotesFilter() {
-  const mockFilters: NotesFilterType[] = [
-    {
-      id: "groceries",
-      name: "groceries",
-    },
-    {
-      id: "class note",
-      name: "class note",
-    },
-    {
-      id: "important",
-      name: "important",
-    },
-  ];
+  const [groups, setGroups] = React.useState<NotesFilterType[]>([]);
 
-  const filters = mockFilters;
+  React.useEffect(() => {
+    const fetchGroups = async () => {
+      try {
+        const res = await notesGetGroupsService();
+
+        console.log("in filter", res);
+
+        if (!res) {
+          return;
+        }
+
+        setGroups(res);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    fetchGroups();
+  }, []);
 
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -34,13 +40,13 @@ export default function NotesFilter() {
       <ToggleGroup
         type="multiple"
         defaultValue={
-          searchParams.has("filter")
-            ? (searchParams.get("filter") || "").split("-")
+          searchParams.has("groups")
+            ? (searchParams.get("groups") || "").split("-")
             : ["all"]
         }
         value={
-          searchParams.has("filter")
-            ? (searchParams.get("filter") || "").split("-")
+          searchParams.has("groups")
+            ? (searchParams.get("groups") || "").split("-")
             : ["all"]
         }
         onValueChange={
@@ -50,12 +56,12 @@ export default function NotesFilter() {
             const newParams = new URLSearchParams();
 
             // if all is selected, remove the filter param
-            if (value.includes("all") && searchParams.has("filter")) {
-              newParams.delete("filter");
+            if (value.includes("all") && searchParams.has("groups")) {
+              newParams.delete("groups");
             } else {
               const filterValue = value.filter((v) => v !== "all");
 
-              newParams.set("filter", filterValue.join("-"));
+              newParams.set("groups", filterValue.join("-"));
             }
 
             // navigate to the new url
@@ -74,11 +80,11 @@ export default function NotesFilter() {
         >
           All
         </ToggleGroupItem>
-        {filters.map((routine) => {
+        {groups.map((group) => {
           return (
             <ToggleGroupItem
-              value={routine.name}
-              key={routine.id}
+              value={group.name}
+              key={group.id}
               className="phone-sm:text-lg data-[state=on]:bg-black data-[state=on]:text-white"
             >
               <div
@@ -89,9 +95,9 @@ export default function NotesFilter() {
               >
                 {
                   //limit the length of the routine name to 10 characters
-                  routine.name.length > 10
-                    ? routine.name.substring(0, 10) + "..."
-                    : routine.name
+                  group.name.length > 10
+                    ? group.name.substring(0, 10) + "..."
+                    : group.name
                 }
               </div>
             </ToggleGroupItem>

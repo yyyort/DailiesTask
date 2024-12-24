@@ -12,6 +12,8 @@ import { MultiSelect } from "../ui/multi-select";
 import { PlusCircledIcon } from "@radix-ui/react-icons";
 import { PinIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { notesGetGroupsService, notesPostService } from "@/service/noteService";
+import { useRouter } from "next/navigation";
 
 export default function NotesAddForm() {
   const [groups, setGroups] = React.useState<
@@ -20,10 +22,35 @@ export default function NotesAddForm() {
       label: string;
     }[]
   >([]);
+
+  //fetch groups
+  React.useEffect(() => {
+    const fetchGroups = async () => {
+      const response = await notesGetGroupsService();
+      setGroups(
+        response.map((group) => ({
+          value: group.name,
+          label: group.name,
+        }))
+      );
+    };
+
+    fetchGroups();
+  }, []);
+
   const [newGroup, setNewGroup] = React.useState<string>("");
 
   const handleAddGroup = (group: string) => {
-    setGroups([...groups, { value: group, label: group }]);
+    //handle only if group is not in groups
+    const exist: boolean = groups.some((gr) => gr.label === group);
+
+    console.log("exist", exist);
+
+    if (!exist) {
+      setGroups([...groups, { value: group, label: group }]);
+      setNewGroup("");
+    }
+
     setNewGroup("");
   };
 
@@ -44,9 +71,18 @@ export default function NotesAddForm() {
     },
   });
 
+  const router = useRouter();
+
   const onSubmit: SubmitHandler<NoteCreateType> = async (data) => {
     try {
-      console.log(data);
+      console.log("insubmit", data);
+
+      await notesPostService(data);
+
+      form.reset();
+
+      //reroute to /notes
+      router.push("/notes");
     } catch (error: unknown) {
       console.error(error);
       if (error instanceof Error) {
@@ -249,6 +285,13 @@ export default function NotesAddForm() {
               </div>
             )}
           />
+
+          {/* root error */}
+          {form.formState.errors && (
+            <div className="text-red-600 text-end bg-white">
+              {form.formState.errors.root?.message}
+            </div>
+          )}
 
           {/* submit */}
           {/* submit button */}
