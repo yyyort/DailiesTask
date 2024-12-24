@@ -18,8 +18,8 @@ export default function SidebarMobile() {
     >
       <Sheet>
         <SheetTrigger asChild>
-          <button>
-            <AlignLeftIcon className="size-10 stroke-1" />
+          <button className="px-2">
+            <AlignLeftIcon className="size-10 stroke-1 scale-x-150" />
           </button>
         </SheetTrigger>
 
