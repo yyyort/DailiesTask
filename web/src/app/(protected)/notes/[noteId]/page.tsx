@@ -1,17 +1,38 @@
 "use server";
 
+import NotesEditForm from "@/components/notes/note-edit-form";
+import { NoteType } from "@/model/notes.model";
+import { notesGetSerive } from "@/service/noteService";
+
 type Params = Promise<{ noteId: string }>;
 
 export default async function Page(props: { params: Params }) {
   const params = await props.params;
   const slug = params.noteId;
 
-    console.log(slug);
+  const note: NoteType = await notesGetSerive(slug);
 
   return (
-    <div>
-      <h1>Notes</h1>
-      <h2>{slug}</h2>
+    <div
+      className="h-screen w-full flex flex-col
+        phone-sm:pt-12 pb-5
+        "
+    >
+      {/* titles */}
+      <header
+        className="
+          phone-sm:px-10
+          "
+      >
+        <h1 className="text-2xl font-bold text-slate-900 text-end">
+          Edit Notes
+        </h1>
+      </header>
+
+      {/* form */}
+      <section className="h-full w-full">
+        <NotesEditForm note={note} />
+      </section>
     </div>
   );
 }

@@ -172,10 +172,10 @@ export const notesGetSerive = async (id: string): Promise<NoteType> => {
 
         const data: {
             message: string;
-            note: NoteType;
+            notes: NoteType;
         } = await response.json();
 
-        return data.note;
+        return data.notes;
     } catch (error: unknown) {
         if (error instanceof Error) {
             console.error(error);
@@ -288,6 +288,41 @@ export const notesUpdateService = async (id: string, data: NoteUpdateType): Prom
         }
     }
 }
+
+/* 
+    PATCh api/notes/:id/pinned
+*/
+export const notesUpdatePinnedService = async (id: string, data: boolean): Promise<void> => {
+    try {
+        const accessToken = await getAccessToken();
+
+        const response = await fetch('http://localhost:4000/api/notes/' + (id) + '/pinned', {
+            method: 'PATCH',
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${accessToken}`
+            },
+            body: JSON.stringify({
+                pinned: data
+            }),
+            cache: 'no-cache'
+        });
+
+        if (!response.ok) {
+            if (response.status === 401) {
+                throw new Error('Unauthorized');
+            }
+        }
+
+    } catch (error) {
+        if (error instanceof Error) {
+            console.error(error);
+            throw new Error('Failed to get note');
+        }
+    }
+}
+
 
 
 /* 

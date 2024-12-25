@@ -49,7 +49,7 @@ export const NoteUpdateSchema = z.object({
     content: z.string().optional(),
     pinned: z.boolean().optional(),
     group: z.array(
-        NoteGroupSchema
+        z.string()
     ).optional(),
 })
 

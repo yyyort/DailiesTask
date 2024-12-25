@@ -1,4 +1,4 @@
-import { and, eq, inArray } from "drizzle-orm";
+import { and, desc, eq, inArray } from "drizzle-orm";
 import { db } from "../db/db";
 import { notesGroupJunctionTable, notesGroupTable, notesTable } from "../db/schema";
 import { NoteCreateType, NoteGroupType, NoteType, NoteUpdateType } from "../model/notes.model";
@@ -23,8 +23,6 @@ export async function noteCreateService(
                 })
                 .returning()
 
-            console.log('insertNote in service', insertNote);
-
             //group logic
 
             //pre process group
@@ -34,8 +32,6 @@ export async function noteCreateService(
                     name: group
                 }
             })
-
-            console.log('preproGroup', preproGroup);
 
             //query group that already exist
             const existGroup = await trx
@@ -53,9 +49,6 @@ export async function noteCreateService(
                     )
                 )
 
-            console.log('existGroup', existGroup);
-
-
             //remove group that already exist
             const newGroups = preproGroup.filter((group) => {
                 return !existGroup.some((exist) => {
@@ -65,7 +58,6 @@ export async function noteCreateService(
             )
 
             if (newGroups.length > 0) {
-                console.log('newGroups', newGroups);
 
                 //insert group that not exist
                 const insertNewGroup = await trx
@@ -79,12 +71,10 @@ export async function noteCreateService(
                         }
                     )
 
-                console.log('insertNewGroup', insertNewGroup);
 
                 //regroup the existing group and new group
                 const regroup = existGroup.concat(insertNewGroup)
 
-                console.log('regroup', regroup);
 
                 //insert junction table
                 const junctionTable = regroup.map((group) => {
@@ -95,7 +85,6 @@ export async function noteCreateService(
                     }
                 })
 
-                console.log('junctionTable', junctionTable);
 
                 await trx
                     .insert(notesGroupJunctionTable)
@@ -114,7 +103,6 @@ export async function noteCreateService(
                     group: regroup
                 }
 
-                console.log('finalNote', finalNote);
 
                 return finalNote;
             }
@@ -145,7 +133,7 @@ export async function noteCreateService(
                 group: existGroup
             }
 
-            console.log('finalNote', finalNote);
+
 
             return finalNote;
 
@@ -262,7 +250,7 @@ export async function notesReadAll(
                             eq(notesGroupTable.userId, userId),
                             inArray(notesGroupTable.name, groups)
                         )
-                    )
+                    ).orderBy(desc(notesGroupTable.createdAt))
 
                 //get all ids of notes in the group in junction table
                 const notesIds = await trx
@@ -291,7 +279,7 @@ export async function notesReadAll(
                                 return note.notesId
                             }))
                         )
-                    )
+                    ).orderBy(desc(notesTable.createdAt))
 
                 const finalNote: NoteType[] = await Promise.all(notes.map(async (note) => {
                     //get group in junction table
@@ -318,7 +306,7 @@ export async function notesReadAll(
                                 inArray(notesGroupTable.id, groupIds),
                                 eq(notesGroupTable.userId, userId)
                             )
-                        )
+                        ).orderBy(desc(notesGroupTable.createdAt))
 
                     const finalNote: NoteType = {
                         id: note.id,
@@ -330,7 +318,6 @@ export async function notesReadAll(
                         updatedAt: new Date(note.updatedAt).toISOString(),
                         group: noteGroup
                     }
-
                     return finalNote;
                 }))
 
@@ -343,7 +330,7 @@ export async function notesReadAll(
                 .from(notesTable)
                 .where(
                     eq(notesTable.userId, userId)
-                )
+                ).orderBy(desc(notesTable.createdAt))
 
             //get all group in junction table for each note
             const finalNote: NoteType[] = await Promise.all(notes.map(async (note) => {
@@ -371,7 +358,7 @@ export async function notesReadAll(
                             inArray(notesGroupTable.id, groupIds),
                             eq(notesGroupTable.userId, userId)
                         )
-                    )
+                    ).orderBy(desc(notesGroupTable.createdAt))
 
                 const finalNote: NoteType = {
                     id: note.id,
@@ -410,7 +397,6 @@ export async function notesReadAllGroup(
     userId: string,
 ): Promise<{ id: string, name: string }[]> {
     try {
-        console.log('userId', userId);
 
         const groups = await db.select({
             id: notesGroupTable.id,
@@ -421,8 +407,6 @@ export async function notesReadAllGroup(
                 eq(notesGroupTable.userId, userId)
             )
 
-
-        console.log('groups', groups);
 
         return groups;
 
@@ -445,6 +429,8 @@ export async function notesUpdateService(
     data: NoteUpdateType
 ): Promise<void> {
     try {
+        console.log("data in update service", data);
+
         await db.transaction(async (trx) => {
             await trx
                 .update(notesTable)
@@ -481,23 +467,151 @@ export async function notesUpdateService(
 export async function notesUpdateGroupService(
     userId: string,
     id: string,
-    groups: NoteGroupType[]
+    groups: string[]
 ): Promise<void> {
     try {
-        //pre process group
-        const insertGroup = groups.map((group) => {
-            return {
-                userId: userId,
-                noteId: id,
-                groupId: group.id
-            }
-        })
 
-        await db
-            .insert(notesGroupJunctionTable)
-            .values(
-                insertGroup
-            )
+
+
+        console.log("groups in update group service", groups);
+
+        //query group of the note
+        await db.transaction(async (trx) => {
+            //get group of the note
+            const noteGroupJunctionId = await trx
+                .select({
+                    groupId: notesGroupJunctionTable.groupId
+                })
+                .from(notesGroupJunctionTable)
+                .where(
+                    eq(notesGroupJunctionTable.noteId, id)
+                )
+
+            console.log("note group junction id", noteGroupJunctionId);
+
+            const noteGroup = await trx
+                .select({
+                    id: notesGroupTable.id,
+                    name: notesGroupTable.name
+                })
+                .from(notesGroupTable)
+                .where(
+                    inArray(notesGroupTable.id, noteGroupJunctionId.map((group) => {
+                        return group.groupId
+                    })
+                    )
+                )
+
+            console.log("note group", noteGroup);
+
+            const allGroup: NoteGroupType[] = await trx
+                .select({
+                    id: notesGroupTable.id,
+                    name: notesGroupTable.name
+                })
+                .from(notesGroupTable)
+                .where(
+                    eq(notesGroupTable.userId, userId)
+                )
+
+            console.log("all group", allGroup);
+
+
+            //check if a group is not in allGroup
+            const notExistGroup = groups.filter((group) => {
+                return !allGroup.some((exist) => {
+                    return exist.name === group
+                })
+            })
+
+            console.log("not exist group", notExistGroup);
+
+            //check if a group is in allGroup
+            const existGroup = groups.filter((group) => {
+                return allGroup.some((exist) => {
+                    return exist.name === group
+                })
+            })
+
+            console.log("exist group", existGroup);
+
+            //query group that already exist
+            const existGroupQuery = await trx
+                .select({
+                    id: notesGroupTable.id,
+                    name: notesGroupTable.name
+                })
+                .from(notesGroupTable)
+                .where(
+                    and(
+                        eq(notesGroupTable.userId, userId),
+                        inArray(notesGroupTable.name, existGroup)
+                    )
+                )
+
+            console.log("exist group query", existGroupQuery);
+
+            //get remove group, group in noteGroup but not in existGroupQuery
+            const removeGroup = noteGroup.filter((group) => {
+                return !existGroupQuery.some((exist) => {
+                    return exist.name === group.name
+                })
+            })
+
+            console.log("remove group", removeGroup);
+
+            //delete group in junction table
+            if (removeGroup.length > 0) {
+
+                //delete group in junction table
+                await trx
+                    .delete(notesGroupJunctionTable)
+                    .where(
+                        and(
+                            eq(notesGroupJunctionTable.noteId, id),
+                            inArray(notesGroupJunctionTable.groupId, removeGroup.map((group) => {
+                                return group.id
+                            }))
+                        )
+                    )
+            }
+
+            //insert new group to group table and junction table
+            if (notExistGroup.length > 0) {
+                //create new group
+                const resGroup: NoteGroupType[] = await trx
+                    .insert(notesGroupTable)
+                    .values(
+                        notExistGroup.map((group) => {
+                            return {
+                                userId: userId,
+                                name: group
+                            }
+                        })
+                    )
+                    .returning({
+                        id: notesGroupTable.id,
+                        name: notesGroupTable.name
+                    })
+
+                console.log("res group", resGroup);
+
+                //insert junction table
+                await trx
+                    .insert(notesGroupJunctionTable)
+                    .values(
+                        resGroup.map((group) => {
+                            return {
+                                userId: userId,
+                                groupId: group.id,
+                                noteId: id
+                            }
+                        })
+                    )
+            }
+
+
+        })
     } catch (error) {
         console.error((error as Error));
         if (error instanceof ApiError) {
