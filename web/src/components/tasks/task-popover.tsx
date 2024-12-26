@@ -2,7 +2,7 @@
 
 import React from "react";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
-import { EllipsisVerticalIcon } from "lucide-react";
+import { EditIcon, EllipsisVerticalIcon, Trash } from "lucide-react";
 import { Button } from "../ui/button";
 import {
   Sheet,
@@ -26,21 +26,22 @@ export default function TaskPopOver({ task }: { task: TaskReturnType }) {
         <PopoverTrigger>
           <EllipsisVerticalIcon className="size-7" />
         </PopoverTrigger>
-        <PopoverContent className="flex flex-col gap-2 w-32 
+        <PopoverContent
+          className="flex flex-col gap-2 w-32 
         phone-sm:mx-10
         laptop:ml-20
-        ">
+        "
+        >
           <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
             <SheetTrigger asChild>
-              <Button variant={"outline"} onClick={() => {}}>
-                Edit
+              <Button variant={"outline"} className="flex gap-2 justify-start">
+                <EditIcon />
+                <p>edit</p>
               </Button>
             </SheetTrigger>
 
             <SheetContent
-              side={
-                size.width ?? 0 > 640 ? "right" : "bottom"
-              }
+              side={size.width ?? 0 > 640 ? "right" : "bottom"}
               className="flex flex-col"
             >
               <SheetHeader>
@@ -58,8 +59,10 @@ export default function TaskPopOver({ task }: { task: TaskReturnType }) {
             onClick={async () => {
               taskDeleteService(task.id);
             }}
+            className="flex gap-2 justify-start"
           >
-            Delete
+            <Trash />
+            <p>delete</p>
           </Button>
         </PopoverContent>
       </Popover>

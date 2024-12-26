@@ -17,7 +17,7 @@ export default function NotesAddButton() {
         router.push("/notes/add");
       }}
     >
-      <PlusIcon className="size-full" />
+      <PlusIcon className="size-full dark:text-teal-50" />
       <p>Add Note</p>
     </Button>
   );

@@ -138,10 +138,9 @@ export default function NotesEditForm({ note }: { note: NoteType }) {
                         <Input
                           type="text"
                           placeholder="New Group"
-                          className="
-                    shadow-md fill-white z-10 bg-white bg-opacity-80 backdrop-filter backdrop-blur-sm
-                    phone-sm:text-sm p-2
-                  "
+                          className={`
+                            shadow-md z-10 backdrop-filter backdrop-blur-sm text-foreground
+                            phone-sm:text-sm p-2`}
                           value={newGroup}
                           onChange={(e) => setNewGroup(e.target.value)}
                         />
@@ -159,7 +158,7 @@ export default function NotesEditForm({ note }: { note: NoteType }) {
                   </FormItem>
 
                   {fieldState.error && (
-                    <div className="text-red-600 text-end bg-white">
+                    <div className="text-red-600 text-end bg-primary">
                       {fieldState.error.message}
                     </div>
                   )}
@@ -185,14 +184,15 @@ export default function NotesEditForm({ note }: { note: NoteType }) {
                         variant="ghost"
                         type="button"
                         onClick={() => field.onChange(!field.value)}
-                        className={cn(
-                          "phone-sm:text-2xl p-2",
-                          field.value ? "bg-blue-500" : "bg-gray-200"
-                        )}
+                        className={cn("phone-sm:text-2xl p-2 bg-background")}
                       >
                         <PinIcon
-                          className={cn("h-6 w-6")}
-                          color={field.value ? "white" : "black"}
+                          className={cn(
+                            "h-6 w-6",
+                            field.value
+                              ? "text-primary"
+                              : "text-muted-foreground"
+                          )}
                         />
                       </Button>
                     </FormControl>
@@ -200,7 +200,7 @@ export default function NotesEditForm({ note }: { note: NoteType }) {
 
                   {/* error */}
                   {fieldState.error && (
-                    <div className="text-red-600 text-end bg-white">
+                    <div className="text-red-600 text-end bg-primary">
                       {fieldState.error.message}
                     </div>
                   )}
@@ -239,7 +239,7 @@ export default function NotesEditForm({ note }: { note: NoteType }) {
                       type="text"
                       placeholder="title"
                       className="
-                      shadow-md fill-white z-10 bg-white bg-opacity-80 backdrop-filter backdrop-blur-sm
+                      shadow-md -10 backdrop-filter backdrop-blur-sm
                       phone-sm:text-2xl p-4 h-14
                     "
                     />
@@ -248,7 +248,7 @@ export default function NotesEditForm({ note }: { note: NoteType }) {
 
                 {/* error */}
                 {fieldState.error && (
-                  <div className="text-red-600 text-end bg-white">
+                  <div className="text-red-600 text-end bg-primary">
                     {fieldState.error.message}
                   </div>
                 )}
@@ -280,7 +280,7 @@ export default function NotesEditForm({ note }: { note: NoteType }) {
 
                 {/* error */}
                 {fieldState.error && (
-                  <div className="text-red-600 text-end bg-white">
+                  <div className="text-red-600 text-end bg-primary">
                     {fieldState.error.message}
                   </div>
                 )}
@@ -290,7 +290,7 @@ export default function NotesEditForm({ note }: { note: NoteType }) {
 
           {/* root error */}
           {form.formState.errors && (
-            <div className="text-red-600 text-end bg-white">
+            <div className="text-red-600 text-end bg-primary">
               {form.formState.errors.root?.message}
             </div>
           )}

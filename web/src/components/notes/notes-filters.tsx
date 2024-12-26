@@ -91,7 +91,7 @@ export default function NotesFilter() {
               type="text"
               placeholder="New Group"
               className="
-                    shadow-md fill-white z-10 bg-white bg-opacity-80 backdrop-filter backdrop-blur-sm
+                    shadow-md fill-white z-10 bg-white backdrop-filter backdrop-blur-sm
                     phone-sm:text-sm p-2
                   "
               value={newGroup}
@@ -195,7 +195,7 @@ export default function NotesFilter() {
         <ToggleGroupItem
           value="all"
           className="
-      phone-sm:text-sm data-[state=on]:bg-black data-[state=on]:text-white
+      phone-sm:text-sm data-[state=on]:bg-primary data-[state=on]:text-white
       laptop:text-lg
       "
         >
@@ -206,7 +206,7 @@ export default function NotesFilter() {
             <ToggleGroupItem
               value={group.name}
               key={group.id}
-              className="phone-sm:text-lg data-[state=on]:bg-black data-[state=on]:text-white"
+              className="phone-sm:text-lg data-[state=on]:bg-primary data-[state=on]:text-white"
             >
               <div
                 className="

@@ -34,7 +34,7 @@ export default function TaskAddButton() {
         </SheetTrigger>
         <SheetContent side={
           size.width ?? 0 > 640 ? "right" : "bottom"
-        } className="flex flex-col
+        } className="flex flex-col overflow-y-auto
           tablet:max-w-[30rem]
         ">
           <SheetHeader>

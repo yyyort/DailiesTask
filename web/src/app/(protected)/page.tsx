@@ -41,7 +41,7 @@ export default async function Home(props: { searchParams: SearchParams }) {
             laptop:block
           "
         >
-          <h2 className="text-lg font-bold text-slate-900 py-4">
+          <h2 className="text-lg font-bold text-foreground py-4">
             Pinned Notes:{" "}
           </h2>
           <Suspense fallback={<div>Loading...</div>}>
@@ -86,7 +86,7 @@ export default async function Home(props: { searchParams: SearchParams }) {
             laptop:hidden
           "
         >
-          <h2 className="text-lg font-bold text-slate-900 py-4">
+          <h2 className="text-lg font-bold text-foreground py-4">
             Pinned Notes:{" "}
           </h2>
           <Suspense fallback={<div>Loading...</div>}>

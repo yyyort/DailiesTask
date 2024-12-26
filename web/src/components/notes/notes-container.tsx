@@ -1,6 +1,6 @@
 import { NoteType } from "@/model/notes.model";
 import React from "react";
-import { Button } from "../ui/button";
+
 import { cn } from "@/lib/utils";
 import { EllipsisVerticalIcon, PinIcon } from "lucide-react";
 import { Badge } from "../ui/badge";
@@ -41,11 +41,11 @@ export async function NotesContainer({ note }: { note: NoteType }) {
   return (
     <Link href={`/notes/${note.id}`}>
       <div
-        className="p-4 border border-gray-200 rounded-lg shadow-sm flex flex-col justify-between
+        className="p-4 border border-secondary rounded-lg shadow-sm flex flex-col justify-between
     phone-sm:w-full phone-sm:p-4 phone-sm:mb-4 phone-sm:min-h-[20rem]
     laptop:min-h-[30rem]
-    bg-[#fcfaf7]
-    hover:shadow-md hover:border-gray-300
+    bg-secondary
+    hover:shadow-md hover:border-ring
     transition-all
     "
       >
@@ -53,7 +53,7 @@ export async function NotesContainer({ note }: { note: NoteType }) {
         <div>
           {/* headers */}
           <div className="flex justify-between items-center">
-            <h2 className="text-lg font-bold text-slate-900">
+            <h2 className="text-lg font-bold text-foreground">
               {
                 //limit the length of the note title to 20 characters
                 note.title.length > 20
@@ -63,8 +63,7 @@ export async function NotesContainer({ note }: { note: NoteType }) {
             </h2>
 
             <div className="flex gap-2">
-              <Button
-                variant="ghost"
+              <button
                 type="button"
                 className={cn("px-2")}
                 onClick={async () => {
@@ -81,10 +80,14 @@ export async function NotesContainer({ note }: { note: NoteType }) {
                 }}
               >
                 <PinIcon
-                  className={cn("h-3 w-3")}
-                  color={note.pinned ? "blue" : "#d1d5db"}
+                  className={cn(
+                    "h-5 w-5 hover:text-green-600",
+                    note.pinned
+                      ? "dark:text-green-300 text-green-600 stroke-2"
+                      : "text-gray-700 stroke-1"
+                  )}
                 />
-              </Button>
+              </button>
 
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -127,7 +130,7 @@ export async function NotesContainer({ note }: { note: NoteType }) {
           {/* content */}
           <div>
             <div
-              className="text-sm text-gray-700
+              className="text-sm text-foreground
                       phone-sm:block
                       laptop:hidden
               "
@@ -143,7 +146,7 @@ export async function NotesContainer({ note }: { note: NoteType }) {
             />
 
             <div
-              className="text-sm text-gray-700
+              className="text-sm text-foreground
                       phone-sm:hidden
                       laptop:block
               "

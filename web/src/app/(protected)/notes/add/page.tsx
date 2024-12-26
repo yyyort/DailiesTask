@@ -14,7 +14,7 @@ export default function NotesAdd() {
       phone-sm:px-10
       "
       >
-        <h1 className="text-2xl font-bold text-slate-900 text-end">
+        <h1 className="text-2xl font-bold text-foreground text-end">
           Add Notes
         </h1>
       </header>

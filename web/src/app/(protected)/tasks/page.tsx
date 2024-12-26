@@ -45,8 +45,8 @@ export default async function Tasks(props: { searchParams: SearchParams }) {
             <TaskAddButton />
           </div>
           <div className="flex flex-col">
-            <h1 className="text-2xl text-slate-800 text-end">task today</h1>
-            <div className="flex flex-row items-center gap-2 text-slate-600">
+            <h1 className="text-2xl text-foreground text-end">task today</h1>
+            <div className="flex flex-row items-center gap-2 text-foreground">
               {/* date today */}
               <h3
                 className="
@@ -69,7 +69,7 @@ export default async function Tasks(props: { searchParams: SearchParams }) {
           <TaskFilter />
 
           {/* task count */}
-          <h3 className="text-2xl text-slate-600">
+          <h3 className="text-2xl text-foreground">
             {tasks.filter((task) => task.status === "done").length} /{" "}
             {tasks.length}
           </h3>

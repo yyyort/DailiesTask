@@ -90,7 +90,7 @@ export default function TaskEditForm({
                       type="text"
                       placeholder="title"
                       className="
-                      shadow-md fill-white z-10 bg-white bg-opacity-80 backdrop-filter backdrop-blur-sm
+                      shadow-md backdrop-filter backdrop-blur-sm
                       phone-sm:text-2xl p-4 h-14
                     "
                     />
@@ -99,7 +99,7 @@ export default function TaskEditForm({
 
                 {/* error */}
                 {fieldState.error && (
-                  <div className="text-red-600 text-end bg-white">
+                  <div className="text-red-600 text-end">
                     {fieldState.error.message}
                   </div>
                 )}
@@ -138,7 +138,7 @@ export default function TaskEditForm({
 
                 {/* error */}
                 {fieldState.error && (
-                  <div className="text-red-600 text-end bg-white">
+                  <div className="text-red-600 text-end">
                     {fieldState.error.message}
                   </div>
                 )}
@@ -155,7 +155,6 @@ export default function TaskEditForm({
                   <FormLabel
                     className="
                     phone-sm:text-xl
-                    text-slate-500
                   "
                   ></FormLabel>
                   <FormControl>
@@ -170,7 +169,7 @@ export default function TaskEditForm({
                       }
                       onChange={field.onChange}
                       className="
-                      shadow-md fill-white z-10 bg-white bg-opacity-80 backdrop-filter backdrop-blur-sm
+                      shadow-md backdrop-filter backdrop-blur-sm
                       phone-sm:text-2xl p-4 h-14
                     "
                     />
@@ -179,7 +178,7 @@ export default function TaskEditForm({
 
                 {/* error */}
                 {fieldState.error && (
-                  <div className="text-red-600 text-end bg-white">
+                  <div className="text-red-600 text-end">
                     {fieldState.error.message}
                   </div>
                 )}
@@ -196,7 +195,6 @@ export default function TaskEditForm({
                   <FormLabel
                     className="
                     phone-sm:text-xl
-                    text-slate-500
                   "
                   ></FormLabel>
                   <FormControl>
@@ -206,7 +204,7 @@ export default function TaskEditForm({
                       value={field.value}
                       onChange={field.onChange}
                       className="
-                      shadow-md fill-white z-10 bg-white bg-opacity-80 backdrop-filter backdrop-blur-sm
+                      shadow-md backdrop-filter backdrop-blur-sm
                       phone-sm:text-2xl p-4 h-14
                     "
                     />
@@ -215,7 +213,7 @@ export default function TaskEditForm({
 
                 {/* error */}
                 {fieldState.error && (
-                  <div className="text-red-600 text-end bg-white">
+                  <div className="text-red-600 text-end">
                     {fieldState.error.message}
                   </div>
                 )}
@@ -232,7 +230,7 @@ export default function TaskEditForm({
                   <FormLabel
                     className="
                     phone-sm:text-xl
-                    text-slate-500
+      
                   "
                   ></FormLabel>
                   <FormControl>
@@ -242,7 +240,7 @@ export default function TaskEditForm({
                       placeholder="description"
                       onChange={field.onChange}
                       className="
-                      shadow-md fill-white z-10 bg-white bg-opacity-80 backdrop-filter backdrop-blur-sm
+                      shadow-md backdrop-filter backdrop-blur-sm
                       phone-sm:text-2xl p-4 h-32
                       tablet:h-[20rem]
                     "
@@ -252,7 +250,7 @@ export default function TaskEditForm({
 
                 {/* error */}
                 {fieldState.error && (
-                  <div className="text-red-600 text-end bg-white">
+                  <div className="text-red-600 text-end">
                     {fieldState.error.message}
                   </div>
                 )}

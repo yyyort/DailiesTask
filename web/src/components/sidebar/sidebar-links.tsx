@@ -30,24 +30,40 @@ export default function SidebarLinks({
     {
       name: "home",
       href: "/",
-      icon: <HouseIcon />,
+      icon: <HouseIcon className={
+        cn(
+          pathName === "/" && "text-green-700 dark:text-green-300"
+        )
+      }/>,
       onClick: () => router.push("/"),
     },
     {
       name: "Tasks",
       href: "/tasks",
-      icon: <SquareCheckBigIcon />,
+      icon: <SquareCheckBigIcon className={
+        cn(
+          pathName === "/tasks" && "text-green-700 dark:text-green-300"
+        )
+      }/>,
       onClick: () => router.push("/tasks"),
     },
     {
       name: "Routines",
       href: "/routines",
-      icon: <ListCheckIcon />,
+      icon: <ListCheckIcon className={
+        cn(
+          pathName === "/routines" && "text-green-700 dark:text-green-300"
+        )
+      }/>,
     },
     {
       name: "Notes",
       href: "/notes",
-      icon: <PenLineIcon />,
+      icon: <PenLineIcon className={
+        cn(
+          pathName === "/notes" && "text-green-700 dark:text-green-300"
+        )
+      }/>,
     },
   ];
 
@@ -58,10 +74,14 @@ export default function SidebarLinks({
           key={link.name}
           href={link.href}
           className={cn(
-            "flex items-center hover:bg-slate-300 rounded-md",
+            `flex items-center rounded-md
+            hover:bg-card
+            transition-all duration-200 ease-in-out
+            `,
+            expanded ? "w-full" : "w-fit",
             variant === "mobile" && "p-2 justify-start w-full",
             pathName === link.href && "underline",
-            pathName === link.href && expanded && "bg-slate-300"
+            pathName === link.href && expanded && "bg-card w-full"
           )}
           onClick={link.onClick}
         >
@@ -69,7 +89,7 @@ export default function SidebarLinks({
             className={cn(
               "flex p-2 gap-2",
               variant === "mobile" && "w-full",
-              pathName === link.href && !expanded && "bg-slate-300 rounded-md"
+              pathName === link.href && !expanded && "bg-card rounded-md"
             )}
           >
             {link.icon}

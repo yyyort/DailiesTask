@@ -24,7 +24,7 @@ export const Tiptap = forwardRef(
       editorProps: {
         attributes: {
           class:
-            "prose min-w-full h-[42rem] max-h-[42rem] overflow-auto text-foreground p-4 rounded-lg shadow-md focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
+            "prose min-w-full h-[42rem] max-h-[42rem] overflow-auto text-foreground p-4 rounded-lg shadow-md focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring border focus-visible:border-primary",
         },
       },
       onUpdate({ editor }) {

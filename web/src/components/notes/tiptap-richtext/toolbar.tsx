@@ -19,26 +19,20 @@ import { Toggle } from "@/components/ui/toggle";
 import { Button } from "@/components/ui/button";
 import { Editor } from "@tiptap/react";
 
-
-export const Toolbar = (
-    { editor }: { editor: Editor | undefined }
-) => {
-
+export const Toolbar = ({ editor }: { editor: Editor | undefined }) => {
   if (!editor) {
     return null;
   }
 
   return (
     <>
-      <div className="flex border border-input bg-transparent rounded-sm w-fit">
+      <div className="flex border border-input rounded-sm w-fit">
         <Toggle
           size="sm"
           onPressedChange={() => editor.chain().focus().toggleBold().run()}
           className={cn(
-            "",
-            editor?.isActive("bold")
-              ? "bg-slate-400 text-white"
-              : "bg-transparent"
+            editor?.isActive("bold") ? "bg-primary" : "bg-transparent",
+            "data-[state=on]:bg-primary"
           )}
         >
           <Bold />
@@ -47,10 +41,8 @@ export const Toolbar = (
           size="sm"
           onPressedChange={() => editor?.chain().focus().toggleItalic().run()}
           className={cn(
-            "",
-            editor.isActive("italic")
-              ? "bg-slate-400 text-white"
-              : "bg-transparent"
+            editor?.isActive("italic") ? "bg-primary" : "bg-transparent",
+            "data-[state=on]:bg-primary"
           )}
         >
           <Italic />
@@ -61,10 +53,8 @@ export const Toolbar = (
             editor?.chain().focus().toggleUnderline().run()
           }
           className={cn(
-            "",
-            editor.isActive("underline")
-              ? "bg-slate-400 text-white"
-              : "bg-transparent"
+            editor?.isActive("underline") ? "bg-primary" : "bg-transparent",
+            "data-[state=on]:bg-primary"
           )}
         >
           <UnderlineIcon />
@@ -73,10 +63,8 @@ export const Toolbar = (
           size="sm"
           onPressedChange={() => editor?.chain().focus().toggleStrike().run()}
           className={cn(
-            "",
-            editor.isActive("strike")
-              ? "bg-slate-400 text-white"
-              : "bg-transparent"
+            editor?.isActive("strike") ? "bg-primary" : "bg-transparent",
+            "data-[state=on]:bg-primary"
           )}
         >
           <Strikethrough />
@@ -86,11 +74,10 @@ export const Toolbar = (
           onPressedChange={() =>
             editor?.chain().focus().toggleBulletList().run()
           }
-          className={
-            editor.isActive("bulletList")
-              ? "bg-slate-400 text-white"
-              : "bg-transparent"
-          }
+          className={cn(
+            editor?.isActive("bulletList") ? "bg-primary" : "bg-transparent",
+            "data-[state=on]:bg-primary"
+          )}
         >
           <List />
         </Toggle>
@@ -99,11 +86,10 @@ export const Toolbar = (
           onPressedChange={() =>
             editor?.chain().focus().toggleOrderedList().run()
           }
-          className={
-            editor.isActive("orderedList")
-              ? "bg-slate-400 text-white"
-              : "bg-transparent"
-          }
+          className={cn(
+            editor?.isActive("orderedList") ? "bg-primary" : "bg-transparent",
+            "data-[state=on]:bg-primary"
+          )}
         >
           <ListOrdered />
         </Toggle>
@@ -112,11 +98,10 @@ export const Toolbar = (
           onPressedChange={() =>
             editor?.chain().focus().toggleCodeBlock().run()
           }
-          className={
-            editor.isActive("code")
-              ? "bg-slate-400 text-white"
-              : "bg-transparent"
-          }
+          className={cn(
+            editor?.isActive("code") ? "bg-primary" : "bg-transparent",
+            "data-[state=on]:bg-primary"
+          )}
         >
           <Code />
         </Toggle>

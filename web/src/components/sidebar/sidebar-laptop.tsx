@@ -2,13 +2,13 @@
 
 import { cn } from "@/lib/utils";
 import React from "react";
-import { Button } from "../ui/button";
 import SidebarLinks from "./sidebar-links";
 import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 import LogoutButton from "../auth-page/logout-button";
 import { ModeToggle } from "../ui/theme-mode-toggle";
 import { getUserData } from "@/service/authService";
 import { UserReturnType } from "@/model/userModel";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 
 export default function SidebarLaptop() {
   const [expanded, setExpanded] = React.useState(false);
@@ -31,7 +31,9 @@ export default function SidebarLaptop() {
   return (
     <div
       className={cn(
-        "flex flex-col h-screen bg-slate-200 items-center gap-2 justify-between",
+        `flex flex-col h-screen bg-secondary items-center gap-2 justify-between
+         transition-all duration-50000 ease
+        `,
         expanded ? "w-40" : "w-20"
       )}
     >
@@ -40,20 +42,42 @@ export default function SidebarLaptop() {
         {/* profile */}
         <div className="mt-10">
           <div className="flex flex-row items-center gap-2 overflow-clip">
-            <p>{user.name}</p>
+            <Avatar>
+              {/* to change to user profile */}
+              <AvatarImage src="https://github.com/shadcn.png" />
+              <AvatarFallback>CN</AvatarFallback>
+            </Avatar>
+            {
+              expanded && (
+                <p>
+                  {user.name}
+                </p>
+              )
+            }
           </div>
 
           <div>
-            <Button
+            <button
               onClick={() => setExpanded(!expanded)}
-              variant={"outline"}
               className={cn(
-                "relative top-8 -right-10 bg-slate-200",
-                expanded ? "-right-24" : ""
+                "relative top-8 -right-10 bg-secondary w-10 h-10 rounded-lg flex items-center justify-center",
+                expanded ? "-right-28" : ""
               )}
             >
-              {expanded ? <ChevronLeftIcon /> : <ChevronRightIcon />}
-            </Button>
+              {expanded ? (
+                <ChevronLeftIcon
+                  className="w-6 h-6
+                  hover:text-green-900 dark:hover:text-green-300 hover:scale-125
+                "
+                />
+              ) : (
+                <ChevronRightIcon
+                  className="w-6 h-6
+                hover:text-green-900 dark:hover:text-green-300 hover:scale-125
+              "
+                />
+              )}
+            </button>
             {/* theme */}
             <div className="mb-10">
               <ModeToggle />

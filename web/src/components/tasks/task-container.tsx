@@ -14,7 +14,7 @@ export default function TaskContainer({
   return (
     <div
       className={cn(
-        `bg-slate-100 rounded-md shadow-md border-b-2 border-r-2 border-slate-200 backdrop-blur-md backdrop-filter flex flex-row
+        `bg-card rounded-md shadow-md border-b-2 border-r-2 border-primary backdrop-blur-md backdrop-filter flex flex-row
       laptop:mb-4
     `,
         task.status === "overdue" && "bg-red-300 bg-opacity-80",
@@ -46,7 +46,8 @@ export default function TaskContainer({
                 "text-2xl font-semibold",
                 variant === "routine" && "text-xl",
                 variant === "minimal" && "text-md",
-                task.status === "done" && "line-through"
+                task.status === "done" &&
+                  "line-through text-secondary-foreground"
               )}
             >
               {task.title}
@@ -89,7 +90,7 @@ export default function TaskContainer({
 
         {variant === "routine" && (
           <div>
-            <div className="w-full border-b-2 border-slate-200 mb-2"></div>
+            <div className="w-full border-b-2 border-green-300 mb-2"></div>
             <div className="flex justify-between">
               <h3 className="text-slate-600 text-sm font-mono">
                 {
@@ -108,7 +109,7 @@ export default function TaskContainer({
 
         {variant === "default" && (
           <div>
-            <div className="w-full border-b-2 border-slate-200 mb-2"></div>
+            <div className="w-full border-b-2 border-green-300 mb-2"></div>
             <div className="flex justify-between">
               <h3 className="text-slate-600 text-sm font-mono">
                 {

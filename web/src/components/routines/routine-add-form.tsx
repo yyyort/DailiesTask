@@ -88,7 +88,6 @@ export default function RoutineAddForm({
                   <FormLabel
                     className="
                     phone-sm:text-xl
-                    text-slate-500
                   "
                   ></FormLabel>
                   <FormControl>
@@ -97,7 +96,7 @@ export default function RoutineAddForm({
                       type="text"
                       placeholder="title"
                       className="
-                      shadow-md fill-white z-10 bg-white bg-opacity-80 backdrop-filter backdrop-blur-sm
+                      shadow-md backdrop-filter backdrop-blur-sm
                       phone-sm:text-2xl p-4 h-14
                     "
                     />
@@ -106,7 +105,7 @@ export default function RoutineAddForm({
 
                 {/* error */}
                 {fieldState.error && (
-                  <div className="text-red-600 text-end bg-white">
+                  <div className="text-red-600 text-end">
                     {fieldState.error.message}
                   </div>
                 )}
@@ -134,7 +133,6 @@ export default function RoutineAddForm({
                         <FormLabel
                           className="
                     phone-sm:text-xl
-                    text-slate-500
                   "
                         ></FormLabel>
                         <FormControl>
@@ -144,7 +142,7 @@ export default function RoutineAddForm({
                             placeholder="description"
                             onChange={field.onChange}
                             className="
-                      shadow-md fill-white z-10 bg-white bg-opacity-80 backdrop-filter backdrop-blur-sm
+                      shadow-md backdrop-filter backdrop-blur-sm
                       phone-sm:text-2xl p-4 phone-sm:h-32
                       tablet:h-[20rem]
                     "
@@ -154,7 +152,7 @@ export default function RoutineAddForm({
 
                       {/* error */}
                       {fieldState.error && (
-                        <div className="text-red-600 text-end bg-white">
+                        <div className="text-red-600 text-end">
                           {fieldState.error.message}
                         </div>
                       )}
@@ -187,7 +185,6 @@ export default function RoutineAddForm({
                           <FormLabel
                             className="
                             phone-sm:text-xl
-                            text-slate-500
                         "
                           ></FormLabel>
                           <FormControl>
@@ -196,7 +193,7 @@ export default function RoutineAddForm({
                               type="text"
                               placeholder="task title"
                               className="
-                            shadow-md fill-white z-10 bg-white bg-opacity-80 backdrop-filter backdrop-blur-sm
+                            shadow-md backdrop-filter backdrop-blur-sm
                             phone-sm:text-2xl p-4 h-14
                             "
                             />
@@ -205,7 +202,7 @@ export default function RoutineAddForm({
 
                         {/* error */}
                         {fieldState.error && (
-                          <div className="text-red-600 text-end bg-white">
+                          <div className="text-red-600 text-end">
                             {fieldState.error.message}
                           </div>
                         )}
@@ -222,7 +219,6 @@ export default function RoutineAddForm({
                           <FormLabel
                             className="
                             phone-sm:text-xl
-                            text-slate-500
                         "
                           ></FormLabel>
                           <FormControl>
@@ -237,7 +233,7 @@ export default function RoutineAddForm({
                               }
                               onChange={field.onChange}
                               className="
-                            shadow-md fill-white z-10 bg-white bg-opacity-80 backdrop-filter backdrop-blur-sm
+                            shadow-md backdrop-filter backdrop-blur-sm
                             phone-sm:text-2xl h-14
                             "
                             />
@@ -246,7 +242,7 @@ export default function RoutineAddForm({
 
                         {/* error */}
                         {fieldState.error && (
-                          <div className="text-red-600 text-end bg-white">
+                          <div className="text-red-600 text-end">
                             {fieldState.error.message}
                           </div>
                         )}
@@ -256,7 +252,7 @@ export default function RoutineAddForm({
                 </div>
 
                 <button onClick={() => remove(index)} type="button">
-                  <X />
+                  <X className="text-primary"/>
                 </button>
               </div>
             ))}
@@ -276,7 +272,7 @@ export default function RoutineAddForm({
             className="text-2xl py-7 hover:border-black hover:border-2"
             variant={"secondary"}
           >
-            <Plus />
+            <Plus className="text-primary"/>
             Add Task
           </Button>
 

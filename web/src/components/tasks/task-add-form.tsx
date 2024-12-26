@@ -77,7 +77,7 @@ export default function TaskAddForm({
                   <FormLabel
                     className="
                     phone-sm:text-xl
-                    text-slate-500
+                    text-foreground
                   "
                   ></FormLabel>
                   <FormControl>
@@ -86,7 +86,7 @@ export default function TaskAddForm({
                       type="text"
                       placeholder="title"
                       className="
-                      shadow-md fill-white z-10 bg-white bg-opacity-80 backdrop-filter backdrop-blur-sm
+                      shadow-md z-10 backdrop-filter backdrop-blur-sm
                       phone-sm:text-2xl p-4 h-14
                     "
                     />
@@ -95,7 +95,7 @@ export default function TaskAddForm({
 
                 {/* error */}
                 {fieldState.error && (
-                  <div className="text-red-600 text-end bg-white">
+                  <div className="text-red-600 text-end bg-background">
                     {fieldState.error.message}
                   </div>
                 )}
@@ -122,12 +122,12 @@ export default function TaskAddForm({
                       value={
                         //transform timeToDo if format is hh:mm to hh:mm:ss
                         field.value?.length === 5
-                            ? field.value + ":00"
-                            : field.value
+                          ? field.value + ":00"
+                          : field.value
                       }
                       onChange={field.onChange}
                       className="
-                      shadow-md fill-white z-10 bg-white bg-opacity-80 backdrop-filter backdrop-blur-sm
+                      shadow-md z-10 backdrop-filter backdrop-blur-sm
                       phone-sm:text-2xl p-4 h-14
                     "
                     />
@@ -136,7 +136,7 @@ export default function TaskAddForm({
 
                 {/* error */}
                 {fieldState.error && (
-                  <div className="text-red-600 text-end bg-white">
+                  <div className="text-red-600 text-end bg-background">
                     {fieldState.error.message}
                   </div>
                 )}
@@ -163,7 +163,7 @@ export default function TaskAddForm({
                       value={field.value}
                       onChange={field.onChange}
                       className="
-                      shadow-md fill-white z-10 bg-white bg-opacity-80 backdrop-filter backdrop-blur-sm
+                      shadow-md backdrop-filter backdrop-blur-sm
                       phone-sm:text-2xl p-4 h-14
                     "
                     />
@@ -172,7 +172,7 @@ export default function TaskAddForm({
 
                 {/* error */}
                 {fieldState.error && (
-                  <div className="text-red-600 text-end bg-white">
+                  <div className="text-red-600 text-end bg-background">
                     {fieldState.error.message}
                   </div>
                 )}
@@ -199,7 +199,7 @@ export default function TaskAddForm({
                       placeholder="description"
                       onChange={field.onChange}
                       className="
-                      shadow-md fill-white z-10 bg-white bg-opacity-80 backdrop-filter backdrop-blur-sm
+                      shadow-md backdrop-filter backdrop-blur-sm
                       phone-sm:text-2xl p-4 phone-sm:h-32
                       tablet:h-[20rem]
                     "
@@ -209,7 +209,7 @@ export default function TaskAddForm({
 
                 {/* error */}
                 {fieldState.error && (
-                  <div className="text-red-600 text-end bg-white">
+                  <div className="text-red-600 text-end bg-background">
                     {fieldState.error.message}
                   </div>
                 )}

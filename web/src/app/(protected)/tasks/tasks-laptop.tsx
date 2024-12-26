@@ -14,11 +14,12 @@ export default function TasksLaptop(
         grid
         laptop:grid-cols-2
         desktop:grid-cols-3
-        gap-4
+        gap-x-8
+        gap-y-4
     '>
         <div>
             <h2 className='
-                text-2xl text-slate-800 font-semibold
+                text-2xl text-foreground font-semibold mb-3
             '>To do</h2>
             {todoTasks.map((task) => (
                 <TaskContainer key={task.id} task={task} />
@@ -26,7 +27,7 @@ export default function TasksLaptop(
         </div>
         <div>
             <h2 className='
-                text-2xl text-slate-800 font-semibold
+                text-2xl text-foreground font-semibold mb-3
             '>Done</h2>
             {doneTasks.map((task) => (
                 <TaskContainer key={task.id} task={task} />
@@ -34,7 +35,7 @@ export default function TasksLaptop(
         </div>
         <div>
             <h2 className='
-                text-2xl text-slate-800 font-semibold
+                text-2xl text-foreground font-semibold mb-3
             '>Overdue</h2>
             {overdueTasks.map((task) => (
                 <TaskContainer key={task.id} task={task} />

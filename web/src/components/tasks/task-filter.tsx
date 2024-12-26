@@ -31,7 +31,11 @@ export default function TaskFilter() {
             // if all is selected, remove the filter param
             if (value.includes("all") && searchParams.has("filter")) {
               newParams.delete("filter");
-            } else if (value.includes("todo") || value.includes("done") || value.includes("overdue")) {
+            } else if (
+              value.includes("todo") ||
+              value.includes("done") ||
+              value.includes("overdue")
+            ) {
               const filterValue = value.filter((v) => v !== "all");
 
               newParams.set("filter", filterValue.join(" "));
@@ -44,18 +48,38 @@ export default function TaskFilter() {
         className="flex flex-row gap-2 mb-3"
         variant={"default"}
       >
-        <ToggleGroupItem value="all" className="
-        phone-sm:text-lg data-[state=on]:bg-black data-[state=on]:text-white
-        ">All</ToggleGroupItem>
-        <ToggleGroupItem value="todo" className="
-        phone-sm:text-lg data-[state=on]:bg-black data-[state=on]:text-white
-        ">todo</ToggleGroupItem>
-        <ToggleGroupItem value="done" className="
-        phone-sm:text-lg data-[state=on]:bg-black data-[state=on]:text-white
-        ">done</ToggleGroupItem>
-        <ToggleGroupItem value="overdue" className="
-        phone-sm:text-lg data-[state=on]:bg-black data-[state=on]:text-white
-        ">overdue</ToggleGroupItem>
+        <ToggleGroupItem
+          value="all"
+          className="
+        phone-sm:text-lg data-[state=on]:bg-primary data-[state=on]:text-white
+        "
+        >
+          All
+        </ToggleGroupItem>
+        <ToggleGroupItem
+          value="todo"
+          className="
+        phone-sm:text-lg data-[state=on]:bg-primary data-[state=on]:text-white
+        "
+        >
+          todo
+        </ToggleGroupItem>
+        <ToggleGroupItem
+          value="done"
+          className="
+        phone-sm:text-lg data-[state=on]:bg-primary data-[state=on]:text-white
+        "
+        >
+          done
+        </ToggleGroupItem>
+        <ToggleGroupItem
+          value="overdue"
+          className="
+        phone-sm:text-lg data-[state=on]:bg-primary data-[state=on]:text-white
+        "
+        >
+          overdue
+        </ToggleGroupItem>
       </ToggleGroup>
     </>
   );

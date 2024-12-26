@@ -17,9 +17,9 @@ export default function RoutineContainer({
     <div
       className="
         flex flex-col gap-2  p-4 
-        bg-slate-100 bg-opacity-10
-        rounded-md shadow-md border-slate-100 border-b-2 border-r-2
-        hover:border-slate-200 hover:border-b-4 hover:shadow-lg
+        rounded-md shadow-md border-primary border-b-2 border-r-2 border-l-[0.5px] border-t-[0.5px]
+        dark:border-t-green-950 border-t-green-100
+        dark:border-l-green-950 border-l-green-100
       "
     >
       <div className="flex justify-between items-center">

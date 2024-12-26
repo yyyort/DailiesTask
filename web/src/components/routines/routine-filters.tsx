@@ -63,7 +63,7 @@ export default function RoutineFilter() {
         <ToggleGroupItem
           value="all"
           className="
-        phone-sm:text-lg data-[state=on]:bg-black data-[state=on]:text-white
+        phone-sm:text-lg data-[state=on]:bg-primary data-[state=on]:text-white
         "
         >
           All
@@ -73,7 +73,7 @@ export default function RoutineFilter() {
             <ToggleGroupItem
               value={routine.title}
               key={routine.id}
-              className="phone-sm:text-lg data-[state=on]:bg-black data-[state=on]:text-white"
+              className="phone-sm:text-lg data-[state=on]:bg-primary data-[state=on]:text-white"
             >
               {routine.title}
             </ToggleGroupItem>

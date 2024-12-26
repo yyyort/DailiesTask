@@ -22,7 +22,7 @@ export default async function Notes(props: { searchParams: SearchParams }) {
       phone-sm:px-10
       "
         >
-          <h1 className="text-2xl font-bold text-slate-900 text-end">Notes</h1>
+          <h1 className="text-2xl font-bold text-foreground text-end">Notes</h1>
         </header>
 
         <div className="flex justify-between items-end">
