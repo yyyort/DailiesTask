@@ -126,32 +126,37 @@ export async function NotesContainer({ note }: { note: NoteType }) {
 
           {/* content */}
           <div>
-            <p
-              className="
-        phone-sm:block phone-sm:text-sm
-        laptop:hidden
-        "
-            >
-              {
-                //limit the length of the note content to 100 characters
-                note.content.length > 250
-                  ? `${note.content.slice(0, 250)}...`
-                  : note.content
+            <div
+              className="text-sm text-gray-700
+                      phone-sm:block
+                      laptop:hidden
+              "
+              dangerouslySetInnerHTML={
+                //parse the note content as HTML
+                {
+                  __html:
+                    note.content.length > 250
+                      ? `${note.content.slice(0, 250)}...`
+                      : note.content,
+                }
               }
-            </p>
-            <p
-              className="
-        phone-sm:hidden
-        laptop:block
-        "
-            >
-              {
-                //limit the length of the note content to 100 characters
-                note.content.length > 800
-                  ? `${note.content.slice(0, 800)} ...`
-                  : note.content
+            />
+
+            <div
+              className="text-sm text-gray-700
+                      phone-sm:hidden
+                      laptop:block
+              "
+              dangerouslySetInnerHTML={
+                //parse the note content as HTML
+                {
+                  __html:
+                    note.content.length > 800
+                      ? `${note.content.slice(0, 800)} ...`
+                      : note.content,
+                }
               }
-            </p>
+            />
           </div>
         </div>
 

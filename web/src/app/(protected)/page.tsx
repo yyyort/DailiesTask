@@ -5,6 +5,9 @@ import { TaskReturnType } from "@/model/task.model";
 import { contributionGetService } from "@/service/contributionService";
 import { taskGetService } from "@/service/taskService";
 import TasksHome from "./tasks/tasks-home";
+import HomeCalendarMobile from "@/components/home/homeCalendar-mobile";
+import PinnedNotes from "@/components/home/pinnedNotes";
+import { Suspense } from "react";
 
 type SearchParams = Promise<{ [key: string]: string | string[] | undefined }>;
 
@@ -26,25 +29,69 @@ export default async function Home(props: { searchParams: SearchParams }) {
     laptop:flex laptop:flex-row
     "
     >
+      {/* contributions graph */}
       <div>
         <ContributionsHeatmap contributions={contributions} />
-      </div>
-      <div className="">
+
+        {/* notes */}
         <div
           className="
+            pl-7
+            phone-sm:hidden
+            laptop:block
+          "
+        >
+          <h2 className="text-lg font-bold text-slate-900 py-4">
+            Pinned Notes:{" "}
+          </h2>
+          <Suspense fallback={<div>Loading...</div>}>
+            <PinnedNotes />
+          </Suspense>
+        </div>
+      </div>
+
+      <div className="">
+        {/* tasks */}
+        <div className="flex flex-col gap-4 p-4 overflow-auto">
+          <div
+            className="
         phone-sm:hidden
         laptop:block
         "
-        >
-          <HomeCalendar />
-        </div>
+          >
+            <HomeCalendar />
+          </div>
 
-        <div className="flex flex-col gap-4 p-4 overflow-auto">
-          <h3 className="text-lg font-medium">
-            {totalTasksDone} / {totalTasks} tasks done
-          </h3>
+          <div className="flex justify-between items-center">
+            <h3 className="text-lg font-medium">
+              {totalTasksDone} / {totalTasks} tasks done
+            </h3>
+            <div
+              className="
+          phone-sm:block
+          laptop:hidden
+          "
+            >
+              <HomeCalendarMobile />
+            </div>
+          </div>
 
           <TasksHome tasks={tasks} />
+        </div>
+
+        {/* notes */}
+        <div
+          className="
+            phone-sm:block
+            laptop:hidden
+          "
+        >
+          <h2 className="text-lg font-bold text-slate-900 py-4">
+            Pinned Notes:{" "}
+          </h2>
+          <Suspense fallback={<div>Loading...</div>}>
+            <PinnedNotes />
+          </Suspense>
         </div>
       </div>
     </div>

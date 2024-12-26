@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { authValidator } from "../middleware/authValidator";
-import { notesDeleteController, notesGetAllController, notesGetAllGroups, notesGetController, notesPostController, notesPutController, notesPutPinnedController } from "../controller/notes.controller";
+import { notesDeleteController, notesGetAllController, notesGetAllGroups, notesGetAllPinnedController, notesGetController, notesPostController, notesPutController, notesPutPinnedController } from "../controller/notes.controller";
 import { schemaValidator } from "../middleware/schemaValidator";
 import { NoteCreateSchema, NoteUpdateSchema } from "../model/notes.model";
 
@@ -10,6 +10,7 @@ router.post("/notes", authValidator, schemaValidator(NoteCreateSchema), notesPos
 
 router.get("/notes", authValidator, notesGetAllController);
 router.get("/notes/groups", authValidator, notesGetAllGroups);
+router.get("/notes/pinned", authValidator, notesGetAllPinnedController);
 router.get("/notes/:id", authValidator, notesGetController);
 
 router.put("/notes/:id", authValidator, schemaValidator(NoteUpdateSchema), notesPutController);

@@ -3,6 +3,7 @@ import React from "react";
 import { ToggleGroup, ToggleGroupItem } from "../ui/toggle-group";
 import { useRouter, useSearchParams } from "next/navigation";
 import { notesGetGroupsService } from "@/service/noteService";
+import { FilterIcon } from "lucide-react";
 
 type NotesFilterType = {
   id: string;
@@ -37,6 +38,11 @@ export default function NotesFilter() {
 
   return (
     <>
+      <div
+        className="p-2"
+      >
+        <FilterIcon className="w-6 h-6" />
+      </div>
       <ToggleGroup
         type="multiple"
         defaultValue={

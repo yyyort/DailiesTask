@@ -1,6 +1,7 @@
 import { NoteCreateType, NoteType, NoteUpdateType } from "@/model/notes.model"
 import { redirect } from "next/navigation";
 import { getAccessToken } from "./authService";
+import DOMPurify from 'dompurify';
 
 /* 
     GET ALL api/notes
@@ -79,6 +80,53 @@ export const notesGetAllService = async (groups?: string): Promise<NoteType[]> =
 
     }
 }
+
+export const notesGetAllPinnedController = async (): Promise<NoteType[]> => {
+    try {
+        const accessToken = await getAccessToken();
+
+
+        const response = await fetch('http://localhost:4000/api/notes/pinned', {
+            method: 'GET',
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${accessToken}`
+            },
+            cache: 'no-cache'
+        });
+
+        if (!response.ok) {
+            if (response.status === 401) {
+                throw new Error('Unauthorized');
+            }
+            return [];
+        }
+
+        const data: {
+            message: string;
+            notes: NoteType[];
+        } = await response.json();
+
+        return data.notes;
+
+    } catch (error: unknown) {
+        if (error instanceof Error) {
+            console.error(error);
+
+            if (error.message === 'Unauthorized') {
+                redirect('/signin');
+            } else {
+                console.error(error);
+                throw new Error('Failed to get notes');
+            }
+        }
+
+        return [];
+
+    }
+}
+
 
 /* 
     GET all note groups api/notes/groups
@@ -204,6 +252,16 @@ export const notesPostService = async (data: NoteCreateType): Promise<NoteType> 
     try {
         const accessToken = await getAccessToken();
 
+        //dom purify data content
+
+        const cleanContent = DOMPurify.sanitize(data.content);
+
+        const cleanData: NoteCreateType = {
+            ...data,
+            content: cleanContent
+        }
+
+
         const response = await fetch('http://localhost:4000/api/notes', {
             method: 'POST',
             credentials: 'include',
@@ -211,7 +269,7 @@ export const notesPostService = async (data: NoteCreateType): Promise<NoteType> 
                 'Content-Type': 'application/json',
                 Authorization: `Bearer ${accessToken}`
             },
-            body: JSON.stringify(data),
+            body: JSON.stringify(cleanData),
             cache: 'no-cache'
         });
 
@@ -264,6 +322,13 @@ export const notesUpdateService = async (id: string, data: NoteUpdateType): Prom
     try {
         const accessToken = await getAccessToken();
 
+        //dom purify data content
+        const cleanContent = DOMPurify.sanitize(data?.content ?? '');
+        const cleanData: NoteUpdateType = {
+            ...data,
+            content: cleanContent
+        }
+
         const response = await fetch('http://localhost:4000/api/notes/' + (id), {
             method: 'PUT',
             credentials: 'include',
@@ -271,7 +336,7 @@ export const notesUpdateService = async (id: string, data: NoteUpdateType): Prom
                 'Content-Type': 'application/json',
                 Authorization: `Bearer ${accessToken}`
             },
-            body: JSON.stringify(data),
+            body: JSON.stringify(cleanData),
             cache: 'no-cache'
         });
 

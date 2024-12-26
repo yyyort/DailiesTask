@@ -24,67 +24,97 @@ export async function noteCreateService(
                 .returning()
 
             //group logic
-
-            //pre process group
-            const preproGroup = data.group.map((group) => {
-                return {
-                    userId: userId,
-                    name: group
-                }
-            })
-
-            //query group that already exist
-            const existGroup = await trx
-                .select(
-                    {
-                        id: notesGroupTable.id,
-                        name: notesGroupTable.name
+            if (data.group && data.group.length > 0) {
+                //pre process group
+                const preproGroup = data.group.map((group) => {
+                    return {
+                        userId: userId,
+                        name: group
                     }
-                )
-                .from(notesGroupTable)
-                .where(
-                    and(
-                        eq(notesGroupTable.userId, userId),
-                        inArray(notesGroupTable.name, data.group)
-                    )
-                )
-
-            //remove group that already exist
-            const newGroups = preproGroup.filter((group) => {
-                return !existGroup.some((exist) => {
-                    return exist.name === group.name
                 })
-            }
-            )
 
-            if (newGroups.length > 0) {
-
-                //insert group that not exist
-                const insertNewGroup = await trx
-                    .insert(notesGroupTable)
-                    .values(
-                        newGroups
-                    ).returning(
+                //query group that already exist
+                const existGroup = await trx
+                    .select(
                         {
                             id: notesGroupTable.id,
                             name: notesGroupTable.name
                         }
                     )
+                    .from(notesGroupTable)
+                    .where(
+                        and(
+                            eq(notesGroupTable.userId, userId),
+                            inArray(notesGroupTable.name, data.group)
+                        )
+                    )
+
+                //remove group that already exist
+                const newGroups = preproGroup.filter((group) => {
+                    return !existGroup.some((exist) => {
+                        return exist.name === group.name
+                    })
+                }
+                )
+
+                if (newGroups.length > 0) {
+
+                    //insert group that not exist
+                    const insertNewGroup = await trx
+                        .insert(notesGroupTable)
+                        .values(
+                            newGroups
+                        ).returning(
+                            {
+                                id: notesGroupTable.id,
+                                name: notesGroupTable.name
+                            }
+                        )
 
 
-                //regroup the existing group and new group
-                const regroup = existGroup.concat(insertNewGroup)
+                    //regroup the existing group and new group
+                    const regroup = existGroup.concat(insertNewGroup)
 
+
+                    //insert junction table
+                    const junctionTable = regroup.map((group) => {
+                        return {
+                            userId: userId,
+                            groupId: group.id,
+                            noteId: insertNote[0].id
+                        }
+                    })
+
+
+                    await trx
+                        .insert(notesGroupJunctionTable)
+                        .values(
+                            junctionTable
+                        )
+
+                    const finalNote: NoteType = {
+                        id: insertNote[0].id,
+                        userId: insertNote[0].userId,
+                        title: insertNote[0].title,
+                        content: insertNote[0].content,
+                        pinned: insertNote[0].pinned,
+                        createdAt: new Date(insertNote[0].createdAt).toISOString(),
+                        updatedAt: new Date(insertNote[0].updatedAt).toISOString(),
+                        group: regroup
+                    }
+
+
+                    return finalNote;
+                }
 
                 //insert junction table
-                const junctionTable = regroup.map((group) => {
+                const junctionTable = existGroup.map((group) => {
                     return {
                         userId: userId,
                         groupId: group.id,
                         noteId: insertNote[0].id
                     }
                 })
-
 
                 await trx
                     .insert(notesGroupJunctionTable)
@@ -100,27 +130,15 @@ export async function noteCreateService(
                     pinned: insertNote[0].pinned,
                     createdAt: new Date(insertNote[0].createdAt).toISOString(),
                     updatedAt: new Date(insertNote[0].updatedAt).toISOString(),
-                    group: regroup
+                    group: existGroup
                 }
+
 
 
                 return finalNote;
+
             }
 
-            //insert junction table
-            const junctionTable = existGroup.map((group) => {
-                return {
-                    userId: userId,
-                    groupId: group.id,
-                    noteId: insertNote[0].id
-                }
-            })
-
-            await trx
-                .insert(notesGroupJunctionTable)
-                .values(
-                    junctionTable
-                )
 
             const finalNote: NoteType = {
                 id: insertNote[0].id,
@@ -130,10 +148,8 @@ export async function noteCreateService(
                 pinned: insertNote[0].pinned,
                 createdAt: new Date(insertNote[0].createdAt).toISOString(),
                 updatedAt: new Date(insertNote[0].updatedAt).toISOString(),
-                group: existGroup
+                group: []
             }
-
-
 
             return finalNote;
 
@@ -391,6 +407,85 @@ export async function notesReadAll(
 }
 
 /* 
+    READ ALL PINNED NOTES
+*/
+export async function notesReadAllPinned(
+    userId: string,
+): Promise<NoteType[]> {
+    try {
+        const notes: NoteType[] = await db.transaction(async (trx) => {
+
+            //get all notes
+            const notes = await trx
+                .select()
+                .from(notesTable)
+                .where(
+                    and(
+                        eq(notesTable.userId, userId),
+                        eq(notesTable.pinned, true)
+                    )
+                ).orderBy(desc(notesTable.createdAt))
+
+            //get all group in junction table for each note
+            const finalNote: NoteType[] = await Promise.all(notes.map(async (note) => {
+                //get group in junction table
+                const groups = await trx
+                    .select()
+                    .from(notesGroupJunctionTable)
+                    .where(
+                        eq(notesGroupJunctionTable.noteId, note.id)
+                    )
+
+                const groupIds = groups.map((group) => {
+                    return group.groupId
+                })
+
+                //get the group corresponding to the group id
+                const noteGroup = await trx
+                    .select({
+                        id: notesGroupTable.id,
+                        name: notesGroupTable.name
+                    })
+                    .from(notesGroupTable)
+                    .where(
+                        and(
+                            inArray(notesGroupTable.id, groupIds),
+                            eq(notesGroupTable.userId, userId)
+                        )
+                    ).orderBy(desc(notesGroupTable.createdAt))
+
+                const finalNote: NoteType = {
+                    id: note.id,
+                    userId: note.userId,
+                    title: note.title,
+                    content: note.content,
+                    pinned: note.pinned,
+                    createdAt: new Date(note.createdAt).toISOString(),
+                    updatedAt: new Date(note.updatedAt).toISOString(),
+                    group: noteGroup
+                }
+
+                return finalNote;
+            }))
+
+            return finalNote;
+
+        });
+
+        return notes;
+    } catch (error) {
+        console.error((error as Error));
+        if (error instanceof ApiError) {
+            throw error;
+        }
+
+        throw new Error((error as Error).message);
+
+    }
+}
+
+
+/* 
     READ ALL GROUP
 */
 export async function notesReadAllGroup(
@@ -437,6 +532,7 @@ export async function notesUpdateService(
                 .set({
                     title: data.title,
                     content: data.content,
+                    pinned: data.pinned
                 })
                 .where(
                     and(

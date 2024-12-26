@@ -10,7 +10,6 @@ import React from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { Form, FormControl, FormField, FormItem, FormLabel } from "../ui/form";
 import { Input } from "../ui/input";
-import { Textarea } from "../ui/textarea";
 import { Button } from "../ui/button";
 import { MultiSelect } from "../ui/multi-select";
 import { PlusCircledIcon } from "@radix-ui/react-icons";
@@ -21,6 +20,7 @@ import {
   notesUpdateService,
 } from "@/service/noteService";
 import { useRouter } from "next/navigation";
+import { Tiptap } from "./tiptap-richtext/tiptap";
 
 export default function NotesEditForm({ note }: { note: NoteType }) {
   const [groups, setGroups] = React.useState<
@@ -270,15 +270,10 @@ export default function NotesEditForm({ note }: { note: NoteType }) {
                   "
                   ></FormLabel>
                   <FormControl>
-                    <Textarea
+                    <Tiptap
                       {...field}
-                      value={field.value}
-                      placeholder="description"
+                      content={field?.value ?? ""}
                       onChange={field.onChange}
-                      className="
-                      shadow-md fill-white z-10 bg-white bg-opacity-80 backdrop-filter backdrop-blur-sm
-                      phone-sm:text-2xl p-4 phone-sm:h-[70vh]
-                    "
                     />
                   </FormControl>
                 </FormItem>
