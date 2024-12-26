@@ -316,6 +316,41 @@ export const notesPostService = async (data: NoteCreateType): Promise<NoteType> 
 }
 
 /* 
+    POST api/notes/groups
+*/
+export const notesPostGroupService = async (name: string): Promise<void> => {
+    try {
+        const accessToken = await getAccessToken();
+
+        const response = await fetch('http://localhost:4000/api/notes/groups', {
+            method: 'POST',
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${accessToken}`
+            },
+            body: JSON.stringify({
+                name
+            }),
+            cache: 'no-cache'
+        });
+
+        if (!response.ok) {
+            if (response.status === 401) {
+                throw new Error('Unauthorized');
+            }
+        }
+
+    } catch (error) {
+        if (error instanceof Error) {
+            console.error(error);
+            throw new Error('Failed to get note');
+        }
+    }
+}
+
+
+/* 
     PUT api/notes/:id
 */
 export const notesUpdateService = async (id: string, data: NoteUpdateType): Promise<void> => {
@@ -412,6 +447,39 @@ export const notesDeleteService = async (id: string,): Promise<void> => {
                 throw new Error('Unauthorized');
             }
         }
+
+    } catch (error) {
+        if (error instanceof Error) {
+            console.error(error);
+            throw new Error('Failed to get note');
+        }
+    }
+}
+
+/* 
+    DELETE api/notes/groups/:name
+*/
+export const notesGroupDeleteService = async (name: string,): Promise<void> => {
+    try {
+        const accessToken = await getAccessToken();
+
+        const response = await fetch('http://localhost:4000/api/notes/groups/' + (name), {
+            method: 'DELETE',
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${accessToken}`
+            },
+            cache: 'no-cache'
+        });
+
+        if (!response.ok) {
+            if (response.status === 401) {
+                throw new Error('Unauthorized');
+            }
+        }
+
+
 
     } catch (error) {
         if (error instanceof Error) {

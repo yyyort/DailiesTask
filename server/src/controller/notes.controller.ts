@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { ApiError } from '../util/apiError';
-import { noteCreateService, notesDeleteService, notesRead, notesReadAll, notesReadAllGroup, notesReadAllPinned, notesUpdatePinnedService, notesUpdateService } from '../service/notes.service';
+import { noteCreateService, notesCreateGroupService, notesDeleteGroupService, notesDeleteService, notesRead, notesReadAll, notesReadAllGroup, notesReadAllPinned, notesUpdatePinnedService, notesUpdateService } from '../service/notes.service';
 import { NoteCreateType, NoteUpdateType } from '../model/notes.model';
 
 /* 
@@ -130,6 +130,27 @@ export const notesPostController = async (req: Request, res: Response): Promise<
 };
 
 /* 
+    POST /api/notes/groups
+*/
+export const notesPostGroupController = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const userId = req.body.userId;
+        const { name } = req.body;
+
+        await notesCreateGroupService(userId, name);
+
+        res.status(201).json({ message: "Notes created successfully" });
+    } catch (error) {
+        console.error((error as Error).message);
+        if (error instanceof ApiError) {
+            res.status(error.status).json({ message: error.message });
+        } else {
+            res.status(500).json({ message: "Internal Server Error", error: (error as Error).message });
+        }
+    }
+}
+
+/* 
     PUT /api/notes/:id
 */
 export const notesPutController = async (req: Request, res: Response): Promise<void> => {
@@ -201,5 +222,27 @@ export const notesDeleteController = async (req: Request, res: Response): Promis
             res.status(500).json({ message: "Internal Server Error", error: (error as Error).message });
         }
 
+    }
+};
+
+
+/* 
+    DELETE /api/notes/groups/:name
+*/
+export const notesDeleteGroupController = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const userId = req.body.userId;
+        const groupName = req.params.name as string;
+
+        await notesDeleteGroupService(userId, groupName);
+
+        res.status(200).json({ message: "Notes updated successfully" });
+    } catch (error) {
+        console.error((error as Error).message);
+        if (error instanceof ApiError) {
+            res.status(error.status).json({ message: error.message });
+        } else {
+            res.status(500).json({ message: "Internal Server Error", error: (error as Error).message });
+        }
     }
 };

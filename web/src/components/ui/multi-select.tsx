@@ -1,5 +1,4 @@
 // src/components/multi-select.tsx
-
 import * as React from "react";
 import { cva, type VariantProps } from "class-variance-authority";
 import {
@@ -8,6 +7,7 @@ import {
   ChevronDown,
   XIcon,
   WandSparkles,
+  FilterIcon,
 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
@@ -28,6 +28,17 @@ import {
   CommandList,
   CommandSeparator,
 } from "@/components/ui/command";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "./alert-dialog";
+import { notesGroupDeleteService } from "@/service/noteService";
 
 /**
  * Variants for the multi-select component to handle different styles.
@@ -45,6 +56,7 @@ const multiSelectVariants = cva(
         destructive:
           "border-transparent bg-destructive text-destructive-foreground hover:bg-destructive/80",
         inverted: "inverted",
+        filter: "border-foreground/10 bg-card text-foreground",
       },
     },
     defaultVariants: {
@@ -200,86 +212,103 @@ export const MultiSelect = React.forwardRef<
       >
         <PopoverTrigger asChild>
           <Button
+            variant={variant === "filter" ? "ghost" : "default"}
             ref={ref}
             {...props}
             onClick={handleTogglePopover}
             className={cn(
               "flex w-full p-1 rounded-md border min-h-10 h-auto items-center justify-between bg-inherit hover:bg-inherit [&_svg]:pointer-events-auto",
-              className
+              className,
+              variant === "filter" ? "border-none hover:scale-125" : ""
             )}
           >
-            {selectedValues.length > 0 ? (
-              <div className="flex justify-between items-center w-full">
-                <div className="flex flex-wrap items-center">
-                  {selectedValues.slice(0, maxCount).map((value) => {
-                    const option = options.find((o) => o.value === value);
-                    const IconComponent = option?.icon;
-                    return (
-                      <Badge
-                        key={value}
-                        className={cn(
-                          isAnimating ? "animate-bounce" : "",
-                          multiSelectVariants({ variant })
+            {
+              //display default
+              variant !== "filter" ? (
+                <div>
+                  {selectedValues.length > 0 ? (
+                    <div className="flex justify-between items-center w-full">
+                      <div className="flex flex-wrap items-center">
+                        {selectedValues.slice(0, maxCount).map((value) => {
+                          const option = options.find((o) => o.value === value);
+                          const IconComponent = option?.icon;
+                          return (
+                            <Badge
+                              key={value}
+                              className={cn(
+                                isAnimating ? "animate-bounce" : "",
+                                multiSelectVariants({ variant })
+                              )}
+                              style={{ animationDuration: `${animation}s` }}
+                            >
+                              {IconComponent && (
+                                <IconComponent className="h-4 w-4 mr-2" />
+                              )}
+                              {option?.label}
+                              <XCircle
+                                className="ml-2 h-4 w-4 cursor-pointer"
+                                onClick={(event) => {
+                                  event.stopPropagation();
+                                  toggleOption(value);
+                                }}
+                              />
+                            </Badge>
+                          );
+                        })}
+                        {selectedValues.length > maxCount && (
+                          <Badge
+                            className={cn(
+                              "bg-transparent text-foreground border-foreground/1 hover:bg-transparent",
+                              isAnimating ? "animate-bounce" : "",
+                              multiSelectVariants({ variant })
+                            )}
+                            style={{ animationDuration: `${animation}s` }}
+                          >
+                            {`+ ${selectedValues.length - maxCount} more`}
+                            <XCircle
+                              className="ml-2 h-4 w-4 cursor-pointer"
+                              onClick={(event) => {
+                                event.stopPropagation();
+                                clearExtraOptions();
+                              }}
+                            />
+                          </Badge>
                         )}
-                        style={{ animationDuration: `${animation}s` }}
-                      >
-                        {IconComponent && (
-                          <IconComponent className="h-4 w-4 mr-2" />
-                        )}
-                        {option?.label}
-                        <XCircle
-                          className="ml-2 h-4 w-4 cursor-pointer"
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <XIcon
+                          className="h-4 mx-2 cursor-pointer text-muted-foreground"
                           onClick={(event) => {
                             event.stopPropagation();
-                            toggleOption(value);
+                            handleClear();
                           }}
                         />
-                      </Badge>
-                    );
-                  })}
-                  {selectedValues.length > maxCount && (
-                    <Badge
-                      className={cn(
-                        "bg-transparent text-foreground border-foreground/1 hover:bg-transparent",
-                        isAnimating ? "animate-bounce" : "",
-                        multiSelectVariants({ variant })
-                      )}
-                      style={{ animationDuration: `${animation}s` }}
-                    >
-                      {`+ ${selectedValues.length - maxCount} more`}
-                      <XCircle
-                        className="ml-2 h-4 w-4 cursor-pointer"
-                        onClick={(event) => {
-                          event.stopPropagation();
-                          clearExtraOptions();
-                        }}
-                      />
-                    </Badge>
+                        <Separator
+                          orientation="vertical"
+                          className="flex min-h-6 h-full"
+                        />
+                        <ChevronDown className="h-4 mx-2 cursor-pointer text-muted-foreground" />
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="flex items-center justify-between w-full mx-auto">
+                      <span className="text-sm text-muted-foreground mx-3">
+                        {placeholder}
+                      </span>
+                      <ChevronDown className="h-4 cursor-pointer text-muted-foreground mx-2" />
+                    </div>
                   )}
                 </div>
-                <div className="flex items-center justify-between">
-                  <XIcon
-                    className="h-4 mx-2 cursor-pointer text-muted-foreground"
-                    onClick={(event) => {
-                      event.stopPropagation();
-                      handleClear();
-                    }}
-                  />
-                  <Separator
-                    orientation="vertical"
-                    className="flex min-h-6 h-full"
-                  />
-                  <ChevronDown className="h-4 mx-2 cursor-pointer text-muted-foreground" />
+              ) : (
+                <div
+                  className={cn(
+                    "flex items-center justify-center w-full h-full text-primary"
+                  )}
+                >
+                  <FilterIcon className="w-10 h-10" />
                 </div>
-              </div>
-            ) : (
-              <div className="flex items-center justify-between w-full mx-auto">
-                <span className="text-sm text-muted-foreground mx-3">
-                  {placeholder}
-                </span>
-                <ChevronDown className="h-4 cursor-pointer text-muted-foreground mx-2" />
-              </div>
-            )}
+              )
+            }
           </Button>
         </PopoverTrigger>
         <PopoverContent
@@ -318,22 +347,78 @@ export const MultiSelect = React.forwardRef<
                     <CommandItem
                       key={option.value}
                       onSelect={() => toggleOption(option.value)}
-                      className="cursor-pointer"
+                      className="cursor-pointer flex items-center justify-between"
                     >
-                      <div
-                        className={cn(
-                          "mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-primary",
-                          isSelected
-                            ? "bg-primary text-primary-foreground"
-                            : "opacity-50 [&_svg]:invisible"
+                      <div className="flex items-center gap-3">
+                        <div
+                          className={cn(
+                            "mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-primary",
+                            isSelected
+                              ? "bg-primary text-primary-foreground"
+                              : "opacity-50 [&_svg]:invisible"
+                          )}
+                        >
+                          <CheckIcon className="h-4 w-4" />
+                        </div>
+                        {option.icon && (
+                          <option.icon className="mr-2 h-4 w-4 text-muted-foreground" />
                         )}
-                      >
-                        <CheckIcon className="h-4 w-4" />
+                        <span>{option.label}</span>
                       </div>
-                      {option.icon && (
-                        <option.icon className="mr-2 h-4 w-4 text-muted-foreground" />
-                      )}
-                      <span>{option.label}</span>
+
+                      <div>
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <button
+                              className="
+                            hover:scale-125
+                          "
+                              onClick={(event) => {
+                                event.stopPropagation();
+                                console.log("delete", option.value);
+                              }}
+                            >
+                              <XCircle
+                                className="ml-2 h-4 w-4 cursor-pointer
+                          "
+                              />
+                            </button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent className="flex flex-col items-end justify-start w-auto">
+                            <AlertDialogHeader>
+                              <AlertDialogTitle className="text-sm font-medium">
+                                Are you sure you want to delete group{" "}
+                                <span>
+                                  <strong>{option.label}</strong>
+                                </span>
+                              </AlertDialogTitle>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel
+                                className="text-sm font-medium"
+                                onClick={(event) => {
+                                  event.stopPropagation();
+                                }}
+                              >
+                                Cancel
+                              </AlertDialogCancel>
+                              <AlertDialogAction
+                                onClick={async (event) => {
+                                  event.stopPropagation();
+
+                                  try {
+                                    await notesGroupDeleteService(option.value);
+                                  } catch (error) {
+                                    console.error(error);
+                                  }
+                                }}
+                              >
+                                Yes
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+                      </div>
                     </CommandItem>
                   );
                 })}

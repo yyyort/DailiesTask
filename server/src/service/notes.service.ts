@@ -169,6 +169,31 @@ export async function noteCreateService(
 }
 
 /* 
+    CREATE GROUP
+*/
+export async function notesCreateGroupService(
+    userId: string,
+    name: string
+): Promise<void> {
+    try {
+        await db
+            .insert(notesGroupTable)
+            .values({
+                userId: userId,
+                name: name
+            })
+
+    } catch (error) {
+        console.error((error as Error));
+        if (error instanceof ApiError) {
+            throw error;
+        }
+
+        throw new Error((error as Error).message);
+    }
+}
+
+/* 
     READ
 */
 export async function notesRead(
@@ -706,6 +731,21 @@ export async function notesUpdateGroupService(
                     )
             }
 
+            //insert junction table for existing group
+            if (existGroupQuery.length > 0) {
+                await trx
+                    .insert(notesGroupJunctionTable)
+                    .values(
+                        existGroupQuery.map((group) => {
+                            return {
+                                userId: userId,
+                                groupId: group.id,
+                                noteId: id
+                            }
+                        })
+                    )
+            }
+
 
         })
     } catch (error) {
@@ -785,5 +825,32 @@ export async function notesDeleteService(
         }
 
         throw new Error((error as Error).message);
+    }
+}
+
+/* 
+    DELETE NOTEGROUP
+*/
+export async function notesDeleteGroupService(
+    userId: string,
+    name: string
+): Promise<void> {
+    try {
+        await db.delete(notesGroupTable)
+            .where(
+                and(
+                    eq(notesGroupTable.userId, userId),
+                    eq(notesGroupTable.name, name)
+                )
+            )
+
+    } catch (error) {
+        console.error((error as Error));
+        if (error instanceof ApiError) {
+            throw error;
+        }
+
+        throw new Error((error as Error).message);
+
     }
 }
