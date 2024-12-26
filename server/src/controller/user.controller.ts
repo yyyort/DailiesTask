@@ -38,6 +38,13 @@ export const userSignUpController = async (req: Request, res: Response): Promise
             maxAge: 7 * 24 * 60 * 60 * 1000 // 7 day,
         });
 
+         //throw server error if token is undefined
+         if (!accessToken || !refreshToken) {
+            throw new ApiError(500, "Internal Server Error", {
+                message: "Token is undefined"
+            });
+        }
+
         res.status(201).json({ message: "User created successfully", user: user, accessToken: accessToken });
     } catch (error: unknown) {
         console.error(error);

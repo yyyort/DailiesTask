@@ -38,11 +38,15 @@ export default function SignUpForm() {
 
       toast({
         title: "Sign up successful",
-        description: `Welcome, ${res.user.email}`,
+        description: `Welcome, ${res?.user.email}`,
       });
 
-      //redirect to the tasks page
-      router.push("/tasks");
+      //delay for 0.5 seconds
+      await new Promise((resolve) => setTimeout(resolve, 500));
+
+      if (res) {
+        router.push("/");
+      }
     } catch (error: unknown) {
       console.error(error);
       form.setError("root", {

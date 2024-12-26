@@ -7,7 +7,7 @@ export const config = {
         '/',
         '/tasks',
         '/routines',
-        '/notes'
+        '/notes',
     ],
 }
 
@@ -17,8 +17,9 @@ export async function middleware(request: NextRequest) {
         '/',
         '/tasks',
         '/routines',
-        '/notes'
+        '/notes',
     ];
+
 
     const isProtectedRoute = protectedRoutes.some(
         (route) => request.nextUrl.pathname === route
@@ -28,6 +29,7 @@ export async function middleware(request: NextRequest) {
         return validateToken(request)
         //return NextResponse.next()
     }
+
     return NextResponse.next()
 }
 
@@ -65,7 +67,7 @@ export async function validateToken(request: NextRequest) {
             await setAccessToken(accessToken);
             await setUserData(user);
 
-            request.headers.set('Authorization', `Bearer ${accessToken}`)
+            /* request.headers.set('Authorization', `Bearer ${accessToken}`) */
 
 
             //redirect to the requested page
@@ -78,3 +80,4 @@ export async function validateToken(request: NextRequest) {
         console.log(error)
     }
 }
+

@@ -1,6 +1,6 @@
 import { UserCreateType, UserSignInType } from "@/model/userModel";
 import { config } from "dotenv";
-import { getAccessToken, removeAccessToken, removeRefreshToken } from "./authService";
+import { getAccessToken, removeAccessToken, removeRefreshToken, setAccessToken, setUserData } from "./authService";
 
 
 config();
@@ -27,9 +27,26 @@ export const SignUpApi = async (data: UserCreateType) => {
       throw new Error(errorMess.message);
     }
 
-    const result = await res.json();
+    const result: {
+      message: string;
+      user: {
+        email: string;
+        id: string;
+        name: string;
+      };
+      accessToken: string;
+    } = await res.json();
 
-    return result;
+    if (result) {
+      await setAccessToken(
+        result.accessToken
+      );
+      await setUserData(
+        result.user
+      );
+
+      return result;
+    }
   } catch (error: unknown) {
     if (error instanceof Error) {
       console.error(error);
@@ -59,9 +76,26 @@ export const SignInApi = async (data: UserSignInType) => {
       throw new Error(errorMess.message);
     }
 
-    const result = await res.json();
+    const result: {
+      message: string;
+      user: {
+        email: string;
+        id: string;
+        name: string;
+      };
+      accessToken: string;
+    } = await res.json();
 
-    return result;
+    if (result) {
+      await setAccessToken(
+        result.accessToken
+      );
+      await setUserData(
+        result.user
+      );
+
+      return result;
+    }
   } catch (error: unknown) {
     if (error instanceof Error) {
       console.error(error);

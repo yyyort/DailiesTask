@@ -10,8 +10,6 @@ export const notesGetAllService = async (groups?: string): Promise<NoteType[]> =
     try {
         const accessToken = await getAccessToken();
 
-        console.log('groups in service web', groups);
-
         if (groups && groups.length > 1) {
             console.log('groups filter in service', groups);
 

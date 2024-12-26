@@ -15,6 +15,7 @@ import { SignInApi } from "@/service/userService";
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
 
+
 export default function SignInForm() {
   const form = useForm<UserSignInType>({
     resolver: zodResolver(UserSignInSchema),
@@ -25,7 +26,7 @@ export default function SignInForm() {
   });
 
   const { toast } = useToast();
-  const router = useRouter(); 
+  const router = useRouter();
 
   const onSubmit: SubmitHandler<UserSignInType> = async (data) => {
     try {
@@ -33,11 +34,12 @@ export default function SignInForm() {
 
       toast({
         title: "Sign in successful",
-        description: `Welcome back, ${res.user.email}`,
+        description: `Welcome back, ${res?.user.email}`,
       });
 
-      //redirect to the tasks page
-      router.push("/tasks");
+      if (res) {
+        router.push("/");
+      }
     } catch (error: unknown) {
       console.error(error);
       form.setError("root", {

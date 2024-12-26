@@ -1,6 +1,7 @@
 import NotesAddButton from "@/components/notes/notes-add-button";
 import NotesList from "@/components/notes/notes-container";
 import NotesFilter from "@/components/notes/notes-filters";
+import NotesListSkeleton from "@/components/notes/notes-list-skeleton";
 import React, { Suspense } from "react";
 
 type SearchParams = Promise<{ [key: string]: string | string[] | undefined }>;
@@ -49,7 +50,7 @@ export default async function Notes(props: { searchParams: SearchParams }) {
 
       {/* notes */}
       <div className="h-full w-full overflow-y-auto pt-6">
-        <Suspense fallback={<div>Loading...</div>}>
+        <Suspense fallback={<NotesListSkeleton/>}>
           <NotesList groups={filterParams} />
         </Suspense>
       </div>
