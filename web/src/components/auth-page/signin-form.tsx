@@ -74,7 +74,7 @@ export default function SignInForm() {
                     type="email"
                     placeholder="email@email.com"
                     className="
-                      shadow-md fill-white z-10 bg-white bg-opacity-80 backdrop-filter backdrop-blur-sm
+                      shadow-md backdrop-filter backdrop-blur-sm
                       phone-sm:text-2xl p-4 h-14
                     "
                   />
@@ -83,7 +83,7 @@ export default function SignInForm() {
 
               {/* error */}
               {fieldState.error && (
-                <div className="text-red-600 text-end bg-white">
+                <div className="text-red-600 text-end">
                   {fieldState.error.message}
                 </div>
               )}
@@ -109,7 +109,7 @@ export default function SignInForm() {
                     {...field}
                     placeholder="password"
                     className="
-                      shadow-md fill-white z-10 bg-white bg-opacity-80 backdrop-filter backdrop-blur-sm
+                      shadow-md backdrop-filter backdrop-blur-sm
                       phone-sm:text-2xl p-4 h-14
                     "
                   />
@@ -118,7 +118,7 @@ export default function SignInForm() {
 
               {/* error */}
               {fieldState.error && (
-                <div className="text-red-600 text-end bg-white">
+                <div className="text-red-600 text-end">
                   {fieldState.error.message}
                 </div>
               )}
@@ -128,7 +128,7 @@ export default function SignInForm() {
 
         {/* error */}
         {form.formState.errors.root && (
-          <div className="text-red-600 text-end bg-white">
+          <div className="text-red-600 text-end">
             {form.formState.errors.root?.message}
           </div>
         )}
@@ -166,7 +166,7 @@ export default function SignInForm() {
           hover:underline
           "
           >
-            <Link href="/signup">dont have an account? sign up</Link>
+            <Link href="/signup" className="text-primary">dont have an account? sign up</Link>
           </Button>
         </div>
       </form>

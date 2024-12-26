@@ -6,6 +6,10 @@ import checkbox from "@/assets/logo/checkbox-black.svg";
 import progress from "@/assets/logo/progress-black.svg";
 import goal from "@/assets/logo/goal-black.svg";
 
+import darkCheckbox from "@/assets/logo/dark/darkCheck.svg";
+import darkProgress from "@/assets/logo/dark/darkProgress.svg";
+import darkGoal from "@/assets/logo/dark/darkGoal.svg";
+
 import { Amatic_SC } from "next/font/google";
 
 const amatic = Amatic_SC({
@@ -39,7 +43,20 @@ export default function Layout({
             alt="bulb"
             width={100}
             height={100}
-            className=""
+            className="
+            dark:hidden
+            block
+            "
+          />
+          <Image
+            src={darkCheckbox}
+            alt="bulb"
+            width={100}
+            height={100}
+            className="
+             dark:block
+            hidden
+            "
           />
           <p className={cn("text-[2.5rem]", amatic.className)}>
             Check you task daily
@@ -52,7 +69,20 @@ export default function Layout({
             alt="bulb"
             width={100}
             height={100}
-            className=""
+            className="
+            dark:hidden
+            block
+            "
+          />
+          <Image
+            src={darkProgress}
+            alt="bulb"
+            width={100}
+            height={100}
+            className="
+            dark:block
+            hidden
+            "
           />
           <p className={cn("text-[2.5rem]", amatic.className)}>
             Track your progress
@@ -60,7 +90,26 @@ export default function Layout({
         </div>
 
         <div className="flex justify-center items-center">
-          <Image src={goal} alt="bulb" width={100} height={100} className="" />
+          <Image
+            src={goal}
+            alt="bulb"
+            width={100}
+            height={100}
+            className="
+            dark:hidden
+            block
+            "
+          />
+          <Image
+            src={darkGoal}
+            alt="bulb"
+            width={100}
+            height={100}
+            className="
+            dark:block
+            hidden
+            "
+          />
           <p className={cn("text-[2.5rem]", amatic.className)}>
             Achieve your goals
           </p>

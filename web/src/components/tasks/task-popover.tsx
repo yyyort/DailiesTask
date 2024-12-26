@@ -14,12 +14,9 @@ import {
 import { TaskReturnType } from "@/model/task.model";
 import TaskEditForm from "./task-edit-form";
 import { taskDeleteService } from "@/service/taskService";
-import useWindowSize from "@/hooks/useWindow";
 
 export default function TaskPopOver({ task }: { task: TaskReturnType }) {
   const [sheetOpen, setSheetOpen] = React.useState(false);
-  const size = useWindowSize();
-
   return (
     <>
       <Popover>
@@ -41,7 +38,7 @@ export default function TaskPopOver({ task }: { task: TaskReturnType }) {
             </SheetTrigger>
 
             <SheetContent
-              side={size.width ?? 0 > 640 ? "right" : "bottom"}
+              side={"right"}
               className="flex flex-col"
             >
               <SheetHeader>

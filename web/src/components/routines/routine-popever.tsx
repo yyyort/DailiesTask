@@ -11,7 +11,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "../ui/sheet";
-import useWindowSize from "@/hooks/useWindow";
+
 import { RoutineReturnType } from "@/model/routine.model";
 import RoutineEditForm from "./routine-edit-form";
 
@@ -21,7 +21,6 @@ export default function RoutinePopOver({
   routine: RoutineReturnType;
 }) {
   const [sheetOpen, setSheetOpen] = React.useState(false);
-  const size = useWindowSize();
 
   return (
     <>
@@ -43,7 +42,7 @@ export default function RoutinePopOver({
             </SheetTrigger>
 
             <SheetContent
-              side={size.width ?? 0 > 640 ? "right" : "bottom"}
+              side={"right"}
               className="flex flex-col h-full overflow-auto
                       tablet:max-w-[30rem]
                       laptop:max-w-[40rem]

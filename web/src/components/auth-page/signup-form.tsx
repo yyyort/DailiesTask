@@ -79,7 +79,7 @@ export default function SignUpForm() {
                     type="email"
                     placeholder="email@email.com"
                     className="
-                      shadow-md fill-white z-10 bg-white bg-opacity-80 backdrop-filter backdrop-blur-sm
+                      shadow-md backdrop-filter backdrop-blur-sm
                       phone-sm:text-2xl p-4 h-14
                     "
                   />
@@ -88,7 +88,7 @@ export default function SignUpForm() {
 
               {/* error */}
               {fieldState.error && (
-                <div className="text-red-600 text-end bg-white">
+                <div className="text-red-600 text-end">
                   {fieldState.error.message}
                 </div>
               )}
@@ -116,7 +116,7 @@ export default function SignUpForm() {
                     type="text"
                     placeholder="name"
                     className="
-                      shadow-md fill-white z-10 bg-white bg-opacity-80 backdrop-filter backdrop-blur-sm
+                      shadow-md backdrop-filter backdrop-blur-sm
                       phone-sm:text-2xl p-4 h-14
                     "
                   />
@@ -125,7 +125,7 @@ export default function SignUpForm() {
 
               {/* error */}
               {fieldState.error && (
-                <div className="text-red-600 text-end bg-white">
+                <div className="text-red-600 text-end">
                   {fieldState.error.message}
                 </div>
               )}
@@ -151,7 +151,7 @@ export default function SignUpForm() {
                     {...field}
                     placeholder="password"
                     className="
-                      shadow-md fill-white z-10 bg-white bg-opacity-80 backdrop-filter backdrop-blur-sm
+                      shadow-md backdrop-filter backdrop-blur-sm
                       phone-sm:text-2xl p-4 h-14
                     "
                   />
@@ -160,7 +160,7 @@ export default function SignUpForm() {
 
               {/* error */}
               {fieldState.error && (
-                <div className="text-red-600 text-end bg-white">
+                <div className="text-red-600 text-end">
                   {fieldState.error.message}
                 </div>
               )}
@@ -186,7 +186,7 @@ export default function SignUpForm() {
                     {...field}
                     placeholder="password"
                     className="
-                      shadow-md fill-white z-10 bg-white bg-opacity-80 backdrop-filter backdrop-blur-sm
+                      shadow-md backdrop-filter backdrop-blur-sm
                       phone-sm:text-2xl p-4 h-14
                     "
                   />
@@ -195,7 +195,7 @@ export default function SignUpForm() {
 
               {/* error */}
               {fieldState.error && (
-                <div className="text-red-600 text-end bg-white">
+                <div className="text-red-600 text-end">
                   {fieldState.error.message}
                 </div>
               )}
@@ -205,7 +205,7 @@ export default function SignUpForm() {
 
         {/* error */}
         {form.formState.errors.root && (
-          <div className="text-red-600 text-end bg-white">
+          <div className="text-red-600 text-end">
             {form.formState.errors.root?.message}
           </div>
         )}
@@ -243,7 +243,7 @@ export default function SignUpForm() {
           hover:underline
           "
           >
-            <Link href="/signin">Already have a account? Sign In</Link>
+            <Link href="/signin" className="text-primary">Already have a account? Sign In</Link>
           </Button>
         </div>
       </form>

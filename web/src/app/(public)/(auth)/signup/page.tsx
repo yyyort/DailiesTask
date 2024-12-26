@@ -5,6 +5,9 @@ import bulbBlack from "@/assets/logo/bulb-black.svg";
 import glitter from "@/assets/logo/glitter-black.svg";
 import SignUpForm from "@/components/auth-page/signup-form";
 
+import darkGlitter from "@/assets/logo/dark/darkGlitter.svg";
+import darkBulb from "@/assets/logo/dark/darkBulb.svg";
+
 export default function SignUp() {
   return (
     <section
@@ -29,6 +32,19 @@ export default function SignUp() {
         height={100}
         className="absolute -z-10 right-14 top-36
             desktop:-right-10 desktop:top-14
+            dark:hidden
+            block
+          "
+      />
+      <Image
+        src={darkGlitter}
+        alt="bulb"
+        width={100}
+        height={100}
+        className="absolute -z-10 right-14 top-36
+            desktop:-right-10 desktop:top-14
+            dark:block
+            hidden
           "
       />
       <SignUpForm />
@@ -37,7 +53,20 @@ export default function SignUp() {
         alt="bulb"
         width={100}
         height={100}
-        className="relative -z-10 -left-7 bottom-[17rem]"
+        className="relative -z-10 -left-7 bottom-[17rem]
+        dark:hidden
+            block
+        "
+      />
+      <Image
+        src={darkBulb}
+        alt="bulb"
+        width={100}
+        height={100}
+        className="relative -z-10 -left-7 bottom-[17rem]
+        dark:block
+            hidden
+        "
       />
     </section>
   );

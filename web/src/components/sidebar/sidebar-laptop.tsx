@@ -32,7 +32,7 @@ export default function SidebarLaptop() {
     <div
       className={cn(
         `flex flex-col h-screen bg-secondary items-center gap-2 justify-between
-         transition-all duration-50000 ease
+         transition-all duration-500 ease
         `,
         expanded ? "w-40" : "w-20"
       )}

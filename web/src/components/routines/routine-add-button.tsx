@@ -10,12 +10,10 @@ import {
   SheetTrigger,
 } from "../ui/sheet";
 import { PlusIcon } from "@radix-ui/react-icons";
-import useWindowSize from "@/hooks/useWindow";
 import RoutineAddForm from "./routine-add-form";
 
 export default function TaskAddButton() {
   const [sheetOpen, setSheetOpen] = React.useState(false);
-  const size = useWindowSize();
 
   return (
     <>
@@ -33,7 +31,7 @@ export default function TaskAddButton() {
           </Button>
         </SheetTrigger>
         <SheetContent
-          side={size.width ?? 0 > 640 ? "right" : "bottom"}
+          side={"right"}
           className="flex flex-col h-full overflow-auto
           tablet:max-w-[30rem]
           laptop:max-w-[40rem]
