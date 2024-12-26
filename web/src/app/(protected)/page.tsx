@@ -1,13 +1,15 @@
 import ContributionsHeatmap from "@/components/home/contributions-heatmap";
 import HomeCalendar from "@/components/home/homeCalendar";
 import { ContributionReturnType } from "@/model/contribution.model";
-import { TaskReturnType } from "@/model/task.model";
+
 import { contributionGetService } from "@/service/contributionService";
-import { taskGetService } from "@/service/taskService";
-import TasksHome from "./tasks/tasks-home";
+
 import HomeCalendarMobile from "@/components/home/homeCalendar-mobile";
 import PinnedNotes from "@/components/home/pinnedNotes";
 import { Suspense } from "react";
+import PinnedNotesSkeleton from "@/components/home/pinnedNotes-skeleton";
+import TasksHome from "@/components/home/tasks-home";
+import TasksHomeSkeleton from "@/components/home/tasks-home-skeleton";
 
 type SearchParams = Promise<{ [key: string]: string | string[] | undefined }>;
 
@@ -15,13 +17,8 @@ export default async function Home(props: { searchParams: SearchParams }) {
   const searchParams = await props.searchParams;
   const date = searchParams.date as string;
 
-  console.log(date);
-
   const contributions: ContributionReturnType[] =
     await contributionGetService();
-  const tasks: TaskReturnType[] = await taskGetService(date);
-  const totalTasksDone = tasks.filter((task) => task.status === "done").length;
-  const totalTasks = tasks.length;
 
   return (
     <div
@@ -44,7 +41,7 @@ export default async function Home(props: { searchParams: SearchParams }) {
           <h2 className="text-lg font-bold text-foreground py-4">
             Pinned Notes:{" "}
           </h2>
-          <Suspense fallback={<div>Loading...</div>}>
+          <Suspense fallback={<PinnedNotesSkeleton />}>
             <PinnedNotes />
           </Suspense>
         </div>
@@ -63,9 +60,7 @@ export default async function Home(props: { searchParams: SearchParams }) {
           </div>
 
           <div className="flex justify-between items-center">
-            <h3 className="text-lg font-medium">
-              {totalTasksDone} / {totalTasks} tasks done
-            </h3>
+            <h3 className="text-lg font-medium"></h3>
             <div
               className="
           phone-sm:block
@@ -76,7 +71,9 @@ export default async function Home(props: { searchParams: SearchParams }) {
             </div>
           </div>
 
-          <TasksHome tasks={tasks} />
+          <Suspense fallback={<TasksHomeSkeleton />}>
+            <TasksHome date={date} />
+          </Suspense>
         </div>
 
         {/* notes */}
@@ -89,7 +86,7 @@ export default async function Home(props: { searchParams: SearchParams }) {
           <h2 className="text-lg font-bold text-foreground py-4">
             Pinned Notes:{" "}
           </h2>
-          <Suspense fallback={<div>Loading...</div>}>
+          <Suspense fallback={<PinnedNotesSkeleton />}>
             <PinnedNotes />
           </Suspense>
         </div>

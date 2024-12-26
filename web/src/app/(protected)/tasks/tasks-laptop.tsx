@@ -1,10 +1,13 @@
 import TaskContainer from '@/components/tasks/task-container';
-import { TaskReturnType } from '@/model/task.model';
+import { TaskReturnType, TaskStatusType } from '@/model/task.model';
+import { taskTodayGetService } from '@/service/taskService';
 import React from 'react'
 
-export default function TasksLaptop(
-    {tasks} : {tasks: TaskReturnType[]}
+export default async function TasksLaptop(
+    { filter }: { filter: TaskStatusType[] }
 ) {
+      const tasks: TaskReturnType[] = await taskTodayGetService(filter);
+
     const todoTasks = tasks.filter((task) => task.status === "todo");
     const doneTasks = tasks.filter((task) => task.status === "done");
     const overdueTasks = tasks.filter((task) => task.status === "overdue");

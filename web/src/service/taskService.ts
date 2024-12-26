@@ -24,7 +24,7 @@ export const taskGetService = async (date?: string): Promise<TaskReturnType[]> =
                 'Content-Type': 'application/json',
                 Authorization: `Bearer ${accessToken}`
             },
-            cache: 'no-cache'
+            cache: 'no-store'
         });
 
         if (!response.ok) {
@@ -121,7 +121,7 @@ export const taskTodayGetService = async (filter?: TaskStatusType[]): Promise<Ta
                     'Content-Type': 'application/json',
                     Authorization: `Bearer ${accessToken}`
                 },
-                cache: 'force-cache'
+                cache: 'no-store'
             });
 
         if (!res.ok) {

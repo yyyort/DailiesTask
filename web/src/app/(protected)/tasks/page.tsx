@@ -3,11 +3,13 @@
 import TaskAddButton from "@/components/tasks/task-add-button";
 import TaskFilter from "@/components/tasks/task-filter";
 
-import { TaskReturnType, TaskStatusType } from "@/model/task.model";
-import { taskTodayGetService } from "@/service/taskService";
+
 import TaskMobile from "./tasks-mobile";
 import { Suspense } from "react";
 import TasksLaptop from "./tasks-laptop";
+import { TaskStatusType } from "@/model/task.model";
+import TasksLaptopSkeleton from "@/components/tasks/tasks-laptop-skeleton";
+import TasksMobileSkeleton from "@/components/tasks/tasks-mobile-skeleton";
 
 type SearchParams = Promise<{ [key: string]: string | string[] | undefined }>;
 
@@ -19,7 +21,6 @@ export default async function Tasks(props: { searchParams: SearchParams }) {
     Array.isArray(filterParams) ? filterParams : [filterParams]
   ).filter(Boolean) as TaskStatusType[];
 
-  const tasks: TaskReturnType[] = await taskTodayGetService(filter);
 
   return (
     <div
@@ -70,8 +71,8 @@ export default async function Tasks(props: { searchParams: SearchParams }) {
 
           {/* task count */}
           <h3 className="text-2xl text-foreground">
-            {tasks.filter((task) => task.status === "done").length} /{" "}
-            {tasks.length}
+            {/* {tasks.filter((task) => task.status === "done").length} /{" "}
+            {tasks.length} */}
           </h3>
         </div>
 
@@ -86,8 +87,8 @@ export default async function Tasks(props: { searchParams: SearchParams }) {
             laptop:hidden
           "
         >
-          <Suspense fallback={<div>Loading...</div>}>
-            <TaskMobile tasks={tasks} />
+          <Suspense fallback={<TasksMobileSkeleton/>}>
+            <TaskMobile filter={filter}/>
           </Suspense>
 
           <div
@@ -107,8 +108,8 @@ export default async function Tasks(props: { searchParams: SearchParams }) {
             laptop:grid
           "
         >
-          <Suspense fallback={<div>Loading...</div>}>
-            <TasksLaptop tasks={tasks} />
+          <Suspense fallback={<TasksLaptopSkeleton/>}>
+            <TasksLaptop filter={filter} />
           </Suspense>
         </div>
       </div>

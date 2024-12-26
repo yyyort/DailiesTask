@@ -1,10 +1,10 @@
 import RoutineAddButton from "@/components/routines/routine-add-button";
-import RoutineContainer from "@/components/routines/routine-container";
+
 import RoutineFilter from "@/components/routines/routine-filters";
-import { RoutineReturnType } from "@/model/routine.model";
-import { routineGetService } from "@/service/routineService";
 
 import React, { Suspense } from "react";
+import RoutineList from "./routineList";
+import RoutineListsSkeleton from "@/components/routines/routine-lists-skeleton";
 
 type SearchParams = Promise<{ [key: string]: string | string[] | undefined }>;
 
@@ -12,9 +12,6 @@ export default async function Routines(props: { searchParams: SearchParams }) {
   const searchParams = await props.searchParams;
   const filterParams = searchParams.filter as string;
 
-  console.log(filterParams);
-
-  const routines: RoutineReturnType[] = await routineGetService(filterParams);
   return (
     <div
       className="h-screen w-full flex flex-col overflow-auto
@@ -49,19 +46,9 @@ export default async function Routines(props: { searchParams: SearchParams }) {
       {/* 
           routines container
       */}
-      <div
-        className="grid gap-4
-      phone-sm:grid-cols-1
-      tablet:grid-cols-2
-      laptop:grid-cols-3 laptop:gap-6
-      "
-      >
-        <Suspense fallback={<div>Loading...</div>}>
-          {routines.map((routine) => (
-            <RoutineContainer key={routine.id} routine={routine} />
-          ))}
-        </Suspense>
-      </div>
+      <Suspense fallback={<RoutineListsSkeleton />}>
+        <RoutineList filterParams={filterParams} />
+      </Suspense>
     </div>
   );
 }

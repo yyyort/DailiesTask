@@ -85,7 +85,6 @@ export const notesGetAllPinnedController = async (): Promise<NoteType[]> => {
     try {
         const accessToken = await getAccessToken();
 
-
         const response = await fetch('http://localhost:4000/api/notes/pinned', {
             method: 'GET',
             credentials: 'include',
