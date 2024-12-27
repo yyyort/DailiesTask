@@ -11,7 +11,6 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
-import { taskUpdateService } from "@/service/taskService";
 import { Textarea } from "../ui/textarea";
 import {
   Select,
@@ -20,6 +19,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
+import { taskUpdateService } from "@/service/tasks/taskActions";
 
 export default function TaskEditForm({
   setSheetOpen,
@@ -164,8 +164,8 @@ export default function TaskEditForm({
                       value={
                         //transform timeToDo if format is hh:mm to hh:mm:ss
                         field.value?.length === 5
-                            ? field.value + ":00"
-                            : field.value
+                          ? field.value + ":00"
+                          : field.value
                       }
                       onChange={field.onChange}
                       className="

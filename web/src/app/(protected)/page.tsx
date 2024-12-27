@@ -1,15 +1,15 @@
 import ContributionsHeatmap from "@/components/home/contributions-heatmap";
-import HomeCalendar from "@/components/home/homeCalendar";
+
 import { ContributionReturnType } from "@/model/contribution.model";
 
 import { contributionGetService } from "@/service/contributionService";
 
-import HomeCalendarMobile from "@/components/home/homeCalendar-mobile";
 import PinnedNotes from "@/components/home/pinnedNotes";
 import { Suspense } from "react";
 import PinnedNotesSkeleton from "@/components/home/pinnedNotes-skeleton";
 import TasksHome from "@/components/home/tasks-home";
 import TasksHomeSkeleton from "@/components/home/tasks-home-skeleton";
+import HomeCalendar from "@/components/home/homeCalendar";
 
 type SearchParams = Promise<{ [key: string]: string | string[] | undefined }>;
 
@@ -49,27 +49,16 @@ export default async function Home(props: { searchParams: SearchParams }) {
 
       <div className="">
         {/* tasks */}
-        <div className="flex flex-col gap-4 p-4 overflow-auto">
-          <div
-            className="
-        phone-sm:hidden
-        laptop:block
+        <div
+          className="flex gap-4 p-4 overflow-auto
+          phone-sm:flex-row
+          laptop:flex-col
+        
         "
-          >
+        >
+          <Suspense fallback={<div>Loading...</div>}>
             <HomeCalendar />
-          </div>
-
-          <div className="flex justify-between items-center">
-            <h3 className="text-lg font-medium"></h3>
-            <div
-              className="
-          phone-sm:block
-          laptop:hidden
-          "
-            >
-              <HomeCalendarMobile />
-            </div>
-          </div>
+          </Suspense>
 
           <Suspense fallback={<TasksHomeSkeleton />}>
             <TasksHome date={date} />

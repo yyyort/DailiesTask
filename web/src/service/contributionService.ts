@@ -17,7 +17,11 @@ export const contributionGetService = async (): Promise<ContributionReturnType[]
                     'Content-Type': 'application/json',
                     Authorization: `Bearer ${accessToken}`
                 },
-                cache: 'default'
+                cache: 'force-cache',
+                next: {
+                    revalidate: 60 * 24, //revalidate every 24 hours
+                    tags: ["getContributions"]
+                }
             }
         );
 

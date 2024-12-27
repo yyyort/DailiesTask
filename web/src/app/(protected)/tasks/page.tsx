@@ -8,7 +8,7 @@ import { Suspense } from "react";
 import TasksLaptop from "./tasks-laptop";
 import TasksLaptopSkeleton from "@/components/tasks/tasks-laptop-skeleton";
 import TasksMobileSkeleton from "@/components/tasks/tasks-mobile-skeleton";
-import HomeCalendarMobile from "@/components/home/homeCalendar-mobile";
+import HomeCalendar from "@/components/home/homeCalendar";
 
 type SearchParams = Promise<{ [key: string]: string | string[] | undefined }>;
 
@@ -43,14 +43,16 @@ export default async function Tasks(props: { searchParams: SearchParams }) {
           <div className="flex flex-col">
             <div className="flex flex-row items-center laptop:gap-2 phone-sm:gap-4">
               <div className="z-10">
-                <HomeCalendarMobile variant="minimal" />
+                <HomeCalendar variant="minimal"/>
               </div>
 
               <div className="flex flex-col">
                 <h1 className="text-[2rem] text-foreground text-end">
-                  {
-                    dateParams ? dateParams === new Date().toLocaleDateString() ? 'Tasks Today' : 'Tasks' : 'Tasks Today'
-                  }
+                  {dateParams
+                    ? dateParams === new Date().toLocaleDateString()
+                      ? "Tasks Today"
+                      : "Tasks"
+                    : "Tasks Today"}
                 </h1>
 
                 {/* date today */}

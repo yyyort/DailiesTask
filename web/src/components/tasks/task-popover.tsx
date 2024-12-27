@@ -13,7 +13,7 @@ import {
 } from "../ui/sheet";
 import { TaskReturnType } from "@/model/task.model";
 import TaskEditForm from "./task-edit-form";
-import { taskDeleteService } from "@/service/taskService";
+import { taskDeleteService } from "@/service/tasks/taskActions";
 
 export default function TaskPopOver({ task }: { task: TaskReturnType }) {
   const [sheetOpen, setSheetOpen] = React.useState(false);
@@ -37,10 +37,7 @@ export default function TaskPopOver({ task }: { task: TaskReturnType }) {
               </Button>
             </SheetTrigger>
 
-            <SheetContent
-              side={"right"}
-              className="flex flex-col"
-            >
+            <SheetContent side={"right"} className="flex flex-col">
               <SheetHeader>
                 <SheetTitle className="text-start text-2xl font-bold">
                   Edit Task
@@ -54,7 +51,7 @@ export default function TaskPopOver({ task }: { task: TaskReturnType }) {
           <Button
             variant={"outline"}
             onClick={async () => {
-              taskDeleteService(task.id);
+              await taskDeleteService(task.id);
             }}
             className="flex gap-2 justify-start"
           >

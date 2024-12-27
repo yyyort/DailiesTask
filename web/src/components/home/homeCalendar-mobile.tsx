@@ -3,37 +3,21 @@
 import React from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { TaskCalendar } from "../ui/taskCalendar";
-import { taskGetEverythingService } from "@/service/taskService";
 import { cn } from "@/lib/utils";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { ChevronDownIcon } from "lucide-react";
 
 export default function HomeCalendarMobile({
+  tasks,
   variant = "default",
 }: {
+  tasks: { id: string; date: Date }[];
   variant?: string;
 }) {
-  const [tasks, setTasks] = React.useState<{ id: string; date: Date }[]>([]);
+
   const [selectedDate, setSelectedDate] = React.useState<Date | undefined>(
     new Date()
   );
-
-  React.useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const res = await taskGetEverythingService();
-
-        setTasks(res);
-      } catch (error: unknown) {
-        if (error instanceof Error) {
-          console.error(error);
-        }
-
-        setTasks([]);
-      }
-    };
-    fetchData();
-  }, []);
 
   const seachParams = useSearchParams();
   const router = useRouter();
@@ -48,7 +32,7 @@ export default function HomeCalendarMobile({
     if (seachParams.get("filter")) {
       newParams.set("filter", seachParams.get("filter")!);
     }
-    
+
     router.push(`?${newParams.toString()}`);
 
     setSelectedDate(date);
@@ -80,7 +64,7 @@ export default function HomeCalendarMobile({
               </div>
             )}
             {variant === "minimal" && (
-              <div className="flex items-center gap-2 p-2 w-full border-2 border-transparent hover:border-primary hover:rounded-md">          
+              <div className="flex items-center gap-2 p-2 w-full border-2 border-transparent hover:border-primary hover:rounded-md">
                 <ChevronDownIcon className="w-6 h-6 text-primary" />
               </div>
             )}
@@ -92,12 +76,10 @@ export default function HomeCalendarMobile({
               mode="single"
               selected={date ? new Date(date) : undefined}
               onSelect={onDateChange}
-              className={
-                cn(
-                  variant === "default" && "scale-100",
-                  variant === "minimal" && "scale-100"
-                )
-              }
+              className={cn(
+                variant === "default" && "scale-100",
+                variant === "minimal" && "scale-100"
+              )}
               modifiers={{ hasEvent: hasEvent }}
               modifiersStyles={{
                 hasEvent: {

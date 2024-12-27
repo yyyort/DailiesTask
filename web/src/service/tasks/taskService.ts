@@ -1,13 +1,14 @@
-"use server"
-import { TaskCreateType, TaskReturnType, TaskStatusType, TaskTodayReturnType, TaskUpdateType } from "@/model/task.model";
-import { getAccessToken } from "./auth/authService";
+
+import { TaskReturnType, TaskTodayReturnType } from "@/model/task.model";
 import { redirect } from "next/navigation";
-import { revalidatePath } from "next/cache";
+import { getAccessToken } from "../auth/authService";
+
+const api = process.env.SERVER_URL;
 
 /* 
     get all tasks
 */
-export const taskGetService = async (date?: string, filter?: string): Promise<TaskReturnType[]> => {
+export const taskGetAllService = async (date?: string, filter?: string): Promise<TaskReturnType[]> => {
     try {
         const accessToken = await getAccessToken();
 
@@ -18,14 +19,17 @@ export const taskGetService = async (date?: string, filter?: string): Promise<Ta
         } */
         if (date && filter) {
             const query = `?date=${date}&filter=${filter}`;
-            const response = await fetch('http://localhost:4000/api/task' + query, {
+            const response = await fetch(api + '/task' + query, {
                 method: 'GET',
                 credentials: 'include',
                 headers: {
                     'Content-Type': 'application/json',
                     Authorization: `Bearer ${accessToken}`
                 },
-                cache: 'no-store'
+                cache: 'force-cache',
+                next: {
+                    tags: ["taskGetAll"]
+                }
             });
 
             if (!response.ok) {
@@ -44,14 +48,17 @@ export const taskGetService = async (date?: string, filter?: string): Promise<Ta
         } else if (date && !filter) {
             console.log('query in date', date);
 
-            const response = await fetch('http://localhost:4000/api/task' + (date ? `?date=${date}` : ''), {
+            const response = await fetch(api + '/task' + (date ? `?date=${date}` : ''), {
                 method: 'GET',
                 credentials: 'include',
                 headers: {
                     'Content-Type': 'application/json',
                     Authorization: `Bearer ${accessToken}`
                 },
-                cache: 'no-store'
+                cache: 'force-cache',
+                next: {
+                    tags: ["taskGetAll"]
+                }
             });
 
             if (!response.ok) {
@@ -70,14 +77,17 @@ export const taskGetService = async (date?: string, filter?: string): Promise<Ta
         } else if (filter && date === undefined) {
             console.log('query in filter', filter);
 
-            const response = await fetch('http://localhost:4000/api/task' + (filter ? `?filter=${filter}` : ''), {
+            const response = await fetch(api + '/task' + (filter ? `?filter=${filter}` : ''), {
                 method: 'GET',
                 credentials: 'include',
                 headers: {
                     'Content-Type': 'application/json',
                     Authorization: `Bearer ${accessToken}`
                 },
-                cache: 'no-store'
+                cache: 'force-cache',
+                next: {
+                    tags: ["taskGetAll"]
+                }
             });
 
             if (!response.ok) {
@@ -96,14 +106,17 @@ export const taskGetService = async (date?: string, filter?: string): Promise<Ta
         } else {
 
 
-            const response = await fetch('http://localhost:4000/api/task', {
+            const response = await fetch(api + '/task', {
                 method: 'GET',
                 credentials: 'include',
                 headers: {
                     'Content-Type': 'application/json',
                     Authorization: `Bearer ${accessToken}`
                 },
-                cache: 'no-store'
+                cache: 'force-cache',
+                next: {
+                    tags: ["taskGetAll"]
+                }
             });
 
             if (!response.ok) {
@@ -136,18 +149,24 @@ export const taskGetService = async (date?: string, filter?: string): Promise<Ta
     }
 }
 
+/* 
+    GET all tasks with only headers
+*/
 export const taskGetEverythingService = async (): Promise<{ id: string, date: Date }[]> => {
     try {
         const accessToken = await getAccessToken();
 
-        const response = await fetch('http://localhost:4000/api/task/everything', {
+        const response = await fetch(api + '/task/everything', {
             method: 'GET',
             credentials: 'include',
             headers: {
                 'Content-Type': 'application/json',
                 Authorization: `Bearer ${accessToken}`
             },
-            cache: 'no-cache'
+            cache: 'force-cache',
+            next: {
+                tags: ["taskGetAllHeaders"]
+            }
         });
 
         if (!response.ok) {
@@ -192,8 +211,7 @@ export const taskTodayGetService = async (filter?: string): Promise<TaskTodayRet
     try {
         const accessToken = await getAccessToken();
 
-        const res = await fetch(
-            'http://localhost:4000/api/task/today' + (filter ? `?filter=${filter}` : '')
+        const res = await fetch(api + '/task/today' + (filter ? `?filter=${filter}` : '')
             , {
                 method: 'GET',
                 credentials: 'include',
@@ -201,7 +219,10 @@ export const taskTodayGetService = async (filter?: string): Promise<TaskTodayRet
                     'Content-Type': 'application/json',
                     Authorization: `Bearer ${accessToken}`
                 },
-                cache: 'no-store'
+                cache: 'force-cache',
+                next: {
+                    tags: ["taskGetToday"]
+                }
             });
 
         if (!res.ok) {
@@ -236,174 +257,3 @@ export const taskTodayGetService = async (filter?: string): Promise<TaskTodayRet
 };
 
 
-/* 
-    create a task
-*/
-export const taskCreateService = async (data: TaskCreateType): Promise<void> => {
-    try {
-        const accessToken = await getAccessToken();
-
-        const res = await fetch('http://localhost:4000/api/task', {
-            method: 'POST',
-            credentials: 'include',
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${accessToken}`
-            },
-            body: JSON.stringify(data),
-        });
-
-        if (!res.ok) {
-            if (res.status === 401) {
-                throw new Error('Unauthorized');
-            }
-        }
-
-
-        // revalidate the tasks
-        revalidatePath('/tasks');
-
-    } catch (error: unknown) {
-        if (error instanceof Error) {
-            console.error(error);
-
-            if (error.message === 'Unauthorized') {
-                redirect('/signin');
-            } else {
-                console.error(error);
-                throw new Error('Failed to create task');
-            }
-        }
-    }
-};
-
-
-/* 
-    update task
-*/
-export const taskUpdateService = async (id: number, data: TaskUpdateType): Promise<void> => {
-    try {
-        const accessToken = await getAccessToken();
-
-        const response = await fetch(`http://localhost:4000/api/task/${id}`, {
-            method: 'PUT',
-            credentials: "include",
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${accessToken}`
-            },
-            body: JSON.stringify(data),
-            cache: 'no-cache'
-        })
-
-
-        if (!response.ok) {
-            console.error(response.json());
-            if (response.status === 401) {
-                throw new Error('Unauthorized');
-            }
-        }
-
-        // revalidate the tasks
-        revalidatePath('/tasks');
-        revalidatePath('/routines');
-
-    } catch (error: unknown) {
-        console.error(error);
-        if (error instanceof Error) {
-            console.error(error);
-
-            if (error.message === 'Unauthorized') {
-                redirect('/signin');
-            } else {
-                console.error(error);
-            }
-        }
-    }
-}
-
-
-/* 
-    update task status
-*/
-export const taskUpdateStatusService = async (id: number, status: TaskStatusType): Promise<void> => {
-    try {
-        const accessToken = await getAccessToken();
-
-        const response = await fetch(`http://localhost:4000/api/task/${id}`, {
-            method: 'PUT',
-            credentials: 'include',
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${accessToken}`
-            },
-            body: JSON.stringify({
-                status: status
-            }),
-            cache: 'no-cache'
-        });
-
-        if (!response.ok) {
-            console.error(response.json());
-            if (response.status === 401) {
-                throw new Error('Unauthorized');
-            }
-        }
-
-        // revalidate the tasks
-        revalidatePath('/tasks');
-
-    } catch (error: unknown) {
-        console.error(error);
-        if (error instanceof Error) {
-            console.error(error);
-
-            if (error.message === 'Unauthorized') {
-                redirect('/signin');
-            } else {
-                console.error(error);
-            }
-        }
-    }
-}
-
-/* 
-    delete a task
-*/
-export const taskDeleteService = async (id: number): Promise<void> => {
-    try {
-        const accessToken = await getAccessToken();
-
-        const response = await fetch(`http://localhost:4000/api/task/${id}`,
-            {
-                method: 'DELETE',
-                credentials: "include",
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${accessToken}`
-                }
-            }
-        )
-
-        if (!response.ok) {
-            console.error(response.json());
-            if (response.status === 401) {
-                throw new Error('Unauthorized');
-            }
-        }
-
-        // revalidate the tasks
-        revalidatePath('/tasks');
-    } catch (error: unknown) {
-        console.error(error);
-        if (error instanceof Error) {
-            console.error(error);
-
-            if (error.message === 'Unauthorized') {
-                redirect('/signin');
-            } else {
-                console.error(error);
-            }
-        }
-    }
-}

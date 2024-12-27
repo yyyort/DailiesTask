@@ -1,8 +1,8 @@
 import { TaskReturnType } from "@/model/task.model";
 import { Checkbox } from "../ui/checkbox";
-import { taskUpdateStatusService } from "@/service/taskService";
 import TaskPopOver from "./task-popover";
 import { cn } from "@/lib/utils";
+import { taskUpdateStatusService } from "@/service/tasks/taskActions";
 
 export default function TaskContainer({
   task,
@@ -36,8 +36,7 @@ export default function TaskContainer({
               "flex flex-col w-full overflow-auto",
               variant === "routine" &&
                 "flex-row items-center justify-between pr-2  gap-2",
-              variant === "default" &&
-                "flex-col gap-2"
+              variant === "default" && "flex-col gap-2"
             )}
           >
             {/* titles */}
@@ -90,7 +89,12 @@ export default function TaskContainer({
 
         {variant === "routine" && (
           <div>
-            <div className={cn("w-full border-b-2 border-green-300 mb-2", task.status === "overdue" && "border-red-400")}></div>
+            <div
+              className={cn(
+                "w-full border-b-2 border-green-300 mb-2",
+                task.status === "overdue" && "border-red-400"
+              )}
+            ></div>
             <div className="flex justify-between">
               <h3 className="text-slate-600 text-sm font-mono">
                 {
@@ -109,7 +113,12 @@ export default function TaskContainer({
 
         {variant === "default" && (
           <div>
-            <div className={cn("w-full border-b-2 border-green-300 mb-2", task.status === "overdue" && "border-red-400")}></div>
+            <div
+              className={cn(
+                "w-full border-b-2 border-green-300 mb-2",
+                task.status === "overdue" && "border-red-400"
+              )}
+            ></div>
             <div className="flex justify-between">
               <h3 className="text-slate-600 text-sm font-mono">
                 {

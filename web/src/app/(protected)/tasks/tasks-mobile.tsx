@@ -1,6 +1,7 @@
 import TaskContainer from "@/components/tasks/task-container";
 import { TaskReturnType } from "@/model/task.model";
-import { taskGetService, taskTodayGetService } from "@/service/taskService";
+import { taskGetAllService, taskTodayGetService } from "@/service/tasks/taskService";
+
 
 export default async function TaskMobile(
   {
@@ -18,7 +19,7 @@ export default async function TaskMobile(
   
       tasks.push(...res);
     } else if (dateFilter && dateFilter !== new Date().toLocaleDateString()) {
-      const res = await taskGetService(dateFilter, filter);
+      const res = await taskGetAllService(dateFilter, filter);
   
       tasks.push(...res);
     }

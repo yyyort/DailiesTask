@@ -7,8 +7,9 @@ import { TaskCreateSchema, TaskCreateType } from "@/model/task.model";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
-import { taskCreateService } from "@/service/taskService";
+
 import { Textarea } from "../ui/textarea";
+import { taskCreateService } from "@/service/tasks/taskActions";
 
 export default function TaskAddForm({
   setSheetOpen,
