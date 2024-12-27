@@ -6,7 +6,7 @@ import SidebarLinks from "./sidebar-links";
 import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 import LogoutButton from "../auth-page/logout-button";
 import { ModeToggle } from "../ui/theme-mode-toggle";
-import { getUserData } from "@/service/authService";
+import { getUserData } from "@/service/auth/authService";
 import { UserReturnType } from "@/model/userModel";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 

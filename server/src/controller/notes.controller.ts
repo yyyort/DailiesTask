@@ -234,6 +234,8 @@ export const notesDeleteGroupController = async (req: Request, res: Response): P
         const userId = req.body.userId;
         const groupName = req.params.name as string;
 
+        console.log("group name", groupName);
+
         await notesDeleteGroupService(userId, groupName);
 
         res.status(200).json({ message: "Notes updated successfully" });

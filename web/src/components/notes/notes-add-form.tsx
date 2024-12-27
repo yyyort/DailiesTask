@@ -11,9 +11,11 @@ import { MultiSelect } from "../ui/multi-select";
 import { PlusCircledIcon } from "@radix-ui/react-icons";
 import { PinIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { notesGetGroupsService, notesPostService } from "@/service/noteService";
+import { notesPostService } from "@/service/notes/notesAction";
 import { useRouter } from "next/navigation";
 import { Tiptap } from "./tiptap-richtext/tiptap";
+import { notesGetGroupsService } from "@/service/notes/noteService";
+import DOMPurify from "dompurify";
 
 export default function NotesAddForm() {
   const [groups, setGroups] = React.useState<
@@ -77,7 +79,14 @@ export default function NotesAddForm() {
     try {
       console.log("insubmit", data);
 
-      await notesPostService(data);
+      //dom purify data content
+      const cleanContent = DOMPurify.sanitize(data.content);
+      const cleanData: NoteCreateType = {
+        ...data,
+        content: cleanContent,
+      };
+
+      await notesPostService(cleanData);
 
       form.reset();
 
@@ -151,7 +160,7 @@ export default function NotesAddForm() {
                   </FormItem>
 
                   {fieldState.error && (
-                    <div className="text-red-600 text-end bg-primary">
+                    <div className="text-red-600 text-end">
                       {fieldState.error.message}
                     </div>
                   )}
@@ -193,7 +202,7 @@ export default function NotesAddForm() {
 
                   {/* error */}
                   {fieldState.error && (
-                    <div className="text-red-600 text-end bg-primary">
+                    <div className="text-red-600 text-end">
                       {fieldState.error.message}
                     </div>
                   )}
@@ -240,7 +249,7 @@ export default function NotesAddForm() {
 
                 {/* error */}
                 {fieldState.error && (
-                  <div className="text-red-600 text-end bg-primary">
+                  <div className="text-red-600 text-end">
                     {fieldState.error.message}
                   </div>
                 )}
@@ -272,7 +281,7 @@ export default function NotesAddForm() {
 
                 {/* error */}
                 {fieldState.error && (
-                  <div className="text-red-600 text-end bg-primary">
+                  <div className="text-red-600 text-end">
                     {fieldState.error.message}
                   </div>
                 )}
@@ -282,7 +291,7 @@ export default function NotesAddForm() {
 
           {/* root error */}
           {form.formState.errors && (
-            <div className="text-red-600 text-end bg-primary">
+            <div className="text-red-600 text-end">
               {form.formState.errors.root?.message}
             </div>
           )}

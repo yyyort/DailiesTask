@@ -2,7 +2,7 @@
 
 import NotesEditForm from "@/components/notes/note-edit-form";
 import { NoteType } from "@/model/notes.model";
-import { notesGetSerive } from "@/service/noteService";
+import { notesGetSerive } from "@/service/notes/noteService";
 
 type Params = Promise<{ noteId: string }>;
 

@@ -11,7 +11,7 @@ import SocialAuth from "./social-auth";
 import Link from "next/link";
 import loadingSpinner from "@/assets/logo/loading-spinner.svg";
 import Image from "next/image";
-import { SignInApi } from "@/service/userService";
+import { SignInApi } from "@/service/auth/userService";
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
 

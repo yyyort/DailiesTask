@@ -15,12 +15,11 @@ import { MultiSelect } from "../ui/multi-select";
 import { PlusCircledIcon } from "@radix-ui/react-icons";
 import { PinIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
-import {
-  notesGetGroupsService,
-  notesUpdateService,
-} from "@/service/noteService";
 import { useRouter } from "next/navigation";
 import { Tiptap } from "./tiptap-richtext/tiptap";
+import { notesGetGroupsService } from "@/service/notes/noteService";
+import { notesUpdateService } from "@/service/notes/notesAction";
+import DOMPurify from "dompurify";
 
 export default function NotesEditForm({ note }: { note: NoteType }) {
   const [groups, setGroups] = React.useState<
@@ -83,7 +82,13 @@ export default function NotesEditForm({ note }: { note: NoteType }) {
   const onSubmit: SubmitHandler<NoteUpdateType> = async (data) => {
     console.log("insubmit", data);
     try {
-      await notesUpdateService(note.id, data);
+      const cleanContent = DOMPurify.sanitize(data?.content ?? "");
+      const cleanData: NoteUpdateType = {
+        ...data,
+        content: cleanContent,
+      };
+
+      await notesUpdateService(note.id, cleanData);
 
       form.reset();
 

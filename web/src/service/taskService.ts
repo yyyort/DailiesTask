@@ -1,6 +1,6 @@
 "use server"
 import { TaskCreateType, TaskReturnType, TaskStatusType, TaskTodayReturnType, TaskUpdateType } from "@/model/task.model";
-import { getAccessToken } from "./authService";
+import { getAccessToken } from "./auth/authService";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 

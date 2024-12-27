@@ -38,7 +38,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "./alert-dialog";
-import { notesGroupDeleteService } from "@/service/noteService";
+import { notesGroupDeleteService } from "@/service/notes/notesAction";
 
 /**
  * Variants for the multi-select component to handle different styles.

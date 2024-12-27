@@ -1,6 +1,8 @@
 import NotesAddButton from "@/components/notes/notes-add-button";
-import NotesList from "@/components/notes/notes-container";
-import NotesFilter from "@/components/notes/notes-filters";
+import NotesList from "@/components/notes/notes-list";
+import NotesFilterGroups from "@/components/notes/notes-filter-group";
+import NotesFilterSkeleton from "@/components/notes/notes-filter-skeleton";
+
 import NotesListSkeleton from "@/components/notes/notes-list-skeleton";
 import React, { Suspense } from "react";
 
@@ -33,7 +35,9 @@ export default async function Notes(props: { searchParams: SearchParams }) {
       phone-sm:px-10
       "
           >
-            <NotesFilter />
+            <Suspense fallback={<NotesFilterSkeleton />}>
+              <NotesFilterGroups />
+            </Suspense>
           </section>
 
           {/* add button */}
@@ -50,7 +54,7 @@ export default async function Notes(props: { searchParams: SearchParams }) {
 
       {/* notes */}
       <div className="h-full w-full overflow-y-auto pt-6">
-        <Suspense fallback={<NotesListSkeleton/>}>
+        <Suspense fallback={<NotesListSkeleton />}>
           <NotesList groups={filterParams} />
         </Suspense>
       </div>

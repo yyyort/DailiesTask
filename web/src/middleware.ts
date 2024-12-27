@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { setAccessToken, setUserData } from "./service/authService";
+import { removeAccessToken, removeRefreshToken, setAccessToken, setUserData } from "./service/auth/authService";
+
+const api = process.env.SERVER_URL
 
 export const config = {
     matcher: [
@@ -45,17 +47,18 @@ export async function validateToken(request: NextRequest) {
 
     // revalidate the access token
     try {
-        const res = await fetch('http://localhost:4000/api/user/revalidate', {
-            method: 'POST',
+        const res = await fetch(api + '/user/revalidate', {
+            method: 'GET',
             credentials: "include",
             headers: {
                 'Content-Type': 'application/json',
                 'Cookie': `refreshToken=${refreshToken}`
             },
-            cache: 'no-cache',
+            cache: 'force-cache',
             next: {
                 // revalidate for 15 minutes as the access token expires in 15 minutes
-                revalidate: 15 * 60
+                revalidate: 800,
+                tags: ["token"]
             }
         })
 
@@ -67,12 +70,12 @@ export async function validateToken(request: NextRequest) {
             await setAccessToken(accessToken);
             await setUserData(user);
 
-            /* request.headers.set('Authorization', `Bearer ${accessToken}`) */
-
-
             //redirect to the requested page
             return NextResponse.next()
         } else {
+            //removes cookies
+            await removeRefreshToken();
+            await removeAccessToken();
 
             return NextResponse.redirect(new URL('/signin', request.url))
         }

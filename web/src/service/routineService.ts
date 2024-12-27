@@ -1,6 +1,6 @@
 "use server";
 import { RoutineCreateType, RoutineReturnType, RoutineUpdateType } from "@/model/routine.model";
-import { getAccessToken } from "./authService";
+import { getAccessToken } from "./auth/authService";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 

@@ -2,10 +2,6 @@
 import React from "react";
 import { ToggleGroup, ToggleGroupItem } from "../ui/toggle-group";
 import { useRouter, useSearchParams } from "next/navigation";
-import {
-  notesGetGroupsService,
-  notesPostGroupService,
-} from "@/service/noteService";
 import { MultiSelect } from "../ui/multi-select";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
@@ -20,35 +16,15 @@ import {
   AlertDialogTrigger,
 } from "../ui/alert-dialog";
 import { AlertDialogTitle } from "@radix-ui/react-alert-dialog";
+import { notesPostGroupService } from "@/service/notes/notesAction";
 
-type NotesFilterType = {
+export type NotesFilterType = {
   id: string;
   name: string;
 };
 
-export default function NotesFilter() {
-  const [groups, setGroups] = React.useState<NotesFilterType[]>([]);
+export default function NotesFilter({ groups }: { groups: NotesFilterType[] }) {
   const [newGroup, setNewGroup] = React.useState("");
-
-  React.useEffect(() => {
-    const fetchGroups = async () => {
-      try {
-        const res = await notesGetGroupsService();
-
-        console.log("in filter", res);
-
-        if (!res) {
-          return;
-        }
-
-        setGroups(res);
-      } catch (error) {
-        console.error(error);
-      }
-    };
-
-    fetchGroups();
-  }, []);
 
   const searchParams = useSearchParams();
   const router = useRouter();

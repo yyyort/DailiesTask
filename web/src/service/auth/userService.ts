@@ -1,19 +1,16 @@
 import { UserCreateType, UserSignInType } from "@/model/userModel";
-import { config } from "dotenv";
 import { getAccessToken, removeAccessToken, removeRefreshToken, setAccessToken, setUserData } from "./authService";
 
-
-config();
-const api = process.env.SERVER_URL ||
-  "http://localhost:4000";
+const api = process.env.SERVER_URL
 
 export const SignUpApi = async (data: UserCreateType) => {
   try {
+
     if (!api) {
       throw new Error("Server url not found");
     }
 
-    const res = await fetch(api + "/api/user/signup", {
+    const res = await fetch(api + "/user/signup", {
       method: "POST",
       credentials: "include",
       headers: {
@@ -58,11 +55,13 @@ export const SignUpApi = async (data: UserCreateType) => {
 
 export const SignInApi = async (data: UserSignInType) => {
   try {
+    console.log("api", api);
+
     if (!api) {
       throw new Error("Server url not found");
     }
 
-    const res = await fetch(api + "/api/user/signin", {
+    const res = await fetch(api + "/user/signin", {
       method: "POST",
       credentials: "include",
       headers: {
@@ -113,7 +112,7 @@ export const SignOutApi = async () => {
       throw new Error("Server url not found");
     }
 
-    const res = await fetch(api + "/api/user/logout", {
+    const res = await fetch(api + "/user/logout", {
       method: "POST",
       credentials: "include",
       headers: {

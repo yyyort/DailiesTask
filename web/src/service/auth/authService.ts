@@ -46,30 +46,5 @@ export const removeRefreshToken = async () => {
     (await cookies()).delete('refreshToken');
 }
 
-export const authenticatedFetch = async (
-    url: string,
-    options: RequestInit = {}
-) => {
-    const accessToken = await getAccessToken();
-
-    if (!accessToken) {
-        throw new Error('Access token not found');
-    }
-
-    const defaultHeaders = {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${accessToken}`
-    };
-
-    return fetch(url, {
-        ...options,
-        credentials: 'include',
-        headers: {
-            ...defaultHeaders,
-            ...options.headers
-        }
-    });
-}
-
 
 

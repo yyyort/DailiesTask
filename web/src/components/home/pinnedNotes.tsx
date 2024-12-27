@@ -1,6 +1,8 @@
 import { NoteType } from "@/model/notes.model";
-import { notesGetAllPinnedController } from "@/service/noteService";
+
 import React from "react";
+
+import { notesGetAllPinnedController } from "@/service/notes/noteService";
 import { NotesContainer } from "../notes/notes-container";
 
 export default async function PinnedNotes() {
@@ -16,9 +18,8 @@ export default async function PinnedNotes() {
     >
       {pinnedNotes.map((note) => (
         <div key={note.id} className="scale-95 ">
-          <NotesContainer  note={note} />
+          <NotesContainer note={note} />
         </div>
-     
       ))}
     </div>
   );

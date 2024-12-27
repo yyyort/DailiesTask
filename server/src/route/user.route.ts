@@ -9,7 +9,7 @@ const router = Router();
 //unprotected routes
 router.post('/user/signup', schemaValidator(UserCreateSchema), userSignUpController);
 router.post('/user/signin', schemaValidator(UserSignInSchema), userSignInController);
-router.post('/user/revalidate', userRevalidateTokenController);
+router.get('/user/revalidate', userRevalidateTokenController);
 
 //protected routes
 router.get('/user/:id', authValidator, userGetController);

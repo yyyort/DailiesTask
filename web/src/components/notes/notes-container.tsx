@@ -1,14 +1,11 @@
-import { NoteType } from "@/model/notes.model";
-import React from "react";
-
+"use client";
 import { cn } from "@/lib/utils";
 import { EllipsisVerticalIcon, PinIcon } from "lucide-react";
 import { Badge } from "../ui/badge";
 import {
   notesDeleteService,
-  notesGetAllService,
   notesUpdatePinnedService,
-} from "@/service/noteService";
+} from "@/service/notes/notesAction";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,38 +13,20 @@ import {
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
 import { Pencil1Icon, TrashIcon } from "@radix-ui/react-icons";
-import { revalidatePath } from "next/cache";
 import Link from "next/link";
+import { NoteType } from "@/model/notes.model";
 
-export default async function NotesList({ groups }: { groups?: string }) {
-  const notes: NoteType[] = await notesGetAllService(groups);
-
+export function NotesContainer({ note }: { note: NoteType }) {
   return (
-    <div
-      className="w-full min-h-full h-full grid items-start
-    phone-sm:grid-cols-2 phone-sm:gap-4 phone-sm:px-4
-    laptop:grid-cols-3 laptop:gap-4 laptop:px-6
-    2k:grid-cols-4 2k:gap-4 2k:px-8
-    "
-    >
-      {notes.map((note) => (
-        <NotesContainer key={note.id} note={note} />
-      ))}
-    </div>
-  );
-}
-
-export async function NotesContainer({ note }: { note: NoteType }) {
-  return (
-    <Link href={`/notes/${note.id}`}>
+    <Link href={`/notes/${note.id}`} className="z-0">
       <div
         className="p-4 border border-secondary rounded-lg shadow-sm flex flex-col justify-between
-    phone-sm:w-full phone-sm:p-4 phone-sm:mb-4 phone-sm:min-h-[20rem]
-    laptop:min-h-[30rem]
-    bg-secondary
-    hover:shadow-md hover:border-ring
-    transition-all
-    "
+      phone-sm:w-full phone-sm:p-4 phone-sm:mb-4 phone-sm:min-h-[20rem]
+      laptop:min-h-[30rem]
+      bg-secondary
+      hover:shadow-md hover:border-ring
+      transition-all
+      "
       >
         {/* contents */}
         <div>
@@ -66,14 +45,12 @@ export async function NotesContainer({ note }: { note: NoteType }) {
               <button
                 type="button"
                 className={cn("px-2")}
-                onClick={async () => {
-                  "use server";
+                onClick={async (event) => {
+                  event.stopPropagation();
+                  event.preventDefault();
 
                   try {
                     await notesUpdatePinnedService(note.id, !note.pinned);
-
-                    //revalidate the notes
-                    revalidatePath("/notes");
                   } catch (error) {
                     console.error(error);
                   }
@@ -91,28 +68,35 @@ export async function NotesContainer({ note }: { note: NoteType }) {
 
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <button>
+                  <button
+                    className="z-10 hover:scale-150"
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      event.preventDefault();
+                    }}
+                  >
                     <EllipsisVerticalIcon className="h-4 w-4" />
                   </button>
                 </DropdownMenuTrigger>
 
                 <DropdownMenuContent>
                   <DropdownMenuItem asChild>
-                    <button className="flex gap-2 items-center w-full">
+                    <Link
+                      href={`/notes/${note.id}`}
+                      className="flex gap-2 items-center w-full cursor-pointer z-10"
+                    >
                       <Pencil1Icon className="h-4 w-4" />
                       <p>edit</p>
-                    </button>
+                    </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
                     <button
-                      className="flex gap-2 items-center w-full"
-                      onClick={async () => {
-                        "use server";
+                      className="flex gap-2 items-center w-full cursor-pointer z-10"
+                      onClick={async (event) => {
+                        event.stopPropagation();
+                        event.preventDefault();
                         try {
                           await notesDeleteService(note.id);
-
-                          //revalidate the notes
-                          revalidatePath("/notes");
                         } catch (error) {
                           console.error(error);
                         }
@@ -131,9 +115,9 @@ export async function NotesContainer({ note }: { note: NoteType }) {
           <div>
             <div
               className="text-sm text-foreground
-                      phone-sm:block
-                      laptop:hidden
-              "
+                        phone-sm:block
+                        laptop:hidden
+                "
               dangerouslySetInnerHTML={
                 //parse the note content as HTML
                 {
@@ -147,9 +131,9 @@ export async function NotesContainer({ note }: { note: NoteType }) {
 
             <div
               className="text-sm text-foreground
-                      phone-sm:hidden
-                      laptop:block
-              "
+                        phone-sm:hidden
+                        laptop:block
+                "
               dangerouslySetInnerHTML={
                 //parse the note content as HTML
                 {

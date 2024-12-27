@@ -3,7 +3,7 @@
     get
 */
 import { ContributionReturnType } from "@/model/contribution.model";
-import { getAccessToken } from "./authService";
+import { getAccessToken } from "./auth/authService";
 
 export const contributionGetService = async (): Promise<ContributionReturnType[]> => {
     try {
