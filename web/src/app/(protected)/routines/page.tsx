@@ -1,10 +1,9 @@
 import RoutineAddButton from "@/components/routines/routine-add-button";
 
-import RoutineFilter from "@/components/routines/routine-filters";
-
 import React, { Suspense } from "react";
 import RoutineList from "./routineList";
 import RoutineListsSkeleton from "@/components/routines/routine-lists-skeleton";
+import RoutineFiltersList from "@/components/routines/routine-filters-list";
 
 type SearchParams = Promise<{ [key: string]: string | string[] | undefined }>;
 
@@ -40,7 +39,7 @@ export default async function Routines(props: { searchParams: SearchParams }) {
         phone-sm:mr-auto
         "
       >
-        <RoutineFilter />
+        <RoutineFiltersList />
       </div>
 
       {/* 

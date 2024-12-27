@@ -14,7 +14,7 @@ import {
 } from "../ui/accordion";
 import { Textarea } from "../ui/textarea";
 import { Plus, X } from "lucide-react";
-import { routineUpdateService } from "@/service/routineService";
+import { routineUpdateService } from "@/service/routines/routineActions";
 
 export default function RoutineEditForm({
   setSheetOpen,
@@ -93,7 +93,7 @@ export default function RoutineEditForm({
                       type="text"
                       placeholder="title"
                       className="
-                      shadow-md fill-white z-10 bg-white bg-opacity-80 backdrop-filter backdrop-blur-sm
+                      shadow-md backdrop-filter backdrop-blur-sm
                       phone-sm:text-2xl p-4 h-14
                     "
                     />
@@ -102,7 +102,7 @@ export default function RoutineEditForm({
 
                 {/* error */}
                 {fieldState.error && (
-                  <div className="text-red-600 text-end bg-white">
+                  <div className="text-red-600 text-end">
                     {fieldState.error.message}
                   </div>
                 )}
@@ -140,7 +140,7 @@ export default function RoutineEditForm({
                             placeholder="description"
                             onChange={field.onChange}
                             className="
-                      shadow-md fill-white z-10 bg-white bg-opacity-80 backdrop-filter backdrop-blur-sm
+                      shadow-md backdrop-filter backdrop-blur-sm
                       phone-sm:text-2xl p-4 phone-sm:h-32
                       tablet:h-[20rem]
                     "
@@ -150,7 +150,7 @@ export default function RoutineEditForm({
 
                       {/* error */}
                       {fieldState.error && (
-                        <div className="text-red-600 text-end bg-white">
+                        <div className="text-red-600 text-end">
                           {fieldState.error.message}
                         </div>
                       )}
@@ -192,7 +192,7 @@ export default function RoutineEditForm({
                               type="text"
                               placeholder="task title"
                               className="
-                            shadow-md fill-white z-10 bg-white bg-opacity-80 backdrop-filter backdrop-blur-sm
+                            shadow-md backdrop-filter backdrop-blur-sm
                             phone-sm:text-2xl p-4 h-14
                             "
                             />
@@ -201,7 +201,7 @@ export default function RoutineEditForm({
 
                         {/* error */}
                         {fieldState.error && (
-                          <div className="text-red-600 text-end bg-white">
+                          <div className="text-red-600 text-end">
                             {fieldState.error.message}
                           </div>
                         )}
@@ -233,7 +233,7 @@ export default function RoutineEditForm({
                               }
                               onChange={field.onChange}
                               className="
-                            shadow-md fill-white z-10 bg-white bg-opacity-80 backdrop-filter backdrop-blur-sm
+                            shadow-md backdrop-filter backdrop-blur-sm
                             phone-sm:text-2xl h-14
                             "
                             />
@@ -242,7 +242,7 @@ export default function RoutineEditForm({
 
                         {/* error */}
                         {fieldState.error && (
-                          <div className="text-red-600 text-end bg-white">
+                          <div className="text-red-600 text-end">
                             {fieldState.error.message}
                           </div>
                         )}

@@ -2,7 +2,7 @@
 
 import React from "react";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
-import { EllipsisVerticalIcon } from "lucide-react";
+import { Edit2Icon, EllipsisVerticalIcon, Trash2Icon } from "lucide-react";
 import { Button } from "../ui/button";
 import {
   Sheet,
@@ -14,6 +14,7 @@ import {
 
 import { RoutineReturnType } from "@/model/routine.model";
 import RoutineEditForm from "./routine-edit-form";
+import { routineDeleteService } from "@/service/routines/routineActions";
 
 export default function RoutinePopOver({
   routine,
@@ -36,8 +37,9 @@ export default function RoutinePopOver({
         >
           <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
             <SheetTrigger asChild>
-              <Button variant={"outline"} onClick={() => {}}>
-                Edit
+              <Button variant={"outline"} className="flex gap-2 justify-start">
+                <Edit2Icon />
+                <p>Edit</p>
               </Button>
             </SheetTrigger>
 
@@ -62,9 +64,11 @@ export default function RoutinePopOver({
             variant={"outline"}
             onClick={async () => {
               // delete routine
+              await routineDeleteService(routine.id);
             }}
           >
-            Delete
+            <Trash2Icon />
+            <p>Delete</p>
           </Button>
         </PopoverContent>
       </Popover>

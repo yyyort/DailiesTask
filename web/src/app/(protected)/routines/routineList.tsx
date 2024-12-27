@@ -1,6 +1,7 @@
 import RoutineContainer from "@/components/routines/routine-container";
 import { RoutineReturnType } from "@/model/routine.model";
-import { routineGetService } from "@/service/routineService";
+import { routineGetAllService } from "@/service/routines/routineService";
+
 import React from "react";
 
 export default async function RoutineList({
@@ -10,7 +11,9 @@ export default async function RoutineList({
 }) {
   console.log(filterParams);
 
-  const routines: RoutineReturnType[] = await routineGetService(filterParams);
+  const routines: RoutineReturnType[] = await routineGetAllService(
+    filterParams
+  );
 
   return (
     <div

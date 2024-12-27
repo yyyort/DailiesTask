@@ -3,26 +3,19 @@
 import React from "react";
 import { ToggleGroup, ToggleGroupItem } from "../ui/toggle-group";
 import { useRouter, useSearchParams } from "next/navigation";
-import { routineGetHeadersService } from "@/service/routineService";
 
 export type routineFilterT = {
   id: string;
   title: string;
 };
 
-export default function RoutineFilter() {
+export default function RoutineFilter({
+  routines,
+}: {
+  routines: routineFilterT[];
+}) {
   const searchParams = useSearchParams();
   const router = useRouter();
-
-  const [routines, setRoutines] = React.useState<routineFilterT[]>([]);
-
-  React.useEffect(() => {
-    const getRoutines = async () => {
-      const res = await routineGetHeadersService();
-      setRoutines(res);
-    };
-    getRoutines();
-  }, []);
 
   return (
     <>

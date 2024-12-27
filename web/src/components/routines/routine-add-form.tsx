@@ -15,7 +15,7 @@ import {
 } from "../ui/accordion";
 import { Textarea } from "../ui/textarea";
 import { Plus, X } from "lucide-react";
-import { routineAddService } from "@/service/routineService";
+import { routineAddService } from "@/service/routines/routineActions";
 
 export default function RoutineAddForm({
   setSheetOpen,
@@ -228,8 +228,8 @@ export default function RoutineAddForm({
                               value={
                                 //transform timeToDo if format is hh:mm to hh:mm:ss
                                 field.value?.length === 5
-                                    ? field.value + ":00"
-                                    : field.value
+                                  ? field.value + ":00"
+                                  : field.value
                               }
                               onChange={field.onChange}
                               className="
@@ -252,7 +252,7 @@ export default function RoutineAddForm({
                 </div>
 
                 <button onClick={() => remove(index)} type="button">
-                  <X className="text-primary"/>
+                  <X className="text-primary" />
                 </button>
               </div>
             ))}
@@ -272,7 +272,7 @@ export default function RoutineAddForm({
             className="text-2xl py-7 hover:border-black hover:border-2"
             variant={"secondary"}
           >
-            <Plus className="text-primary"/>
+            <Plus className="text-primary" />
             Add Task
           </Button>
 
