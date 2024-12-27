@@ -21,10 +21,10 @@ export default async function Page(props: { params: Params }) {
       {/* titles */}
       <header
         className="
-          phone-sm:px-10
+          phone-sm:px-10 pb-4
           "
       >
-        <h1 className="text-2xl font-bold text-slate-900 text-end">
+        <h1 className="text-2xl font-bold text-foreground text-end">
           Edit Notes
         </h1>
       </header>

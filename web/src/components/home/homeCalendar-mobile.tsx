@@ -8,7 +8,11 @@ import { cn } from "@/lib/utils";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { ChevronDownIcon } from "lucide-react";
 
-export default function HomeCalendarMobile() {
+export default function HomeCalendarMobile({
+  variant = "default",
+}: {
+  variant?: string;
+}) {
   const [tasks, setTasks] = React.useState<{ id: string; date: Date }[]>([]);
   const [selectedDate, setSelectedDate] = React.useState<Date | undefined>(
     new Date()
@@ -39,6 +43,12 @@ export default function HomeCalendarMobile() {
     if (!date) return;
     const newParams = new URLSearchParams();
     newParams.set("date", date.toLocaleDateString());
+
+    //check if there already is a filter
+    if (seachParams.get("filter")) {
+      newParams.set("filter", seachParams.get("filter")!);
+    }
+    
     router.push(`?${newParams.toString()}`);
 
     setSelectedDate(date);
@@ -58,18 +68,23 @@ export default function HomeCalendarMobile() {
     <>
       <Popover>
         <PopoverTrigger asChild>
-          <div
-            className={cn(
-              "flex items-center gap-2 p-2 rounded-md border w-full"
+          <button>
+            {variant === "default" && (
+              <div className="flex items-center gap-2 p-2 rounded-md border w-full">
+                <ChevronDownIcon className="w-6 h-6" />
+                <p className="text-sm">
+                  {selectedDate?.toDateString() === new Date().toDateString()
+                    ? "Today"
+                    : selectedDate?.toDateString()}
+                </p>
+              </div>
             )}
-          >
-            <ChevronDownIcon className="w-6 h-6" />
-            <p className="text-sm">
-              {selectedDate?.toDateString() === new Date().toDateString()
-                ? "Today"
-                : selectedDate?.toDateString()}
-            </p>
-          </div>
+            {variant === "minimal" && (
+              <div className="flex items-center gap-2 p-2 w-full border-2 border-transparent hover:border-primary hover:rounded-md">          
+                <ChevronDownIcon className="w-6 h-6 text-primary" />
+              </div>
+            )}
+          </button>
         </PopoverTrigger>
         <PopoverContent align="start" className="w-auto p-0">
           <div className="flex">
@@ -77,7 +92,12 @@ export default function HomeCalendarMobile() {
               mode="single"
               selected={date ? new Date(date) : undefined}
               onSelect={onDateChange}
-              className="sclae-125 "
+              className={
+                cn(
+                  variant === "default" && "scale-100",
+                  variant === "minimal" && "scale-100"
+                )
+              }
               modifiers={{ hasEvent: hasEvent }}
               modifiersStyles={{
                 hasEvent: {

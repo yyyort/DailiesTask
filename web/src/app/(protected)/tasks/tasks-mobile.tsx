@@ -1,10 +1,28 @@
 import TaskContainer from "@/components/tasks/task-container";
-import { TaskReturnType, TaskStatusType } from "@/model/task.model";
-import { taskTodayGetService } from "@/service/taskService";
+import { TaskReturnType } from "@/model/task.model";
+import { taskGetService, taskTodayGetService } from "@/service/taskService";
 
-export default async function TaskMobile({ filter }: { filter: TaskStatusType[] }) {
-  const tasks: TaskReturnType[] = await taskTodayGetService(filter);
+export default async function TaskMobile(
+  {
+    filter,
+    dateFilter,
+  }: {
+    filter: string;
+    dateFilter: string;
+  }
+) {
+  const tasks: TaskReturnType[] = [];
   
+  if (dateFilter === new Date().toLocaleDateString() || !dateFilter) {
+      const res = await taskTodayGetService(filter);
+  
+      tasks.push(...res);
+    } else if (dateFilter && dateFilter !== new Date().toLocaleDateString()) {
+      const res = await taskGetService(dateFilter, filter);
+  
+      tasks.push(...res);
+    }
+
   return (
     <>
       {tasks.map((task) => (

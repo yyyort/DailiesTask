@@ -17,7 +17,7 @@ export default function TaskContainer({
         `bg-card rounded-md shadow-md border-b-2 border-r-2 border-primary backdrop-blur-md backdrop-filter flex flex-row
       laptop:mb-4
     `,
-        task.status === "overdue" && "bg-red-300 bg-opacity-80",
+        task.status === "overdue" && "border-red-600",
         variant === "routine" && "p-4",
         variant === "default" && "p-4",
         variant === "minimal" && "p-2 px-4 items-center"
@@ -37,7 +37,7 @@ export default function TaskContainer({
               variant === "routine" &&
                 "flex-row items-center justify-between pr-2  gap-2",
               variant === "default" &&
-                "flex-row items-center justify-between pr-2  gap-2"
+                "flex-col gap-2"
             )}
           >
             {/* titles */}
@@ -63,7 +63,7 @@ export default function TaskContainer({
             )}
             {variant === "default" && (
               <div>
-                <p className="text-slate-600 text-sm w-full overflow-auto">
+                <p className="text-muted-foreground text-sm w-full overflow-auto">
                   {(task.description ?? "").length > 100
                     ? task.description?.slice(0, 100) + "..."
                     : task.description}
@@ -90,7 +90,7 @@ export default function TaskContainer({
 
         {variant === "routine" && (
           <div>
-            <div className="w-full border-b-2 border-green-300 mb-2"></div>
+            <div className={cn("w-full border-b-2 border-green-300 mb-2", task.status === "overdue" && "border-red-400")}></div>
             <div className="flex justify-between">
               <h3 className="text-slate-600 text-sm font-mono">
                 {
@@ -109,7 +109,7 @@ export default function TaskContainer({
 
         {variant === "default" && (
           <div>
-            <div className="w-full border-b-2 border-green-300 mb-2"></div>
+            <div className={cn("w-full border-b-2 border-green-300 mb-2", task.status === "overdue" && "border-red-400")}></div>
             <div className="flex justify-between">
               <h3 className="text-slate-600 text-sm font-mono">
                 {

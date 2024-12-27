@@ -1,4 +1,4 @@
-import { and, asc, eq, exists, inArray, isNotNull, isNull, lt, max, notExists, or, } from "drizzle-orm";
+import { and, asc, eq, exists, inArray, isNotNull, isNull, lt, max, notExists, } from "drizzle-orm";
 import { db } from "../db/db";
 import { taskTable, taskTodayTable } from "../db/schema";
 import { TaskReturnType, TaskStatusType, TaskTodayReturnType, TaskTodayType } from "../model/task.model";
@@ -24,10 +24,8 @@ export const taskTodayGetService = async (userId: string, filter?: TaskStatusTyp
                 .where(
                     and(
                         eq(taskTodayTable.userId, userId),
-                        or(
-                            ...filter.map(status => eq(taskTable.status, status))
-                        )
-                    )
+                        filter ? inArray(taskTable.status, filter) : inArray(taskTable.status, ['todo', 'done', 'overdue']
+                        ))
                 )
                 .innerJoin(taskTable, eq(taskTodayTable.taskId, taskTable.id))
                 .orderBy(asc(taskTodayTable.order));
@@ -307,7 +305,7 @@ export const taskTodayRecycleRoutine = async (): Promise<void> => {
     }
 };
 
-export const taskTodayCronService = cron.schedule('0 9 13 * * * ', async () => {
+export const taskTodayCronService = cron.schedule('0 9 11 * * * ', async () => {
     try {
         //setting overdue tasks
         await taskTodaySetOverdue();

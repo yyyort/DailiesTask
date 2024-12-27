@@ -7,7 +7,7 @@ import { revalidatePath } from "next/cache";
 /* 
     get all tasks
 */
-export const taskGetService = async (date?: string): Promise<TaskReturnType[]> => {
+export const taskGetService = async (date?: string, filter?: string): Promise<TaskReturnType[]> => {
     try {
         const accessToken = await getAccessToken();
 
@@ -16,30 +16,110 @@ export const taskGetService = async (date?: string): Promise<TaskReturnType[]> =
             console.error('Date format is incorrect');
             throw new Error('Date format is incorrect');
         } */
+        if (date && filter) {
+            const query = `?date=${date}&filter=${filter}`;
+            const response = await fetch('http://localhost:4000/api/task' + query, {
+                method: 'GET',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${accessToken}`
+                },
+                cache: 'no-store'
+            });
 
-        const response = await fetch('http://localhost:4000/api/task' + (date ? `?date=${date}` : ''), {
-            method: 'GET',
-            credentials: 'include',
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${accessToken}`
-            },
-            cache: 'no-store'
-        });
-
-        if (!response.ok) {
-            if (response.status === 401) {
-                throw new Error('Unauthorized');
+            if (!response.ok) {
+                if (response.status === 401) {
+                    throw new Error('Unauthorized');
+                }
+                return [];
             }
-            return [];
+
+            const data: {
+                message: string;
+                tasks: TaskReturnType[];
+            } = await response.json();
+
+            return data.tasks;
+        } else if (date && !filter) {
+            console.log('query in date', date);
+
+            const response = await fetch('http://localhost:4000/api/task' + (date ? `?date=${date}` : ''), {
+                method: 'GET',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${accessToken}`
+                },
+                cache: 'no-store'
+            });
+
+            if (!response.ok) {
+                if (response.status === 401) {
+                    throw new Error('Unauthorized');
+                }
+                return [];
+            }
+
+            const data: {
+                message: string;
+                tasks: TaskReturnType[];
+            } = await response.json();
+
+            return data.tasks;
+        } else if (filter && date === undefined) {
+            console.log('query in filter', filter);
+
+            const response = await fetch('http://localhost:4000/api/task' + (filter ? `?filter=${filter}` : ''), {
+                method: 'GET',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${accessToken}`
+                },
+                cache: 'no-store'
+            });
+
+            if (!response.ok) {
+                if (response.status === 401) {
+                    throw new Error('Unauthorized');
+                }
+                return [];
+            }
+
+            const data: {
+                message: string;
+                tasks: TaskReturnType[];
+            } = await response.json();
+
+            return data.tasks;
+        } else {
+
+
+            const response = await fetch('http://localhost:4000/api/task', {
+                method: 'GET',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${accessToken}`
+                },
+                cache: 'no-store'
+            });
+
+            if (!response.ok) {
+                if (response.status === 401) {
+                    throw new Error('Unauthorized');
+                }
+                return [];
+            }
+
+            const data: {
+                message: string;
+                tasks: TaskReturnType[];
+            } = await response.json();
+
+            return data.tasks;
         }
-
-        const data: {
-            message: string;
-            tasks: TaskReturnType[];
-        } = await response.json();
-
-        return data.tasks;
     } catch (error: unknown) {
         if (error instanceof Error) {
             console.error(error);
@@ -56,7 +136,7 @@ export const taskGetService = async (date?: string): Promise<TaskReturnType[]> =
     }
 }
 
-export const taskGetEverythingService = async (): Promise<{id: string, date: Date}[]> => {
+export const taskGetEverythingService = async (): Promise<{ id: string, date: Date }[]> => {
     try {
         const accessToken = await getAccessToken();
 
@@ -79,7 +159,7 @@ export const taskGetEverythingService = async (): Promise<{id: string, date: Dat
 
         const data: {
             message: string;
-            tasks: {id: string, date: string}[];
+            tasks: { id: string, date: string }[];
         } = await response.json();
 
         return data.tasks.map(task => ({
@@ -108,12 +188,12 @@ export const taskGetEverythingService = async (): Promise<{id: string, date: Dat
 /* 
     get all today tasks
 */
-export const taskTodayGetService = async (filter?: TaskStatusType[]): Promise<TaskTodayReturnType[]> => {
+export const taskTodayGetService = async (filter?: string): Promise<TaskTodayReturnType[]> => {
     try {
         const accessToken = await getAccessToken();
 
         const res = await fetch(
-            'http://localhost:4000/api/task/today' + (filter ? `?filter=${filter.join(' ')}` : '')
+            'http://localhost:4000/api/task/today' + (filter ? `?filter=${filter}` : '')
             , {
                 method: 'GET',
                 credentials: 'include',

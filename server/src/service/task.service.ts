@@ -1,9 +1,9 @@
-import { and, eq, isNull } from "drizzle-orm";
+import { and, eq, inArray, isNull } from "drizzle-orm";
 import { db } from "../db/db";
 import { taskTable } from "../db/schema";
 import { TaskCreateType, TaskReturnType, TaskStatusType, TaskUpdateType, } from "../model/task.model";
 import { ApiError } from "../util/apiError";
-import { taskConvertFromDb, tasksConvertFromDb } from "../util/task.util";
+import { taskConvertFromDb } from "../util/task.util";
 import { taskTodayCreateService } from "./taskToday.service";
 
 //read
@@ -12,7 +12,8 @@ import { taskTodayCreateService } from "./taskToday.service";
 */
 export async function taskGetAllService(
     userId: string,
-    date?: string
+    date?: string,
+    filter?: TaskStatusType[]
 ): Promise<TaskReturnType[]> {
     try {
         const res = await db
@@ -29,12 +30,21 @@ export async function taskGetAllService(
             .where(
                 and(
                     eq(taskTable.userId, userId),
-                    date ? eq(taskTable.deadline, new Date(date).toLocaleDateString()) : eq(taskTable.deadline, new Date().toLocaleDateString())
+                    date ? eq(taskTable.deadline, new Date(date).toLocaleDateString()) : eq(taskTable.deadline, new Date().toLocaleDateString()),
+                    filter ? inArray(taskTable.status, filter) : inArray(taskTable.status, ["todo", "done", "overdue"])
                 )
             );
 
         //convert data to TaskReturnType
-        const tasks: TaskReturnType[] = await tasksConvertFromDb(res);
+        const tasks: TaskReturnType[] = res.map(task => ({
+            id: task.id,
+            routineId: task.routineId,
+            title: task.title,
+            description: task.description ?? undefined,
+            status: task.status,
+            timeToDo: task.timeToDo,
+            deadline: task.deadline
+        }));
 
         return tasks;
     } catch (error: unknown) {

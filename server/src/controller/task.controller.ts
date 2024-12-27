@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { ApiError } from "../util/apiError";
 import { taskCreateService, taskDeleteService, taskGetAllService, taskGetEverythingService, taskGetService, taskUpdateService, taskUpdateStatusService } from "../service/task.service";
-import { TaskCreateType, TaskUpdateType } from "../model/task.model";
+import { TaskCreateType, TaskStatusType, TaskUpdateType } from "../model/task.model";
 
 //read
 export const taskGetController = async (req: Request, res: Response): Promise<void> => {
@@ -27,18 +27,20 @@ export const taskGetAllController = async (req: Request, res: Response): Promise
     try {
         const userId = req.body.userId;
         const date = req.query.date;
+        const filter = req.query.filter;
 
-        //check date correct format
-        /*  if (date && typeof date === 'string' && !date.match(/^\d{2}-\d{2}-\d{4}$/)) {
-             console.error("Date format is incorrect");
-             throw new ApiError(400, "Date format is incorrect", {});
-         }
-  */
-        console.log('in task get', date?.toString());
+        if (filter) {
+            const splitFilter: TaskStatusType[] = (filter as string).split(" ") as TaskStatusType[];
 
-        const tasks = await taskGetAllService(userId, date as string);
+            const tasks = await taskGetAllService(userId, date as string, splitFilter);
 
-        res.status(200).json({ message: "Tasks retrieved successfully", tasks: tasks });
+
+            res.status(200).json({ message: "Tasks retrieved successfully", tasks: tasks });
+        } else {
+            const tasks = await taskGetAllService(userId, date as string);
+
+            res.status(200).json({ message: "Tasks retrieved successfully", tasks: tasks });
+        }
     } catch (error: unknown) {
         console.error((error as Error).message);
         if (error instanceof ApiError) {

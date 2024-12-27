@@ -41,6 +41,11 @@ export default function TaskFilter() {
               newParams.set("filter", filterValue.join(" "));
             }
 
+            //check if there already is a date
+            if (searchParams.get("date")) {
+              newParams.set("date", searchParams.get("date")!);
+            }
+
             // navigate to the new url
             router.push(`?${newParams.toString()}`);
           }

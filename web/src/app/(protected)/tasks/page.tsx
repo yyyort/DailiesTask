@@ -3,24 +3,19 @@
 import TaskAddButton from "@/components/tasks/task-add-button";
 import TaskFilter from "@/components/tasks/task-filter";
 
-
 import TaskMobile from "./tasks-mobile";
 import { Suspense } from "react";
 import TasksLaptop from "./tasks-laptop";
-import { TaskStatusType } from "@/model/task.model";
 import TasksLaptopSkeleton from "@/components/tasks/tasks-laptop-skeleton";
 import TasksMobileSkeleton from "@/components/tasks/tasks-mobile-skeleton";
+import HomeCalendarMobile from "@/components/home/homeCalendar-mobile";
 
 type SearchParams = Promise<{ [key: string]: string | string[] | undefined }>;
 
 export default async function Tasks(props: { searchParams: SearchParams }) {
   const searchParams = await props.searchParams;
-  const filterParams = searchParams.filter;
-
-  const filter: TaskStatusType[] = (
-    Array.isArray(filterParams) ? filterParams : [filterParams]
-  ).filter(Boolean) as TaskStatusType[];
-
+  const filterParams = searchParams.filter as string;
+  const dateParams = searchParams.date as string;
 
   return (
     <div
@@ -46,19 +41,37 @@ export default async function Tasks(props: { searchParams: SearchParams }) {
             <TaskAddButton />
           </div>
           <div className="flex flex-col">
-            <h1 className="text-2xl text-foreground text-end">task today</h1>
-            <div className="flex flex-row items-center gap-2 text-foreground">
-              {/* date today */}
-              <h3
-                className="
-                phone-sm:text-sm
+            <div className="flex flex-row items-center laptop:gap-2 phone-sm:gap-4">
+              <div className="z-10">
+                <HomeCalendarMobile variant="minimal" />
+              </div>
+
+              <div className="flex flex-col">
+                <h1 className="text-[2rem] text-foreground text-end">
+                  {
+                    dateParams ? dateParams === new Date().toLocaleDateString() ? 'Tasks Today' : 'Tasks' : 'Tasks Today'
+                  }
+                </h1>
+
+                {/* date today */}
+                <h3
+                  className="
+                phone-sm:text-sm text-muted-foreground
+                laptop:text-lg
+                phone-sm:text-end laptop:text-start
               "
-              >
-                {new Date().toLocaleString("en-US", {
-                  month: "long",
-                  day: "numeric",
-                })}
-              </h3>
+                >
+                  {dateParams
+                    ? new Date(dateParams).toLocaleDateString("en-US", {
+                        month: "long",
+                        day: "numeric",
+                      })
+                    : new Date().toLocaleDateString("en-US", {
+                        month: "long",
+                        day: "numeric",
+                      })}
+                </h3>
+              </div>
             </div>
           </div>
         </div>
@@ -87,8 +100,8 @@ export default async function Tasks(props: { searchParams: SearchParams }) {
             laptop:hidden
           "
         >
-          <Suspense fallback={<TasksMobileSkeleton/>}>
-            <TaskMobile filter={filter}/>
+          <Suspense fallback={<TasksMobileSkeleton />}>
+            <TaskMobile filter={filterParams} dateFilter={dateParams} />
           </Suspense>
 
           <div
@@ -108,8 +121,8 @@ export default async function Tasks(props: { searchParams: SearchParams }) {
             laptop:grid
           "
         >
-          <Suspense fallback={<TasksLaptopSkeleton/>}>
-            <TasksLaptop filter={filter} />
+          <Suspense fallback={<TasksLaptopSkeleton />}>
+            <TasksLaptop filter={filterParams} dateFilter={dateParams} />
           </Suspense>
         </div>
       </div>
