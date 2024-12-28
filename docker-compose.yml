@@ -16,7 +16,7 @@ services:
       - POSTGRES_USER=${POSTGRES_USER:?}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:?}
       - PORT=4000
-      - NODE_ENV=development
+      - NODE_ENV=dev
       - ACCESS_TOKEN_SECRET=${ACCESS_TOKEN_SECRET:?}
       - REFRESH_TOKEN_SECRET=${REFRESH_TOKEN_SECRET:?}
   db:
@@ -32,12 +32,15 @@ services:
       POSTGRES_DB: ${POSTGRES_DB:?}
     volumes:
       - db-data:/var/lib/postgresql/data
-    command: ['postgres', '-p', '5434']
+    command: ["postgres", "-p", "5434"]
     healthcheck:
       test:
-        ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:?} -d ${POSTGRES_DB:?} -p 5434"]
+        [
+          "CMD-SHELL",
+          "pg_isready -U ${POSTGRES_USER:?} -d ${POSTGRES_DB:?} -p 5434",
+        ]
       interval: 5s
       timeout: 5s
-      retries: 5 
+      retries: 5
 volumes:
   db-data:

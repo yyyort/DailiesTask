@@ -13,7 +13,11 @@ export const userSignUpController = async (req: Request, res: Response): Promise
     try {
         const { email, password, confirmPassword, name } = req.body;
 
+        console.log(email);
+
         const reqBody: UserCreateType = { email, password, confirmPassword, name };
+
+        console.log(reqBody);
 
         const user: UserReturnType = await userCreateService(reqBody);
 
@@ -38,8 +42,8 @@ export const userSignUpController = async (req: Request, res: Response): Promise
             maxAge: 7 * 24 * 60 * 60 * 1000 // 7 day,
         });
 
-         //throw server error if token is undefined
-         if (!accessToken || !refreshToken) {
+        //throw server error if token is undefined
+        if (!accessToken || !refreshToken) {
             throw new ApiError(500, "Internal Server Error", {
                 message: "Token is undefined"
             });

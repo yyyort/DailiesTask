@@ -5,50 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1732986935443,
-      "tag": "0000_late_bushwacker",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1732987021308,
-      "tag": "0001_charming_blindfold",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1733284838775,
-      "tag": "0002_worried_sunfire",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1734142315383,
-      "tag": "0003_wandering_network",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "7",
-      "when": 1734843907644,
-      "tag": "0004_unique_zaran",
-      "breakpoints": true
-    },
-    {
-      "idx": 5,
-      "version": "7",
-      "when": 1734931691734,
-      "tag": "0005_youthful_hulk",
-      "breakpoints": true
-    },
-    {
-      "idx": 6,
-      "version": "7",
-      "when": 1734947181587,
-      "tag": "0006_faithful_microchip",
+      "when": 1735386685041,
+      "tag": "0000_exotic_nehzno",
       "breakpoints": true
     }
   ]

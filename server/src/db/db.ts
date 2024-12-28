@@ -7,11 +7,11 @@ import { Pool } from 'pg';
 
 dotenv.config();
 
-const env = process.env.NODE_ENV || 'development';
+const env = process.env.NODE_ENV || 'dev';
 
 //db connection
 const pool = new Pool({
-    host: env === 'development' ? 'host.docker.internal' : 'localhost',
+    host: env === 'dev' ? 'host.docker.internal' : 'localhost',
     user: 'user',
     password: '1234',
     database: 'dailiestask',

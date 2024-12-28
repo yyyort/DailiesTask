@@ -7,7 +7,7 @@ import { serial } from 'drizzle-orm/pg-core';
 import { pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
 
 export const usersTable = pgTable("users_table", {
-    id: uuid('id').primaryKey().defaultRandom().unique().notNull(),
+    id: uuid('id').primaryKey().defaultRandom().notNull(),
     email: text('email').unique().notNull(),
     name: text('name').notNull(),
     password: text('password').notNull(),
@@ -18,7 +18,7 @@ export const usersTable = pgTable("users_table", {
 export const taskStatus = pgEnum("task_status", ["todo", "done", "overdue"]);
 
 export const taskTable = pgTable("task_table", {
-    id: serial('id').primaryKey().unique().notNull(),
+    id: serial('id').primaryKey().notNull(),
     userId: uuid('user_id').notNull().references(() => usersTable.id, {
         onDelete: 'cascade',
         onUpdate: 'cascade',
@@ -37,7 +37,7 @@ export const taskTable = pgTable("task_table", {
 });
 
 export const taskTodayTable = pgTable("task_today_table", {
-    id: serial('id').primaryKey().unique().notNull(),
+    id: serial('id').primaryKey().notNull(),
     userId: uuid('user_id').notNull().references(() => usersTable.id, {
         onDelete: 'cascade',
         onUpdate: 'cascade',
@@ -50,7 +50,7 @@ export const taskTodayTable = pgTable("task_today_table", {
 })
 
 export const routineTable = pgTable("routine_table", {
-    id: uuid('id').primaryKey().defaultRandom().unique().notNull(),
+    id: uuid('id').primaryKey().defaultRandom().notNull(),
     userId: uuid('user_id').notNull().references(() => usersTable.id, {
         onDelete: 'cascade',
         onUpdate: 'cascade',
@@ -63,7 +63,7 @@ export const routineTable = pgTable("routine_table", {
 
 
 export const contributionTable = pgTable("contribution_table", {
-    id: uuid('id').primaryKey().defaultRandom().unique().notNull(),
+    id: uuid('id').primaryKey().defaultRandom().notNull(),
     userId: uuid('user_id').notNull().references(() => usersTable.id, {
         onDelete: 'cascade',
         onUpdate: 'cascade',
@@ -76,7 +76,7 @@ export const contributionTable = pgTable("contribution_table", {
 });
 
 export const notesTable = pgTable("notes_table", {
-    id: uuid('id').primaryKey().defaultRandom().unique().notNull(),
+    id: uuid('id').primaryKey().defaultRandom().notNull(),
     userId: uuid('user_id').notNull().references(() => usersTable.id, {
         onDelete: 'cascade',
         onUpdate: 'cascade',
@@ -89,7 +89,7 @@ export const notesTable = pgTable("notes_table", {
 });
 
 export const notesGroupTable = pgTable("group_table", {
-    id: uuid('id').primaryKey().defaultRandom().unique().notNull(),
+    id: uuid('id').primaryKey().defaultRandom().notNull(),
     userId: uuid('user_id').notNull().references(() => usersTable.id, {
         onDelete: 'cascade',
         onUpdate: 'cascade',

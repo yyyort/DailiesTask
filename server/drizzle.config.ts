@@ -10,9 +10,9 @@ export default defineConfig({
   dialect: 'postgresql',
   dbCredentials: {
     host: 'localhost',
-    user: process.env.POSTGRES_USER!,
-    password: process.env.POSTGRES_PASSWORD!,
-    database: process.env.POSTGRES_DB!,
+    user: 'user',
+    password: '1234',
+    database: 'dailiestask',
     port: 5434,
     ssl: false,
   },
