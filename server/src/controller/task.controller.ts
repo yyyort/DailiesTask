@@ -84,7 +84,6 @@ export const taskCreateController = async (req: Request, res: Response): Promise
             timeToDo,
             deadline
         };
-
         const task = await taskCreateService(userId, data);
 
         res.status(201).json({ message: "Task created successfully", task: task });
@@ -124,9 +123,9 @@ export const taskUpdateController = async (req: Request, res: Response): Promise
             deadline
         };
 
-        const task = await taskUpdateService(userId, Number(id), data);
+        await taskUpdateService(userId, Number(id), data);
 
-        res.status(200).json({ message: "Task updated successfully", task: task });
+        res.status(200).json({ message: "Task updated successfully" });
     } catch (error: unknown) {
         console.error(error);
         if (error instanceof ApiError) {
@@ -149,9 +148,9 @@ export const taskUpdateStatusController = async (req: Request, res: Response): P
             throw new ApiError(400, "No status provided to update", {});
         }
 
-        const task = await taskUpdateStatusService(req.body.userId, Number(id), status);
+        await taskUpdateStatusService(req.body.userId, Number(id), status);
 
-        res.status(200).json({ message: "Task status updated successfully", task: task });
+        res.status(200).json({ message: "Task status updated successfully" });
     } catch (error: unknown) {
         console.error(error);
         if (error instanceof ApiError) {
@@ -168,9 +167,9 @@ export const taskDeleteController = async (req: Request, res: Response): Promise
         const { id } = req.params;
         const userId = req.body.userId;
 
-        const task = await taskDeleteService(userId, Number(id));
+        await taskDeleteService(userId, Number(id));
 
-        res.status(200).json({ message: "Task deleted successfully", task: task });
+        res.status(200).json({ message: "Task deleted successfully" });
     } catch (error: unknown) {
         console.error(error);
         if (error instanceof ApiError) {

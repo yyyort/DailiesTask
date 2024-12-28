@@ -287,11 +287,6 @@ export async function taskUpdateStatusService(
             throw new ApiError(400, "Id is required", {});
         }
 
-        if (!userId) {
-            console.error("User Id is required");
-            throw new ApiError(400, "User Id is required", {});
-        }
-
         if (status !== "todo" && status !== "done" && status !== "overdue") {
             console.error("Invalid status");
             throw new ApiError(400, "Invalid status", {});

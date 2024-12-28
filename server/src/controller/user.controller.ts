@@ -13,11 +13,7 @@ export const userSignUpController = async (req: Request, res: Response): Promise
     try {
         const { email, password, confirmPassword, name } = req.body;
 
-        console.log(email);
-
         const reqBody: UserCreateType = { email, password, confirmPassword, name };
-
-        console.log(reqBody);
 
         const user: UserReturnType = await userCreateService(reqBody);
 
