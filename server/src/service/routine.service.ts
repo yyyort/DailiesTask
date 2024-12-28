@@ -1,6 +1,6 @@
 import { and, eq, inArray } from "drizzle-orm";
 import { db } from "../db/db";
-import { routineTable, taskTable } from "../db/schema";
+import { routineTable, taskTable, taskTodayTable } from "../db/schema";
 import { RoutineCreateType, RoutineReturnType, RoutineUpdateType } from "../model/routine.model";
 import { TaskCreateType, TaskReturnType } from "../model/task.model";
 import { taskCreateService, taskUpdateService } from "./task.service";
@@ -80,38 +80,67 @@ export async function routineGetAllService(userId: string, filters?: string[]): 
             )
 
         //post processing
-        const routines: RoutineReturnType[] = await Promise.all(resRoutines.map(async routine => {
-            const resTasks = await db.select({
-                id: taskTable.id,
-                title: taskTable.title,
-                description: taskTable.description,
-                status: taskTable.status,
-                timeToDo: taskTable.timeToDo,
-                deadline: taskTable.deadline,
-            }).from(taskTable)
-                .where(
-                    and(
-                        eq(taskTable.userId, userId),
-                        eq(taskTable.routineId, routine.id)
-                    )
-                )
 
-            const tasks: TaskReturnType[] = resTasks.map(task => {
-                return {
-                    id: task.id,
-                    title: task.title,
-                    description: task.description ?? "",
-                    status: task.status,
-                    timeToDo: task.timeToDo,
-                    deadline: task.deadline
+        /* 
+            patch: get tasks from taskTodayTable instead of taskTable
+        */
+        const routines: RoutineReturnType[] = await Promise.all(resRoutines.map(async routine => {
+            //steps
+            //get all ids in task today table
+            //get tasks based on the ids
+            //filter based on the routine id
+            //return the tasks
+
+            const resTasks: TaskReturnType[] = await db.transaction(
+                async trx => {
+                    //get all ids in task today table
+                    const taskIds = await trx
+                        .select({
+                            id: taskTodayTable.taskId
+                        })
+                        .from(taskTodayTable)
+                        .where(
+                            eq(taskTodayTable.userId, userId)
+                        )
+
+                    //get tasks based on the ids
+                    //filter based on the routine id
+                    const tasks = await trx.select({
+                        id: taskTable.id,
+                        title: taskTable.title,
+                        description: taskTable.description,
+                        status: taskTable.status,
+                        timeToDo: taskTable.timeToDo,
+                        deadline: taskTable.deadline,
+                    }).from(taskTable)
+                        .where(
+                            and(
+                                inArray(taskTable.id, taskIds.map(task => task.id)), //tasks in today
+                                eq(taskTable.userId, userId), // tasks of user
+                                eq(taskTable.routineId, routine.id) //tasks of routine
+                            )
+
+                        )
+
+                    //post processing
+                    return tasks.map(task => {
+                        return {
+                            id: task.id,
+                            title: task.title,
+                            description: task.description ?? "",
+                            status: task.status,
+                            timeToDo: task.timeToDo,
+                            deadline: task.deadline
+                        }
+                    })
                 }
-            })
+            )
 
             return {
                 id: routine.id,
                 title: routine.title,
                 description: routine.description ?? "",
-                tasks: tasks
+                tasks: resTasks
             }
         }))
 
@@ -150,6 +179,21 @@ export async function routineGetAllHeaders(userId: string): Promise<{ id: string
 */
 export async function routineGetService(userId: string, id: string): Promise<RoutineReturnType> {
     try {
+
+        /* 
+            patch: get tasks from taskTodayTable instead of taskTable
+        */
+
+        //get today's tasks ids
+        const taskIds = await db
+            .select({
+                id: taskTodayTable.taskId
+            })
+            .from(taskTodayTable)
+            .where(
+                eq(taskTodayTable.userId, userId)
+            )
+
         const res = await db
             .select({
                 id: routineTable.id,
@@ -174,7 +218,9 @@ export async function routineGetService(userId: string, id: string): Promise<Rou
             .innerJoin(taskTable,
                 and(
                     eq(taskTable.userId, userId),
-                    eq(taskTable.routineId, id)
+                    eq(taskTable.routineId, id),
+                    inArray(taskTable.id, taskIds.map(task => task.id)
+                    )
                 )
             )
 

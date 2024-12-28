@@ -24,7 +24,7 @@ export const taskTable = pgTable("task_table", {
         onUpdate: 'cascade',
     }),
     routineId: uuid('routine_id').references(() => routineTable.id, {
-        onDelete: 'cascade',
+        onDelete: 'set null',
         onUpdate: 'cascade',
     }),
     title: text('title').notNull(),

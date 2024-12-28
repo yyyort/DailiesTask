@@ -1,4 +1,4 @@
-import { and, asc, eq, exists, inArray, isNotNull, isNull, lt, max, notExists, } from "drizzle-orm";
+import { and, asc, eq, exists, inArray, isNotNull, lt, max, notExists, } from "drizzle-orm";
 import { db } from "../db/db";
 import { taskTable, taskTodayTable } from "../db/schema";
 import { TaskReturnType, TaskStatusType, TaskTodayReturnType, TaskTodayType } from "../model/task.model";
@@ -86,6 +86,7 @@ export const taskTodayGetService = async (userId: string, filter?: TaskStatusTyp
     }
 };
 
+
 /* 
     insert a newly created if it is today
 */
@@ -126,6 +127,151 @@ export const taskTodayCreateService = async (userId: string, task: TaskReturnTyp
     }
 };
 
+//job for making the tasks that is past the deadline overdue
+export const taskTodaySetOverdue = async (): Promise<void> => {
+    try {
+        //update all tasks that are past the deadline
+        await db
+            .update(taskTable)
+            .set({
+                status: 'overdue'
+            })
+            .where(
+                and(
+                    eq(taskTable.status, 'todo'),
+                    lt(taskTable.deadline, new Date().toLocaleDateString())
+                ),
+            )
+    } catch (error: unknown) {
+        console.error((error as Error));
+        if (error instanceof ApiError) {
+            throw error;
+        }
+
+        throw new Error((error as Error).message);
+    }
+};
+
+//job for recyling the tasks that are in routine
+export const taskTodayRecycleRoutine = async (): Promise<void> => {
+    try {
+
+        /* 
+            patch: instead of setting the status to todo
+            create a new tasks for today
+        */
+        await db.transaction(async (tx) => {
+
+            //get all todays tasks id
+            const tasksTodayIds = await tx
+                .select({
+                    taskId: taskTodayTable.taskId
+                })
+                .from(taskTodayTable);
+
+            //get all tasks that are in routine in tasksTodayIds
+            const tasks = await tx
+                .select({
+                    id: taskTable.id,
+                    userId: taskTable.userId,
+                    routineId: taskTable.routineId,
+                    title: taskTable.title,
+                    description: taskTable.description,
+                    status: taskTable.status,
+                    timeToDo: taskTable.timeToDo,
+                    deadline: taskTable.deadline
+                })
+                .from(taskTable)
+                .where(
+                    and(
+                        isNotNull(taskTable.routineId),
+                        inArray(taskTable.id, tasksTodayIds.map(task => task.taskId))
+                    )
+                )
+
+            //post process tasks
+            const newTasks = tasks.map(task => {
+                return {
+                    userId: task.userId,
+                    title: task.title,
+                    description: task.description ?? "",
+                    status: 'todo' as 'todo' | 'done' | 'overdue',
+                    timeToDo: task.timeToDo,
+                    deadline: new Date().toLocaleDateString(),
+                    createdAt: new Date(),
+                    updatedAt: new Date(),
+                    routineId: task.routineId
+                }
+            })
+
+            //insert copied tasks with today's date
+            const newRoutineTasks = await tx
+                .insert(taskTable)
+                .values(
+                    newTasks
+                )
+                .returning(
+                    {
+                        userId: taskTable.userId,
+                        id: taskTable.id,
+                        title: taskTable.title,
+                        description: taskTable.description,
+                        status: taskTable.status,
+                        timeToDo: taskTable.timeToDo,
+                        deadline: taskTable.deadline
+                    }
+                );
+
+            console.log('taskTodayRecycleRoutine newRoutineTasks', newRoutineTasks);
+        });
+
+
+    } catch (error: unknown) {
+        console.error((error as Error));
+        if (error instanceof ApiError) {
+            throw error;
+        }
+        throw new Error((error as Error).message);
+    }
+};
+
+//job for deleting previous day's task
+export const taskTodayCleanUp = async (): Promise<void> => {
+    try {
+        //remove all tasks that has deadline of yesterday or before, and have status of done
+        await db.transaction(async (tx) => {
+            //get all tasks that are yesterday's date and not in task_today_table
+            const res = await tx
+                .select({
+                    id: taskTodayTable.id
+                })
+                .from(taskTodayTable)
+                .where(
+                    and(
+                        lt(taskTable.deadline, new Date().toLocaleDateString()), //yesterday's date
+                        eq(taskTable.status, 'done'),
+                    )
+                )
+                .innerJoin(taskTable, eq(taskTodayTable.taskId, taskTable.id));
+
+            console.log('taskTodayCleanUp getting tasks yesterday', res);
+
+            //bulk delete
+            if (res.length > 0) {
+                await tx
+                    .delete(taskTodayTable)
+                    .where(inArray(taskTodayTable.id, res.map(task => task.id)));
+            }
+        })
+
+    } catch (error: unknown) {
+        console.error((error as Error));
+        if (error instanceof ApiError) {
+            throw error;
+        }
+        throw new Error((error as Error).message);
+    }
+};
 
 
 //job for inserting today's task
@@ -218,106 +364,20 @@ export const taskTodaySetNewTask = async (): Promise<void> => {
     }
 };
 
-//job for deleting previous day's task
-export const taskTodayCleanUp = async (): Promise<void> => {
-    try {
-        //remove all tasks that has deadline of yesterday or before, and have status of done, except for tasks that has routineId
-        await db.transaction(async (tx) => {
-            //get all tasks that are yesterday's date and not in task_today_table
-            const res = await tx
-                .select({
-                    id: taskTodayTable.id
-                })
-                .from(taskTodayTable)
-                .where(
-                    and(
-                        lt(taskTable.deadline, new Date().toLocaleDateString()), //yesterday's date
-                        eq(taskTable.status, 'done'),
-                        isNull(taskTable.routineId)
-                    )
-                )
-                .innerJoin(taskTable, eq(taskTodayTable.taskId, taskTable.id));
-
-            console.log('taskTodayCleanUp getting tasks yesterday', res);
-
-            //bulk delete
-            if (res.length > 0) {
-                await tx
-                    .delete(taskTodayTable)
-                    .where(inArray(taskTodayTable.id, res.map(task => task.id)));
-            }
-
-        })
-
-    } catch (error: unknown) {
-        console.error((error as Error));
-        if (error instanceof ApiError) {
-            throw error;
-        }
-
-        throw new Error((error as Error).message);
-    }
-};
-
-//job for making the tasks that is past the deadline overdue
-export const taskTodaySetOverdue = async (): Promise<void> => {
-    try {
-        //update all tasks that are past the deadline
-        await db
-            .update(taskTable)
-            .set({
-                status: 'overdue'
-            })
-            .where(
-                and(
-                    eq(taskTable.status, 'todo'),
-                    lt(taskTable.deadline, new Date().toLocaleDateString())
-                ),
-            )
-    } catch (error: unknown) {
-        console.error((error as Error));
-        if (error instanceof ApiError) {
-            throw error;
-        }
-
-        throw new Error((error as Error).message);
-    }
-};
-
-//job for recyling the tasks that are in routine
-export const taskTodayRecycleRoutine = async (): Promise<void> => {
-    try {
-        await db
-            .update(taskTable)
-            .set({
-                status: 'todo',
-                deadline: new Date().toLocaleDateString()
-            })
-            .where(
-                isNotNull(taskTable.routineId),
-            )
-    } catch (error: unknown) {
-        console.error((error as Error));
-        if (error instanceof ApiError) {
-            throw error;
-        }
-        throw new Error((error as Error).message);
-    }
-};
-
-export const taskTodayCronService = cron.schedule('0 9 11 * * * ', async () => {
+//seconds minutes hours day month year
+export const taskTodayCronService = cron.schedule('0 13 17 * * * ', async () => {
     try {
         //setting overdue tasks
         await taskTodaySetOverdue();
+
+        //recycle routine tasks
+        await taskTodayRecycleRoutine();
 
         //set users contributions
         await contributionCreateService();
 
         //clean up previous day's task
         await taskTodayCleanUp();
-
-        //recycle routine tasks
-        await taskTodayRecycleRoutine();
 
         //insert new tasks for today
         await taskTodaySetNewTask();
