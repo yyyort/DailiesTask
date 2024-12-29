@@ -8,21 +8,28 @@ export const authValidator = async (req: Request, res: Response, next: NextFunct
 
         if (!authHeader?.startsWith('Bearer ')) {
             throw new ApiError(401, 'Unauthorized', {});
-            return;
         }
 
         const token = authHeader!.split(' ')[1];
 
         const payload = await verifyToken(token, 'access');
 
-        const { id } = payload;
+        if (!payload) {
+            throw new ApiError(401, 'Unauthorized', {});
+        }
 
+        console.log('authValidator finf', req.body.userId);
+
+
+        const { id } = payload;
         req.body.userId = id;
+
 
         next();
     } catch (error: unknown) {
         console.error((error as Error).message);
         console.error(error);
+        console.error('authValidator error got error here');
         if (error instanceof ApiError) {
             res.status(error.status).json({ message: error.message });
             return;

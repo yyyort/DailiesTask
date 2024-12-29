@@ -3,6 +3,7 @@ import { db } from "../../../db/db";
 import { usersTable } from "../../../db/schema";
 import request from "supertest";
 import { TaskCreateType, TaskStatusType } from "../../../model/task.model";
+import { eq } from "drizzle-orm";
 
 /* 
     router.get('/task/today', authValidator, taskTodayGetController);
@@ -22,11 +23,16 @@ describe("task controller test", async () => {
     //reset 
     beforeAll(async () => {
         await db.delete(usersTable)
-
+            .where(
+                eq(usersTable.email, 'taskTest@gmail.com')
+            )
     });
 
     afterAll(async () => {
         await db.delete(usersTable)
+            .where(
+                eq(usersTable.email, 'taskTest@gmail.com')
+            )
     });
 
     const req = request('http://localhost:4000');
@@ -54,9 +60,12 @@ describe("task controller test", async () => {
         POST TASK
     */
     describe("task post controller", async () => {
-        //resets
+        //reset 
         beforeAll(async () => {
             await db.delete(usersTable)
+                .where(
+                    eq(usersTable.email, 'taskTest@gmail.com')
+                )
         });
 
         //normal test, should pass and return task
@@ -94,9 +103,12 @@ describe("task controller test", async () => {
         GET TASK
     */
     describe("task get controller", async () => {
-        //resets
+        //reset 
         beforeAll(async () => {
             await db.delete(usersTable)
+                .where(
+                    eq(usersTable.email, 'taskTest@gmail.com')
+                )
         });
 
         //normal test, should pass and return tasks
@@ -149,11 +161,13 @@ describe("task controller test", async () => {
         PUT PATCH TASK
     */
     describe("task put patch controller", async () => {
-        //resets
+        //reset 
         beforeAll(async () => {
             await db.delete(usersTable)
+                .where(
+                    eq(usersTable.email, 'taskTest@gmail.com')
+                )
         });
-
         //normal test, should pass and update task
         it("should update task", async () => {
             await req.post('/api/user/signup').send({
@@ -202,11 +216,13 @@ describe("task controller test", async () => {
         PUT PATCH TASK
     */
     describe("task delete controller", async () => {
-        //resets
+        //reset 
         beforeAll(async () => {
             await db.delete(usersTable)
+                .where(
+                    eq(usersTable.email, 'taskTest@gmail.com')
+                )
         });
-
         //normal test, should pass and update task
         it("should update task", async () => {
             await req.post('/api/user/signup').send({

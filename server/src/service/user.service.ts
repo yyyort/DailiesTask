@@ -23,7 +23,11 @@ export async function userCreateService(data: UserCreateType): Promise<UserRetur
                 )
                 .limit(1);
 
-            if (userExist.length > 0) {
+            console.log('find me bitx', userExist);
+
+            if (userExist.length >= 1) {
+                console.log('find me bitx 2', userExist);
+
                 throw new ApiError(400, "User already exists", {
                     message: "User already exists"
                 });
@@ -188,12 +192,9 @@ export async function userUpdateService(id: string, data: UserUpdateType): Promi
                     .where(
                         eq(usersTable.email, data.email)
                     )
-                    .limit(1);
 
-                if (userExist.length > 0) {
-                    throw new ApiError(400, "User already exists", {
-                        message: "User already exists"
-                    });
+                if (userExist.length >= 1) {
+                    throw new ApiError(400, "Email already exists", {});
                 }
             }
 
