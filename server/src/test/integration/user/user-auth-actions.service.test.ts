@@ -4,9 +4,7 @@ import { userCreateService, userDeleteService, userUpdateService } from "../../.
 import { UserCreateType, UserReturnType } from "../../../model/user.model";
 import { db } from "../../../db/db";
 import { usersTable } from "../../../db/schema";
-import { eq } from 'drizzle-orm';
-import { v4 as uuid } from "uuid";
-
+import { eq, inArray } from 'drizzle-orm';
 
 describe("user update service", async () => {
     //test data
@@ -22,13 +20,17 @@ describe("user update service", async () => {
         await db.delete(usersTable)
             .where(
                 eq(usersTable.email, user.email)
+
             )
     });
 
     beforeAll(async () => {
         await db.delete(usersTable)
             .where(
-                eq(usersTable.email, user.email)
+                inArray(usersTable.email, [
+                    user.email,
+                    'toBeDelete@gmail.com'
+                ])
             )
     });
 
@@ -50,14 +52,14 @@ describe("user update service", async () => {
         const userUpdated: UserReturnType = await userUpdateService(
             userCreated.id,
             {
-                email: uuid() + user.email,
+                name: 'updated test'
             }
         );
 
         expect(userUpdated).toBeDefined();
         expect(userUpdated).toMatchObject({
             id: userCreated.id,
-            name: userCreated.name
+            name: 'updated test'
         })
     });
 
@@ -66,7 +68,7 @@ describe("user update service", async () => {
 
         //create user
         const userCreated: UserReturnType = await userCreateService({
-            email: user.email,
+            email: 'toBeDelete@gmail.com',
             password: user.password,
             confirmPassword: user.confirmPassword,
             name: user.name

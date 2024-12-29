@@ -10,6 +10,8 @@ export const config = {
         '/tasks',
         '/routines',
         '/notes',
+        '/notes/add',
+        '/notes/[id]',
     ],
 }
 
