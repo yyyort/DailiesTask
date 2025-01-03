@@ -5,6 +5,7 @@ import { TaskReturnType } from "../model/task.model";
 export const taskConvertFromDb = async (task: TaskTableReturnType): Promise<TaskReturnType> => {
     return {
         id: task.id,
+        routineTaskId: task.routineTaskId,
         title: task.title,
         description: task.description ?? "",
         status: task.status,
@@ -17,7 +18,7 @@ export const tasksConvertFromDb = async (tasks: TaskTableReturnType[]): Promise<
     return tasks.map(task => {
         return {
             id: task.id,
-            routineId: task.routineId,
+            routineTaskId: task.routineTaskId,
             title: task.title,
             description: task.description ?? "",
             status: task.status,

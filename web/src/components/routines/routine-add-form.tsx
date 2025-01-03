@@ -258,6 +258,14 @@ export default function RoutineAddForm({
             ))}
           </div>
 
+          {/* root error */}
+          {form.formState.errors.root && (
+            <div className="text-red-600 text-end">
+              {form.formState.errors.root.message}
+            </div>
+          )}
+
+
           {/* add task button*/}
           <Button
             type="button"

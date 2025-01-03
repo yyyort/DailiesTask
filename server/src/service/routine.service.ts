@@ -1,8 +1,8 @@
-import { and, eq, inArray } from "drizzle-orm";
+import { and, eq, exists, inArray } from "drizzle-orm";
 import { db } from "../db/db";
-import { routineTable, taskTable, taskTodayTable } from "../db/schema";
-import { RoutineCreateType, RoutineReturnType, RoutineUpdateType } from "../model/routine.model";
-import { TaskCreateType, TaskReturnType } from "../model/task.model";
+import { routineTable, routineTasksTable, taskTable, taskTodayTable } from "../db/schema";
+import { RoutineCreateType, RoutineReturnType, RoutineTaskReturnType, RoutineUpdateType } from "../model/routine.model";
+import { TaskCreateType } from "../model/task.model";
 import { taskCreateService, taskUpdateService } from "./task.service";
 
 
@@ -17,40 +17,91 @@ export async function routineCreateService(userId: string, data: RoutineCreateTy
             description: data.description
         }
 
-        //create routine
-        const resRoutine = await db.insert(routineTable)
-            .values(routineData)
-            .returning({
-                id: routineTable.id
-            });
+        const routine: RoutineReturnType = await db.transaction(async (trx) => {
+            //create routine
+            const resRoutine = await trx
+                .insert(routineTable)
+                .values(routineData)
+                .returning({
+                    id: routineTable.id
+                });
 
+            //pre process routine tasks
+            const routineTaskTobeCreated = data.tasks?.map(task => {
+                return {
+                    userId: userId,
+                    routineId: resRoutine[0].id,
+                    title: task.title,
+                    description: task.description ?? "",
+                    status: task.status,
+                    timeToDo: task.timeToDo,
+                    deadline: task.deadline
+                }
+            })
 
-        const tasksData: TaskCreateType[] = data.tasks?.map(task => {
-            return {
-                userId: userId,
-                routineId: resRoutine[0].id,
-                title: task.title,
-                description: task.description ?? "",
-                status: task.status,
-                timeToDo: task.timeToDo,
-                deadline: task.deadline
+            if (routineTaskTobeCreated) {
+                //create routine tasks
+                const resRoutineTasks = await trx
+                    .insert(routineTasksTable)
+                    .values(
+                        routineTaskTobeCreated
+                    )
+                    .returning({
+                        id: routineTasksTable.id,
+                        title: routineTasksTable.title,
+                        description: routineTasksTable.description ?? "",
+                        status: routineTasksTable.status,
+                        timeToDo: routineTasksTable.timeToDo,
+                        deadline: routineTasksTable.deadline,
+                        routineId: routineTasksTable.routineId
+                    });
+
+                //post process tasks
+                const tasksTobeCreated: TaskCreateType[] = resRoutineTasks.map(task => {
+                    return {
+                        routineTaskId: task.id,
+                        title: task.title,
+                        description: task.description ?? "",
+                        status: task.status,
+                        timeToDo: task.timeToDo,
+                        deadline: task.deadline
+                    }
+                })
+
+                //create tasks
+                Promise.all(tasksTobeCreated.map(async task => {
+                    console.log("task find me calling taskCreateService", task);
+                    await taskCreateService(userId, task);
+                }))
+
+                return {
+                    id: resRoutine[0].id,
+                    title: data.title,
+                    description: data.description,
+                    tasks: resRoutineTasks.map(task => {
+                        return {
+                            id: task.id,
+                            routineId: task.routineId,
+                            title: task.title,
+                            description: task.description ?? "",
+                            status: task.status,
+                            timeToDo: task.timeToDo,
+                            deadline: task.deadline
+                        }
+                    })
+                }
+            } else {
+                return {
+                    id: resRoutine[0].id,
+                    title: data.title,
+                    description: data.description,
+                    tasks: []
+                }
             }
-        }) ?? [];
 
-        //create tasks
-        const resTasks: TaskReturnType[] = await Promise.all(tasksData.map(async task => {
-            const res = await taskCreateService(userId, task);
+        });
 
-            return res;
-        }
-        ))
-
-        return {
-            id: resRoutine[0].id,
-            title: data.title,
-            description: data.description,
-            tasks: resTasks
-        }
+        return routine;
 
     } catch (error) {
         console.error((error as Error));
@@ -80,59 +131,87 @@ export async function routineGetAllService(userId: string, filters?: string[]): 
             )
 
         //post processing
-
         /* 
-            patch: get tasks from taskTodayTable instead of taskTable
+            patch: get tasks from routineTasksTable instead of taskTable
         */
         const routines: RoutineReturnType[] = await Promise.all(resRoutines.map(async routine => {
-            //steps
-            //get all ids in task today table
-            //get tasks based on the ids
-            //filter based on the routine id
-            //return the tasks
 
-            const resTasks: TaskReturnType[] = await db.transaction(
+            const resTasks: RoutineTaskReturnType[] = await db.transaction(
                 async trx => {
-                    //get all ids in task today table
-                    const taskIds = await trx
+                    const tasks = await trx
+                        .select(
+                            {
+                                id: routineTasksTable.id,
+                                routineId: routineTasksTable.routineId,
+                                title: routineTasksTable.title,
+                                description: routineTasksTable.description,
+                                status: routineTasksTable.status,
+                                timeToDo: routineTasksTable.timeToDo,
+                                deadline: routineTasksTable.deadline
+                            }
+                        )
+                        .from(routineTasksTable)
+                        .where(
+                            and(
+                                eq(routineTasksTable.userId, userId),
+                                eq(routineTasksTable.routineId, routine.id)
+                            )
+                        )
+
+                    //get tasks status
+                    const tasksId = await trx
                         .select({
-                            id: taskTodayTable.taskId
+                            taskId: taskTodayTable.taskId
                         })
                         .from(taskTodayTable)
                         .where(
-                            eq(taskTodayTable.userId, userId)
+                            and(
+                                exists(
+                                    db
+                                        .select({
+                                            id: taskTable.id
+                                        })
+                                        .from(taskTable)
+                                        .where(
+                                            and(
+                                                eq(taskTable.userId, userId),
+                                                inArray(taskTable.routineTaskId, tasks.map(task => task.id))
+                                            )
+                                        )
+                                )
+                            )
                         )
 
-                    //get tasks based on the ids
-                    //filter based on the routine id
-                    const tasks = await trx.select({
-                        id: taskTable.id,
-                        title: taskTable.title,
-                        description: taskTable.description,
-                        status: taskTable.status,
-                        timeToDo: taskTable.timeToDo,
-                        deadline: taskTable.deadline,
-                    }).from(taskTable)
+                    const taskStatus = await trx
+                        .select({
+                            id: taskTable.id,
+                            status: taskTable.status,
+                            routineTaskId: taskTable.routineTaskId
+                        })
+                        .from(taskTable)
                         .where(
                             and(
-                                inArray(taskTable.id, taskIds.map(task => task.id)), //tasks in today
-                                eq(taskTable.userId, userId), // tasks of user
-                                eq(taskTable.routineId, routine.id) //tasks of routine
+                                eq(taskTable.userId, userId),
+                                inArray(taskTable.id, tasksId.map(task => task.taskId))
                             )
-
                         )
 
-                    //post processing
-                    return tasks.map(task => {
+                    //map status to tasks
+                    const finalTasks = tasks.map(task => {
+                        const status = taskStatus.find(status => status.routineTaskId === task.id);
+
                         return {
                             id: task.id,
+                            routineId: task.routineId,
                             title: task.title,
                             description: task.description ?? "",
-                            status: task.status,
+                            status: status ? status.status : "todo",
                             timeToDo: task.timeToDo,
                             deadline: task.deadline
                         }
-                    })
+                    });
+
+                    return finalTasks;
                 }
             )
 
@@ -181,76 +260,105 @@ export async function routineGetService(userId: string, id: string): Promise<Rou
     try {
 
         /* 
-            patch: get tasks from taskTodayTable instead of taskTable
+            patch: get tasks from RoutineTasksTable instead of taskTable
         */
 
-        //get today's tasks ids
-        const taskIds = await db
-            .select({
-                id: taskTodayTable.taskId
-            })
-            .from(taskTodayTable)
-            .where(
-                eq(taskTodayTable.userId, userId)
-            )
-
-        const res = await db
-            .select({
-                id: routineTable.id,
-                title: routineTable.title,
-                description: routineTable.description,
-                tasks: {
-                    id: taskTable.id,
-                    title: taskTable.title,
-                    description: taskTable.description,
-                    status: taskTable.status,
-                    timeToDo: taskTable.timeToDo,
-                    deadline: taskTable.deadline
-                }
-            })
-            .from(routineTable)
-            .where(
-                and(
-                    eq(routineTable.userId, userId),
-                    eq(routineTable.id, id)
-                )
-            )
-            .innerJoin(taskTable,
-                and(
-                    eq(taskTable.userId, userId),
-                    eq(taskTable.routineId, id),
-                    inArray(taskTable.id, taskIds.map(task => task.id)
+        const routine: RoutineReturnType = await db.transaction(
+            async (trx) => {
+                //tasks
+                const tasks = await trx
+                    .select({
+                        id: routineTasksTable.id,
+                        routineId: routineTasksTable.routineId,
+                        title: routineTasksTable.title,
+                        description: routineTasksTable.description,
+                        status: routineTasksTable.status,
+                        timeToDo: routineTasksTable.timeToDo,
+                        deadline: routineTasksTable.deadline
+                    })
+                    .from(routineTasksTable)
+                    .where(
+                        and(
+                            eq(routineTasksTable.userId, userId),
+                            eq(routineTasksTable.routineId, id)
+                        )
                     )
-                )
-            )
 
-        //post processing
-        const routine: RoutineReturnType = res.reduce<RoutineReturnType>(
-            (acc: RoutineReturnType, curr) => {
-                if (!acc.id) {
-                    acc.id = curr.id;
-                    acc.title = curr.title;
-                    acc.description = curr.description ?? "";
-                    acc.tasks = []
+                const tasksId = await trx
+                    .select({
+                        taskId: taskTodayTable.taskId
+                    })
+                    .from(taskTodayTable)
+                    .where(
+                        and(
+                            exists(
+                                db
+                                    .select({
+                                        id: taskTable.id
+                                    })
+                                    .from(taskTable)
+                                    .where(
+                                        and(
+                                            eq(taskTable.userId, userId),
+                                            inArray(taskTable.routineTaskId, tasks.map(task => task.id))
+                                        )
+                                    )
+                            )
+                        )
+                    )
+
+
+                const taskStatus = await trx
+                    .select({
+                        id: taskTable.id,
+                        status: taskTable.status,
+                        routineTaskId: taskTable.routineTaskId
+                    })
+                    .from(taskTable)
+                    .where(
+                        and(
+                            eq(taskTable.userId, userId),
+                            inArray(taskTable.id, tasksId.map(task => task.taskId))
+                        )
+                    )
+
+                //map status to tasks
+                const finalTasks: RoutineTaskReturnType[] = tasks.map(task => {
+                    const status = taskStatus.find(status => status.routineTaskId === task.id);
+
+                    return {
+                        id: task.id,
+                        routineId: task.routineId,
+                        title: task.title,
+                        description: task.description ?? "",
+                        status: status ? status.status : "todo",
+                        timeToDo: task.timeToDo,
+                        deadline: task.deadline
+                    }
+                });
+
+
+                //routine
+                const routine = await trx
+                    .select({
+                        id: routineTable.id,
+                        title: routineTable.title,
+                        description: routineTable.description
+                    })
+                    .from(routineTable)
+                    .where(
+                        and(
+                            eq(routineTable.userId, userId),
+                            eq(routineTable.id, id)
+                        )
+                    )
+
+                return {
+                    id: routine[0].id,
+                    title: routine[0].title,
+                    description: routine[0].description ?? "",
+                    tasks: finalTasks
                 }
-
-                acc.tasks?.push({
-                    id: curr.tasks.id,
-                    title: curr.tasks.title,
-                    description: curr.tasks.description ?? "",
-                    status: curr.tasks.status,
-                    timeToDo: curr.tasks.timeToDo,
-                    deadline: curr.tasks.deadline
-                })
-
-                return acc;
-            },
-
-            {
-                id: "",
-                title: "",
-                description: "",
-                tasks: []
             }
         )
 
@@ -264,60 +372,197 @@ export async function routineGetService(userId: string, id: string): Promise<Rou
 /* 
     update routine
 */
-export async function routineUpdateService(userId: string, id: string, data: RoutineUpdateType): Promise<RoutineUpdateType> {
+export async function routineUpdateService(userId: string, routineId: string, data: RoutineUpdateType): Promise<RoutineReturnType> {
     try {
         const routineData = {
             title: data.title,
             description: data.description
         }
 
-        console.log("data", data);
+        const routine = await db.transaction(async (trx) => {
 
-        if (data.tasks) {
-            //updating tasks
-            const updatingTasks = data.tasks.filter(task => task.id !== undefined && task.id !== null);
+            if (data.tasks) {
+                //updating tasks
+                const updatingTasks = data.tasks.filter(task => task.id !== undefined && task.id !== null);
 
-            if (updatingTasks.length > 0) {
-                console.log("updating tasks", updatingTasks);
+                if (updatingTasks.length > 0) {
+                    console.log("updating tasks", updatingTasks);
 
-                const updatingTasksData = updatingTasks.map(task => {
-                    return {
-                        id: task.id,
-                        title: task.title,
-                        description: task.description ?? "",
-                        status: task.status,
-                        timeToDo: task.timeToDo,
-                        deadline: task.deadline
-                    }
-                })
-
-                await Promise.all(updatingTasksData.map(async task => {
-
-                    if (task.id) {
-                        await taskUpdateService(userId, Number(task.id), {
+                    const updatingTasksData = updatingTasks.map(task => {
+                        return {
+                            id: task.id,
+                            routineId: task.routineId,
                             title: task.title,
-                            description: task.description,
+                            description: task.description ?? "",
                             status: task.status,
                             timeToDo: task.timeToDo,
-                            deadline: task.deadline,
-                            routineId: id
-                        });
-                    }
-                })).catch(error => {
-                    throw error;
-                })
+                            deadline: task.deadline
+                        }
+                    })
+
+                    //tasks
+                    await Promise.all(updatingTasksData.map(async task => {
+                        if (task.id && task.routineId) {
+                            //update routine tasks
+                            const resRoutineTask = await trx
+                                .update(routineTasksTable)
+                                .set({
+                                    title: task.title,
+                                    description: task.description,
+                                    status: task.status,
+                                    timeToDo: task.timeToDo,
+                                    deadline: task.deadline
+                                })
+                                .where(
+                                    and(
+                                        eq(routineTasksTable.routineId, task.routineId),
+                                        eq(routineTasksTable.userId, userId),
+                                        eq(routineTasksTable.id, task.id)
+                                    )
+                                )
+                                .returning({
+                                    id: routineTasksTable.id,
+                                    routineId: routineTasksTable.routineId,
+                                    title: routineTasksTable.title,
+                                    description: routineTasksTable.description,
+                                    status: routineTasksTable.status,
+                                    timeToDo: routineTasksTable.timeToDo,
+                                    deadline: routineTasksTable.deadline
+                                });
+
+                            //get tasks, that are related to this routine task and in taskTodayTable
+                            const selectedTask = await trx
+                                .select({
+                                    id: taskTable.id,
+                                })
+                                .from(taskTable)
+                                .where(
+                                    and(
+                                        eq(taskTable.userId, userId),
+                                        eq(taskTable.routineTaskId, task.id),
+                                        exists(
+                                            db.select({
+                                                id: taskTodayTable.id
+                                            })
+                                                .from(taskTodayTable)
+                                                .where(
+                                                    and(
+                                                        eq(taskTodayTable.userId, userId),
+                                                        eq(taskTodayTable.taskId, taskTable.id)
+                                                    )
+                                                )
+                                        )
+                                    )
+                                )
+
+                            if (selectedTask.length > 0) {
+
+                                //update tasks
+                                await taskUpdateService(userId, selectedTask[0].id, {
+                                    title: task.title,
+                                    description: task.description,
+                                    status: task.status,
+                                    timeToDo: task.timeToDo,
+                                    deadline: task.deadline,
+                                    routineTaskId: resRoutineTask[0].id
+                                });
+
+                            }
+
+                        }
+                    }));
+                }
             }
 
+            //deleting tasks
+            const getTasks = await trx
+                .select({
+                    id: routineTasksTable.id
+                })
+                .from(routineTasksTable)
+                .where(
+                    and(
+                        eq(routineTasksTable.userId, userId),
+                        eq(routineTasksTable.routineId, routineId)
+                    )
+                )
+
+            //tasks that are in routineTasksTable but not in data.tasks
+            const deletingTasks = getTasks.filter(task => {
+                const found = data.tasks?.find(taskData => taskData.id === task.id);
+                return found === undefined;
+            });
+
+            //delete tasks in taskTable that exist in routineTasksTable
+            await trx
+                .delete(taskTable)
+                .where(
+                    and(
+                        eq(taskTable.userId, userId),
+                        inArray(taskTable.routineTaskId, deletingTasks.map(task => task.id)),
+                        exists(
+                            db.select({
+                                id: taskTodayTable.id
+                            })
+                                .from(taskTodayTable)
+                                .where(
+                                    and(
+                                        eq(taskTodayTable.userId, userId),
+                                        eq(taskTodayTable.taskId, taskTable.id)
+                                    )
+                                )
+                        )
+                    )
+                )
+
+            //delete tasks
+            await trx
+                .delete(routineTasksTable)
+                .where(
+                    and(
+                        eq(routineTasksTable.userId, userId),
+                        eq(routineTasksTable.routineId, routineId),
+                        inArray(routineTasksTable.id, deletingTasks.map(task => task.id))
+                    )
+                )
 
 
+
+            //update routine
+            const res = await trx
+                .update(routineTable)
+                .set(routineData)
+                .where(
+                    and(
+                        eq(routineTable.userId, userId),
+                        eq(routineTable.id, routineId)
+                    )
+                )
+                .returning({
+                    title: routineTable.title,
+                    description: routineTable.description
+                });
+
+            const routine: RoutineReturnType = {
+                id: routineId,
+                title: res[0].title,
+                description: res[0].description ?? "",
+                tasks: []
+            }
+
+            return routine;
+        });
+
+        if (data.tasks) {
             //new tasks
             const newTasks = data.tasks.filter(task => task.id === undefined || task.id === null);
+            console.log("new tasks", newTasks);
 
             if (newTasks.length > 0) {
                 const newTasksData: TaskCreateType[] = newTasks.map(task => {
                     return {
                         userId: userId,
-                        routineId: id,
+                        routineId: routineId,
                         title: task.title,
                         description: task.description ?? "",
                         status: task.status,
@@ -326,36 +571,53 @@ export async function routineUpdateService(userId: string, id: string, data: Rou
                     }
                 })
 
+                console.log("newTasksData", newTasksData);
+
                 //create tasks
                 await Promise.all(newTasksData.map(async task => {
-                    await taskCreateService(userId, task);
-                })
-                ).catch(
-                    error => {
-                        throw error;
+
+                    console.log("task find me", task);
+
+                    //create routine tasks
+                    const resRoutineTask = await db
+                        .insert(routineTasksTable)
+                        .values({
+                            userId: userId,
+                            routineId: routineId,
+                            title: task.title,
+                            description: task.description ?? "",
+                            status: task.status,
+                            timeToDo: task.timeToDo,
+                            deadline: task.deadline
+                        })
+                        .returning({
+                            id: routineTasksTable.id,
+                            routineId: routineTasksTable.routineId,
+                            title: routineTasksTable.title,
+                            description: routineTasksTable.description,
+                            status: routineTasksTable.status,
+                            timeToDo: routineTasksTable.timeToDo,
+                            deadline: routineTasksTable.deadline
+                        });
+
+                    if (resRoutineTask.length > 0) {
+                        await taskCreateService(userId, {
+                            routineTaskId: resRoutineTask[0].id,
+                            title: resRoutineTask[0].title,
+                            description: resRoutineTask[0].description ?? "",
+                            status: resRoutineTask[0].status,
+                            timeToDo: resRoutineTask[0].timeToDo,
+                            deadline: resRoutineTask[0].deadline
+                        });
                     }
-                )
+
+                })
+                );
             }
         }
 
-        //update routine
-        const res = await db.update(routineTable)
-            .set(routineData)
-            .where(
-                and(
-                    eq(routineTable.userId, userId),
-                    eq(routineTable.id, id)
-                )
-            )
-            .returning({
-                title: routineTable.title,
-                description: routineTable.description
-            });
+        return routine;
 
-        return {
-            title: res[0].title,
-            description: res[0].description ?? ""
-        }
     } catch (error) {
         console.error((error as Error));
         throw new Error((error as Error).message);
@@ -368,16 +630,56 @@ export async function routineUpdateService(userId: string, id: string, data: Rou
 */
 export async function routineDeleteService(userId: string, id: string): Promise<void> {
     try {
-        await db.delete(routineTable)
-            .where(
-                and(
-                    eq(routineTable.userId, userId),
-                    eq(routineTable.id, id)
+        await db.transaction(async (trx) => {
+
+            const tasks = await trx
+                .select({
+                    id: routineTasksTable.id
+                })
+                .from(routineTasksTable)
+                .where(
+                    and(
+                        eq(routineTasksTable.userId, userId),
+                        eq(routineTasksTable.routineId, id)
+                    )
                 )
-            )
-            .returning({
-                id: routineTable.id
-            });
+
+            //delete tasks in taskTable that exist in routineTasksTable
+            await trx
+                .delete(taskTable)
+                .where(
+                    and(
+                        eq(taskTable.userId, userId),
+                        inArray(taskTable.routineTaskId, tasks.map(task => task.id)),
+                        exists(
+                            db.select({
+                                id: taskTodayTable.id
+                            })
+                                .from(taskTodayTable)
+                                .where(
+                                    and(
+                                        eq(taskTodayTable.userId, userId),
+                                        eq(taskTodayTable.taskId, taskTable.id)
+                                    )
+                                )
+                        )
+                    )
+                )
+
+
+            //delete whole routine
+            await trx.delete(routineTable)
+                .where(
+                    and(
+                        eq(routineTable.userId, userId),
+                        eq(routineTable.id, id)
+                    )
+                )
+                .returning({
+                    id: routineTable.id
+                });
+
+        });
     } catch (error) {
         console.error((error as Error));
         throw new Error((error as Error).message);

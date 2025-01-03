@@ -26,13 +26,9 @@ export async function verifyToken(token: string, type: 'refresh' | 'access'): Pr
 
         const payload = decoded;
 
-        console.log('find me', payload);
-
         if (!payload) {
             throw new ApiError(401, 'Invalid token payload', {});
         }
-
-        console.log('find me 2', payload.id);
 
         const selectUser = await db
             .select({
@@ -48,7 +44,6 @@ export async function verifyToken(token: string, type: 'refresh' | 'access'): Pr
                 });
             });
 
-        console.log('find me 3', selectUser);
 
         if (!selectUser) {
             throw new ApiError(401, 'User not found', {});
@@ -56,7 +51,6 @@ export async function verifyToken(token: string, type: 'refresh' | 'access'): Pr
 
         const user = selectUser[0];
 
-        console.log('find me 4', user);
 
         if (!user) {
             throw new ApiError(401, 'User not found', {});

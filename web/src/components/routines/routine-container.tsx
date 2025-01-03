@@ -24,10 +24,10 @@ export default function RoutineContainer({
     >
       <div className="flex justify-between items-center">
         <div className="flex items-center gap-2">
-        <RoutinePopOver routine={routine} />
-        <h1 className="font-bold text-2xl">{routine.title}</h1>
+          <RoutinePopOver routine={routine} />
+          <h1 className="font-bold text-2xl">{routine.title}</h1>
         </div>
-        
+
         {/* count */}
         <h3 className="font-thin text-lg text-slate-500">
           {taskDone} / {taskTotal}
@@ -36,7 +36,18 @@ export default function RoutineContainer({
 
       <div className="flex flex-col gap-3">
         {routine.tasks?.map((task) => (
-          <TaskContainer key={task.id} task={task} variant="routine" />
+          <TaskContainer
+            key={task.id}
+            task={{
+              id: Number(task.id),
+              title: task.title,
+              description: task.description,
+              status: task.status,
+              timeToDo: task.timeToDo,
+              deadline: task.deadline,
+            }}
+            variant="routine"
+          />
         ))}
       </div>
     </div>

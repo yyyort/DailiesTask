@@ -86,31 +86,6 @@ export default function TaskContainer({
             />
           </div>
         </div>
-
-        {variant === "routine" && (
-          <div>
-            <div
-              className={cn(
-                "w-full border-b-2 border-green-300 mb-2",
-                task.status === "overdue" && "border-red-400"
-              )}
-            ></div>
-            <div className="flex justify-between">
-              <h3 className="text-slate-600 text-sm font-mono">
-                {
-                  //if task is today date, show today instead of date
-                  task.deadline === new Date().toISOString().split("T")[0]
-                    ? "Today"
-                    : task.deadline.slice(5, 10)
-                }
-              </h3>
-              <h3 className="text-slate-600 text-sm font-mono">
-                {task.timeToDo?.slice(0, 5)}
-              </h3>
-            </div>
-          </div>
-        )}
-
         {variant === "default" && (
           <div>
             <div

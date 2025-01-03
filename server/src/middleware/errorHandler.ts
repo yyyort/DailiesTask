@@ -6,6 +6,8 @@ export const errorHandler = async (error: unknown, _: Request, res: Response, ne
     console.error((error as Error).message);
     console.error(error);
     if (error instanceof ApiError) {
+        console.error("ApiError", error);
+
         res.status(error.status).json({ message: error.message });
         next();
     }

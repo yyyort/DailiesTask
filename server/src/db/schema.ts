@@ -17,15 +17,45 @@ export const usersTable = pgTable("users_table", {
 
 export const taskStatus = pgEnum("task_status", ["todo", "done", "overdue"]);
 
+export const routineTable = pgTable("routine_table", {
+    id: uuid('id').primaryKey().defaultRandom().notNull(),
+    userId: uuid('user_id').notNull().references(() => usersTable.id, {
+        onDelete: 'cascade',
+        onUpdate: 'cascade',
+    }),
+    title: text('title').notNull(),
+    description: text('description'),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+    updatedAt: timestamp('updated_at').defaultNow().notNull().$onUpdate(() => new Date()),
+})
+
+export const routineTasksTable = pgTable("routine_tasks_table", {
+    id: uuid('id').defaultRandom().primaryKey().notNull(),
+    userId: uuid('user_id').notNull().references(() => usersTable.id, {
+        onDelete: 'cascade',
+        onUpdate: 'cascade',
+    }),
+    routineId: uuid('routine_id').notNull().references(() => routineTable.id, {
+        onDelete: 'cascade',
+        onUpdate: 'cascade',
+    }),
+    title: text('title').notNull(),
+    description: text('description'),
+    status: taskStatus('status').default('todo').notNull(),
+    timeToDo: time('time_to_do').notNull(),
+    deadline: date('deadline').notNull(),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+    updatedAt: timestamp('updated_at').defaultNow().notNull().$onUpdate(() => new Date()),
+});
+
 export const taskTable = pgTable("task_table", {
     id: serial('id').primaryKey().notNull(),
     userId: uuid('user_id').notNull().references(() => usersTable.id, {
         onDelete: 'cascade',
         onUpdate: 'cascade',
     }),
-    routineId: uuid('routine_id').references(() => routineTable.id, {
+    routineTaskId: uuid('routine_task_id').references(() => routineTasksTable.id, {
         onDelete: 'set null',
-        onUpdate: 'cascade',
     }),
     title: text('title').notNull(),
     description: text('description'),
@@ -47,18 +77,6 @@ export const taskTodayTable = pgTable("task_today_table", {
         onUpdate: 'cascade',
     }).unique(),
     order: integer('order').notNull(),
-})
-
-export const routineTable = pgTable("routine_table", {
-    id: uuid('id').primaryKey().defaultRandom().notNull(),
-    userId: uuid('user_id').notNull().references(() => usersTable.id, {
-        onDelete: 'cascade',
-        onUpdate: 'cascade',
-    }),
-    title: text('title').notNull(),
-    description: text('description'),
-    createdAt: timestamp('created_at').defaultNow().notNull(),
-    updatedAt: timestamp('updated_at').defaultNow().notNull().$onUpdate(() => new Date()),
 })
 
 

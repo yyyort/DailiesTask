@@ -18,9 +18,6 @@ export const authValidator = async (req: Request, res: Response, next: NextFunct
             throw new ApiError(401, 'Unauthorized', {});
         }
 
-        console.log('authValidator finf', req.body.userId);
-
-
         const { id } = payload;
         req.body.userId = id;
 

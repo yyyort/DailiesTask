@@ -1,10 +1,11 @@
-import { and, asc, eq, exists, inArray, isNotNull, lt, max, notExists, } from "drizzle-orm";
+import { and, asc, eq, exists, inArray, lt, max, notExists, } from "drizzle-orm";
 import { db } from "../db/db";
-import { taskTable, taskTodayTable } from "../db/schema";
+import { routineTable, routineTasksTable, taskTable, taskTodayTable } from "../db/schema";
 import { TaskReturnType, TaskStatusType, TaskTodayReturnType, TaskTodayType } from "../model/task.model";
 import { ApiError } from "../util/apiError";
 import cron from "node-cron";
 import { contributionCreateService } from "./contribution.service";
+
 
 
 export const taskTodayGetService = async (userId: string, filter?: TaskStatusType[]): Promise<TaskTodayReturnType[]> => {
@@ -160,69 +161,74 @@ export const taskTodayRecycleRoutine = async (): Promise<void> => {
             patch: instead of setting the status to todo
             create a new tasks for today
         */
-        await db.transaction(async (tx) => {
-
-            //get all todays tasks id
-            const tasksTodayIds = await tx
-                .select({
-                    taskId: taskTodayTable.taskId
+        await db.transaction(async (trx) => {
+            const routinesTasks = await
+                trx.select({
+                    id: routineTable.id,
                 })
-                .from(taskTodayTable);
+                    .from(routineTable);
+
 
             //get all tasks that are in routine in tasksTodayIds
-            const tasks = await tx
+            /* 
+                PATCH: instead of getting tasks from taskTodayTable, get it from routineTasksTable
+            */
+            const tasks = await trx
                 .select({
+                    id: routineTasksTable.id,
+                    userId: routineTasksTable.userId,
+                    routineId: routineTasksTable.routineId,
+                    title: routineTasksTable.title,
+                    description: routineTasksTable.description,
+                    status: routineTasksTable.status,
+                    timeToDo: routineTasksTable.timeToDo,
+                    deadline: routineTasksTable.deadline
+                })
+                .from(routineTasksTable)
+                .where(
+                    inArray(routineTasksTable.routineId, routinesTasks.map(routine => routine.id))
+                )
+
+            const tasksToBeInserted = tasks.map(task => {
+                return {
+                    userId: task.userId,
+                    title: task.title,
+                    description: task.description ?? '',
+                    status: task.status,
+                    timeToDo: task.timeToDo,
+                    deadline: new Date().toLocaleDateString(),
+                    routineTaskId: task.id
+                }
+            });
+
+            //bulk insert to tasks table
+            const insertedTasks = await trx
+                .insert(taskTable)
+                .values(tasksToBeInserted)
+                .returning({
                     id: taskTable.id,
                     userId: taskTable.userId,
-                    routineId: taskTable.routineId,
                     title: taskTable.title,
                     description: taskTable.description,
                     status: taskTable.status,
                     timeToDo: taskTable.timeToDo,
-                    deadline: taskTable.deadline
+                    deadline: taskTable.deadline,
+                    routineTasksTableId: taskTable.routineTaskId,
                 })
-                .from(taskTable)
-                .where(
-                    and(
-                        isNotNull(taskTable.routineId),
-                        inArray(taskTable.id, tasksTodayIds.map(task => task.taskId))
-                    )
-                )
 
-            //post process tasks
-            const newTasks = tasks.map(task => {
-                return {
-                    userId: task.userId,
+
+            await Promise.all(insertedTasks.map(async (task) => {
+                await taskTodayCreateService(task.userId, {
+                    id: task.id,
                     title: task.title,
-                    description: task.description ?? "",
-                    status: 'todo' as 'todo' | 'done' | 'overdue',
+                    description: task.description ?? '',
+                    status: task.status,
                     timeToDo: task.timeToDo,
-                    deadline: new Date().toLocaleDateString(),
-                    createdAt: new Date(),
-                    updatedAt: new Date(),
-                    routineId: task.routineId
-                }
-            })
+                    deadline: task.deadline
+                });
+            }));
 
-            //insert copied tasks with today's date
-            const newRoutineTasks = await tx
-                .insert(taskTable)
-                .values(
-                    newTasks
-                )
-                .returning(
-                    {
-                        userId: taskTable.userId,
-                        id: taskTable.id,
-                        title: taskTable.title,
-                        description: taskTable.description,
-                        status: taskTable.status,
-                        timeToDo: taskTable.timeToDo,
-                        deadline: taskTable.deadline
-                    }
-                );
-
-            console.log('taskTodayRecycleRoutine newRoutineTasks', newRoutineTasks);
+            console.log('taskTodayRecycleRoutine newRoutineTasks', tasksToBeInserted);
         });
 
 

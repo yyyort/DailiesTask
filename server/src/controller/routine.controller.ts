@@ -109,7 +109,7 @@ export const routineUpdateController = async (req: Request, res: Response): Prom
         }
 
         //update routine
-        const routine: RoutineUpdateType = await routineUpdateService(userId, id, data);
+        const routine: RoutineReturnType = await routineUpdateService(userId, id, data);
 
         res.status(200).json({
             message: "Routine updated successfully", routine: {

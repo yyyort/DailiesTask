@@ -44,8 +44,26 @@ export default function RoutineEditForm({
     data: RoutineUpdateType
   ) => {
     try {
+      //if tasks is the same as the routine tasks or the tasks is not dirty, remove it from the data
+      if (
+        data.tasks === routine.tasks ||
+        !form.getFieldState("tasks").isDirty
+      ) {
+        console.log("removing tasks");
+
+        await routineUpdateService(
+          {
+            title: data.title,
+            description: data.description,
+          },
+          routine.id
+        );
+      } else {
+        console.log("updating tasks");  
+        await routineUpdateService(data, routine.id);
+      }
+
       // call the service to update a routine
-      await routineUpdateService(data, routine.id);
 
       form.reset();
 
