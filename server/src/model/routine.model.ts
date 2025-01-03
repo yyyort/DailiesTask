@@ -16,7 +16,10 @@ export const RoutineTaskSchema = z.object({
     updatedAt: z.date(),
 })
 
-export const RoutineTaskReturnSchema = RoutineTaskSchema.omit({ userId: true, createdAt: true, updatedAt: true });
+export const RoutineTaskReturnSchema = RoutineTaskSchema.omit({ userId: true, createdAt: true, updatedAt: true, routineId: true }).extend({
+    routineId: z.string().optional().nullable(),
+    type: z.string().optional().nullable()
+});
 
 export const RoutineTaskCreateSchema = RoutineTaskSchema.pick({ title: true, description: true, status: true, timeToDo: true, deadline: true }).extend(
     {
@@ -30,7 +33,8 @@ export const RoutineTaskUpdateSchema = z.object({
     description: z.string().optional(),
     status: z.enum(["todo", "done", "overdue"]).optional(),
     timeToDo: z.string().time().optional(),
-    deadline: z.string().date().optional()
+    deadline: z.string().date().optional(),
+    type: z.string().optional().nullable()
 })
 
 export type RoutineTaskType = z.infer<typeof RoutineTaskSchema>;

@@ -2,7 +2,7 @@
 import { z } from 'zod';
 
 export const TaskSchema = z.object({
-    id: z.number(),
+    id: z.string(),
     userId: z.string(),
     routineTaskId: z.string().optional().nullable(),
     title: z.string().refine(data => data.length > 0, {
@@ -16,7 +16,11 @@ export const TaskSchema = z.object({
     updatedAt: z.date(),
 })
 
-export const TaskReturnSchema = TaskSchema.omit({ userId: true, createdAt: true, updatedAt: true });
+export const TaskReturnSchema = TaskSchema
+    .omit({ userId: true, createdAt: true, updatedAt: true })
+    .extend({
+        type: z.string().optional().nullable()
+    });
 
 export const TaskCreateSchema = TaskSchema.pick({ title: true, description: true, status: true, timeToDo: true, deadline: true, routineTaskId: true });
 
@@ -46,7 +50,7 @@ export type TaskTodayReturnType = z.infer<typeof taskTodayReturnSchema>;
 export const TaskTodaySchema = z.object({
     id: z.number(),
     userId: z.string(),
-    taskId: z.number(),
+    taskId: z.string(),
     order: z.number(),
 })
 

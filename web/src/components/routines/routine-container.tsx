@@ -39,12 +39,13 @@ export default function RoutineContainer({
           <TaskContainer
             key={task.id}
             task={{
-              id: Number(task.id),
+              id: task.id,
               title: task.title,
               description: task.description,
               status: task.status,
               timeToDo: task.timeToDo,
               deadline: task.deadline,
+              type: task.type,
             }}
             variant="routine"
           />

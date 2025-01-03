@@ -9,7 +9,7 @@ export const taskGetController = async (req: Request, res: Response): Promise<vo
         const { id } = req.params;
         const userId = req.body.userId;
 
-        const task = await taskGetService(userId, Number(id));
+        const task = await taskGetService(userId, id);
 
         res.status(200).json({ message: "Task retrieved successfully", task: task });
     } catch (error: unknown) {
@@ -123,7 +123,7 @@ export const taskUpdateController = async (req: Request, res: Response): Promise
             deadline
         };
 
-        await taskUpdateService(userId, Number(id), data);
+        await taskUpdateService(userId, id, data);
 
         res.status(200).json({ message: "Task updated successfully" });
     } catch (error: unknown) {
@@ -148,7 +148,7 @@ export const taskUpdateStatusController = async (req: Request, res: Response): P
             throw new ApiError(400, "No status provided to update", {});
         }
 
-        await taskUpdateStatusService(req.body.userId, Number(id), status);
+        await taskUpdateStatusService(req.body.userId, id, status);
 
         res.status(200).json({ message: "Task status updated successfully" });
     } catch (error: unknown) {
@@ -167,7 +167,7 @@ export const taskDeleteController = async (req: Request, res: Response): Promise
         const { id } = req.params;
         const userId = req.body.userId;
 
-        await taskDeleteService(userId, Number(id));
+        await taskDeleteService(userId, id);
 
         res.status(200).json({ message: "Task deleted successfully" });
     } catch (error: unknown) {

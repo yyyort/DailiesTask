@@ -60,7 +60,7 @@ export async function taskGetAllService(
 
 export async function taskGetEverythingService(
     userId: string,
-): Promise<{ id: number, date: string }[]> {
+): Promise<{ id: string, date: string }[]> {
     try {
         const res = await db
             .select({
@@ -76,7 +76,7 @@ export async function taskGetEverythingService(
             );
 
         //convert data to TaskReturnType
-        const tasks: { id: number, date: string }[] = res;
+        const tasks: { id: string, date: string }[] = res;
 
         return tasks;
     } catch (error: unknown) {
@@ -96,7 +96,7 @@ export async function taskGetEverythingService(
 */
 export async function taskGetService(
     userId: string,
-    id: number,
+    id: string,
 ): Promise<TaskReturnType> {
     try {
         const res = await db
@@ -220,11 +220,6 @@ export async function taskCreateService(
             return taskData;
         }
 
-        //q: why arent my console logs showing up?
-        //a: you need to run the command "npm run dev" in the terminal to see the console logs
-        //q: but it is running in a container
-        //a: you need to run the command "docker logs <container id>" to see the console logs
-
     } catch (error: unknown) {
         console.error((error as Error));
         if (error instanceof ApiError) {
@@ -238,7 +233,7 @@ export async function taskCreateService(
 //update
 export async function taskUpdateService(
     userId: string,
-    id: number,
+    id: string,
     data: TaskUpdateType,
 ): Promise<TaskReturnType> {
     try {
@@ -346,7 +341,7 @@ export async function taskUpdateService(
 //task status update
 export async function taskUpdateStatusService(
     userId: string,
-    id: number,
+    id: string,
     status: TaskStatusType
 ): Promise<TaskReturnType> {
     try {
@@ -403,7 +398,7 @@ export async function taskUpdateStatusService(
 //delete
 export async function taskDeleteService(
     userId: string,
-    id: number
+    id: string
 ): Promise<TaskReturnType> {
     try {
         const task = await db.delete(taskTable)

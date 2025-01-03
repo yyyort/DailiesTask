@@ -54,7 +54,7 @@ export const taskCreateService = async (data: TaskCreateType): Promise<void> => 
 /* 
     update task
 */
-export const taskUpdateService = async (id: number, data: TaskUpdateType): Promise<void> => {
+export const taskUpdateService = async (id: string, data: TaskUpdateType): Promise<void> => {
     try {
         const accessToken = await getAccessToken();
 
@@ -100,7 +100,7 @@ export const taskUpdateService = async (id: number, data: TaskUpdateType): Promi
 /* 
     update task status
 */
-export const taskUpdateStatusService = async (id: number, status: TaskStatusType): Promise<void> => {
+export const taskUpdateStatusService = async (id: string, status: TaskStatusType): Promise<void> => {
     try {
         const accessToken = await getAccessToken();
 
@@ -147,7 +147,7 @@ export const taskUpdateStatusService = async (id: number, status: TaskStatusType
 /* 
     delete a task
 */
-export const taskDeleteService = async (id: number): Promise<void> => {
+export const taskDeleteService = async (id: string): Promise<void> => {
     try {
         const accessToken = await getAccessToken();
 

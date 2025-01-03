@@ -1,5 +1,5 @@
 {
-  "id": "191bd97f-a116-459c-8467-d7d5c0ef1edd",
+  "id": "0fad87fe-b605-4c52-8ae0-efb5ba07c199",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -457,9 +457,10 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "serial",
+          "type": "uuid",
           "primaryKey": true,
-          "notNull": true
+          "notNull": true,
+          "default": "gen_random_uuid()"
         },
         "user_id": {
           "name": "user_id",
@@ -546,7 +547,7 @@
             "id"
           ],
           "onDelete": "set null",
-          "onUpdate": "cascade"
+          "onUpdate": "no action"
         }
       },
       "compositePrimaryKeys": {},
@@ -573,7 +574,7 @@
         },
         "task_id": {
           "name": "task_id",
-          "type": "serial",
+          "type": "uuid",
           "primaryKey": false,
           "notNull": true
         },

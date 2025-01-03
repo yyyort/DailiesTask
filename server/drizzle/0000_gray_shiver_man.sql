@@ -56,7 +56,7 @@ CREATE TABLE IF NOT EXISTS "routine_tasks_table" (
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "task_table" (
-	"id" serial PRIMARY KEY NOT NULL,
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"user_id" uuid NOT NULL,
 	"routine_task_id" uuid,
 	"title" text NOT NULL,
@@ -71,7 +71,7 @@ CREATE TABLE IF NOT EXISTS "task_table" (
 CREATE TABLE IF NOT EXISTS "task_today_table" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"user_id" uuid NOT NULL,
-	"task_id" serial NOT NULL,
+	"task_id" uuid NOT NULL,
 	"order" integer NOT NULL,
 	CONSTRAINT "task_today_table_task_id_unique" UNIQUE("task_id")
 );
@@ -147,7 +147,7 @@ EXCEPTION
 END $$;
 --> statement-breakpoint
 DO $$ BEGIN
- ALTER TABLE "task_table" ADD CONSTRAINT "task_table_routine_task_id_routine_tasks_table_id_fk" FOREIGN KEY ("routine_task_id") REFERENCES "public"."routine_tasks_table"("id") ON DELETE set null ON UPDATE cascade;
+ ALTER TABLE "task_table" ADD CONSTRAINT "task_table_routine_task_id_routine_tasks_table_id_fk" FOREIGN KEY ("routine_task_id") REFERENCES "public"."routine_tasks_table"("id") ON DELETE set null ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;

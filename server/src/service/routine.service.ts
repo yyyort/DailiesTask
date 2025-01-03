@@ -133,12 +133,13 @@ export async function routineGetAllService(userId: string, filters?: string[]): 
         //post processing
         /* 
             patch: get tasks from routineTasksTable instead of taskTable
+            patch v.2: get the task in task table if it exist else get the task in routineTasksTable
         */
         const routines: RoutineReturnType[] = await Promise.all(resRoutines.map(async routine => {
 
             const resTasks: RoutineTaskReturnType[] = await db.transaction(
                 async trx => {
-                    const tasks = await trx
+                    const tasksFromRoutineTaskTable = await trx
                         .select(
                             {
                                 id: routineTasksTable.id,
@@ -158,57 +159,51 @@ export async function routineGetAllService(userId: string, filters?: string[]): 
                             )
                         )
 
-                    //get tasks status
-                    const tasksId = await trx
+                    //get tasks from taskTable
+                    const tasksFromTaskTable = await trx
                         .select({
-                            taskId: taskTodayTable.taskId
+                            id: taskTable.id,
+                            title: taskTable.title,
+                            routineTaskId: taskTable.routineTaskId,
+                            description: taskTable.description,
+                            status: taskTable.status,
+                            timeToDo: taskTable.timeToDo,
                         })
-                        .from(taskTodayTable)
+                        .from(taskTable)
                         .where(
                             and(
                                 exists(
                                     db
                                         .select({
-                                            id: taskTable.id
+                                            id: taskTodayTable.taskId
                                         })
-                                        .from(taskTable)
+                                        .from(taskTodayTable)
                                         .where(
                                             and(
                                                 eq(taskTable.userId, userId),
-                                                inArray(taskTable.routineTaskId, tasks.map(task => task.id))
+                                                inArray(taskTable.routineTaskId, tasksFromRoutineTaskTable.map(task => task.id))
                                             )
                                         )
                                 )
                             )
                         )
 
-                    const taskStatus = await trx
-                        .select({
-                            id: taskTable.id,
-                            status: taskTable.status,
-                            routineTaskId: taskTable.routineTaskId
-                        })
-                        .from(taskTable)
-                        .where(
-                            and(
-                                eq(taskTable.userId, userId),
-                                inArray(taskTable.id, tasksId.map(task => task.taskId))
-                            )
-                        )
-
-                    //map status to tasks
-                    const finalTasks = tasks.map(task => {
-                        const status = taskStatus.find(status => status.routineTaskId === task.id);
+                    //return tasks that are in taskTable else return tasks from routineTasksTable
+                    const finalTasks: RoutineTaskReturnType[] = tasksFromRoutineTaskTable.map(task => {
+                        //if task exist in taskTable
+                        const taskInTaskTable = tasksFromTaskTable.find(taskInTaskTable => taskInTaskTable.routineTaskId === task.id);
 
                         return {
-                            id: task.id,
+                            id: taskInTaskTable ? taskInTaskTable.id : task.id,
                             routineId: task.routineId,
-                            title: task.title,
-                            description: task.description ?? "",
-                            status: status ? status.status : "todo",
-                            timeToDo: task.timeToDo,
-                            deadline: task.deadline
+                            title: taskInTaskTable ? taskInTaskTable.title : task.title,
+                            description: taskInTaskTable ? taskInTaskTable.description ?? "" : task.description ?? "",
+                            status: taskInTaskTable ? taskInTaskTable.status : task.status,
+                            timeToDo: taskInTaskTable ? taskInTaskTable.timeToDo : task.timeToDo,
+                            deadline: task.deadline,
+                            type: taskInTaskTable ? "task" : "routineTask"
                         }
+
                     });
 
                     return finalTasks;

@@ -39,18 +39,31 @@ export default function TaskContainer({
               variant === "default" && "flex-col gap-2"
             )}
           >
-            {/* titles */}
-            <h1
-              className={cn(
-                "text-2xl font-semibold",
-                variant === "routine" && "text-xl",
-                variant === "minimal" && "text-md",
-                task.status === "done" &&
-                  "line-through text-secondary-foreground"
+            <div>
+              {/* titles */}
+              <h1
+                className={cn(
+                  "text-2xl font-semibold",
+                  variant === "routine" && "text-xl",
+                  variant === "minimal" && "text-md",
+                  task.status === "done" &&
+                    "line-through text-secondary-foreground"
+                )}
+              >
+                {task.title}
+              </h1>
+
+              {/* addons for routines*/}
+              {variant === "routine" && (
+                <div>
+                  <h3 className="text-muted-foreground text-xs">
+                    {task.type === "routineTask"
+                      ? "task is deleted in today"
+                      : ""}
+                  </h3>
+                </div>
               )}
-            >
-              {task.title}
-            </h1>
+            </div>
 
             {/* description */}
             {variant === "routine" && (

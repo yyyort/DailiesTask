@@ -49,7 +49,7 @@ export const routineTasksTable = pgTable("routine_tasks_table", {
 });
 
 export const taskTable = pgTable("task_table", {
-    id: serial('id').primaryKey().notNull(),
+    id: uuid('id').defaultRandom().primaryKey().notNull(),
     userId: uuid('user_id').notNull().references(() => usersTable.id, {
         onDelete: 'cascade',
         onUpdate: 'cascade',
@@ -72,7 +72,7 @@ export const taskTodayTable = pgTable("task_today_table", {
         onDelete: 'cascade',
         onUpdate: 'cascade',
     }),
-    taskId: serial('task_id').notNull().references(() => taskTable.id, {
+    taskId: uuid('task_id').notNull().references(() => taskTable.id, {
         onDelete: 'cascade',
         onUpdate: 'cascade',
     }).unique(),

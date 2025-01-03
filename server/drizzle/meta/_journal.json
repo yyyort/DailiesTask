@@ -5,15 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1735909065574,
-      "tag": "0000_regular_switch",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1735913242739,
-      "tag": "0001_breezy_shatterstar",
+      "when": 1735915963905,
+      "tag": "0000_gray_shiver_man",
       "breakpoints": true
     }
   ]
