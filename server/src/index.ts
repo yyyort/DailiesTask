@@ -51,9 +51,7 @@ app.use('/api', NotesRouter);
 */
 taskTodayCronService.start();
 
-
-
 /* server */
-app.listen(PORT, () => {
+app.listen(Number(PORT), "0.0.0.0", () => {
   console.log(`Server is running at http://localhost:${PORT}`);
 });
