@@ -8,9 +8,6 @@ services:
       - ${PORT:?}:${PORT:?}
     volumes:
       - ./server/src:/home/node/app/src
-    depends_on:
-      db:
-        condition: service_healthy
     environment:
       - POSTGRES_DB=${POSTGRES_DB:?}
       - POSTGRES_USER=${POSTGRES_USER:?}
@@ -22,6 +19,8 @@ services:
       - REFRESH_TOKEN_SECRET=${REFRESH_TOKEN_SECRET:?}
       - WEB_URL=${WEB_URL:?}
   db:
+    profiles:
+      ['dev']
     image: postgres
     restart: always
     ports:

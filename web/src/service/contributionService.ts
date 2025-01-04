@@ -5,11 +5,14 @@
 import { ContributionReturnType } from "@/model/contribution.model";
 import { getAccessToken } from "./auth/authService";
 
+const api = process.env.SERVER_URL
+
+
 export const contributionGetService = async (): Promise<ContributionReturnType[]> => {
     try {
         const accessToken = await getAccessToken();
 
-        const res = await fetch('http://localhost:4000/api/contributions/',
+        const res = await fetch(api + '/contributions/',
             {
                 method: 'GET',
                 credentials: 'include',
