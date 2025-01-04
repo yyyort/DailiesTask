@@ -77,7 +77,7 @@ export default function ContributionsHeatmap({
     return acc;
   }, []);
 
-  // Get contribution level for a date
+  // Get contribution level for a date, based on tasks done
   const getContributionLevel = (date: Date) => {
     const contribution = contributions.find((c) =>
       isSameDay(new Date(c.createdAt), date)
@@ -85,13 +85,24 @@ export default function ContributionsHeatmap({
 
     if (!contribution) return 0;
 
-    const completionRate = contribution.tasksDone / contribution.tasksTotal;
+    const tasksDone = contribution.tasksDone;
 
-    if (completionRate >= 0.8) return 4;
-    if (completionRate >= 0.6) return 3;
-    if (completionRate >= 0.4) return 2;
-    if (completionRate > 0) return 1;
+    if (tasksDone >= 7) return 4;
+    if (tasksDone >= 5) return 3;
+    if (tasksDone >= 3) return 2;
+    if (tasksDone > 0) return 1;
+
     return 0;
+  };
+
+  const getTasksDone = (date: Date): number => {
+    const contribution = contributions.find((c) =>
+      isSameDay(new Date(c.createdAt), date)
+    );
+
+    if (!contribution) return 0;
+
+    return contribution.tasksDone;
   };
 
   // Get color based on contribution level
@@ -203,6 +214,7 @@ export default function ContributionsHeatmap({
                 <div key={weekIndex} className="flex flex-col gap-1">
                   {week.map((date, dateIndex) => {
                     const level = getContributionLevel(date);
+                    const tasksDone = getTasksDone(date);
                     return (
                       <div
                         key={dateIndex}
@@ -212,8 +224,8 @@ export default function ContributionsHeatmap({
                     phone-sm:w-4 phone-sm:h-4
                     `}
                         title={`${formatDate(date)}: ${
-                          level === 0 ? "No" : level
-                        } contribution${level !== 1 ? "s" : ""}`}
+                          level === 0 ? "No" : tasksDone
+                        } Tasks done${tasksDone !== 1 ? "s" : ""}`}
                       />
                     );
                   })}

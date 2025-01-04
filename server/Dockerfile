@@ -17,7 +17,7 @@ COPY . .
 CMD [ "npm", "run", "dev" ]
 
 # production environment
-FROM base AS prodruction
+FROM base AS production
 RUN --mount=type=bind,source=package.json,target=package.json \
     --mount=type=bind,source=package-lock.json,target=package-lock.json \
     --mount=type=cache,target=/root/.npm \

@@ -9,11 +9,6 @@ export default defineConfig({
   schema: './src/db/schema.ts',
   dialect: 'postgresql',
   dbCredentials: {
-    host: 'localhost',
-    user: 'user',
-    password: '1234',
-    database: 'dailiestask',
-    port: 5434,
-    ssl: false,
+    url: String(process.env.DATABASE_URL),
   },
 });

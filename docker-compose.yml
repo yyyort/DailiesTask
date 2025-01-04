@@ -5,7 +5,7 @@ services:
       context: ./server
       target: dev
     ports:
-      - "4000:4000"
+      - ${PORT:?}:${PORT:?}
     volumes:
       - ./server/src:/home/node/app/src
     depends_on:
@@ -15,10 +15,12 @@ services:
       - POSTGRES_DB=${POSTGRES_DB:?}
       - POSTGRES_USER=${POSTGRES_USER:?}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:?}
-      - PORT=4000
+      - DATABASE_URL=${DATABASE_URL:?}
+      - PORT=${PORT:?}
       - NODE_ENV=dev
       - ACCESS_TOKEN_SECRET=${ACCESS_TOKEN_SECRET:?}
       - REFRESH_TOKEN_SECRET=${REFRESH_TOKEN_SECRET:?}
+      - WEB_URL=${WEB_URL:?}
   db:
     image: postgres
     restart: always

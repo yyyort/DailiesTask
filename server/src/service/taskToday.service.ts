@@ -156,12 +156,9 @@ export const taskTodaySetOverdue = async (): Promise<void> => {
 //job for recyling the tasks that are in routine
 export const taskTodayRecycleRoutine = async (): Promise<void> => {
     try {
-
-        /* 
-            patch: instead of setting the status to todo
-            create a new tasks for today
-        */
         await db.transaction(async (trx) => {
+
+            //get all routines
             const routinesTasks = await
                 trx.select({
                     id: routineTable.id,
@@ -189,48 +186,55 @@ export const taskTodayRecycleRoutine = async (): Promise<void> => {
                     inArray(routineTasksTable.routineId, routinesTasks.map(routine => routine.id))
                 )
 
-            const tasksToBeInserted = tasks.map(task => {
-                return {
-                    userId: task.userId,
-                    title: task.title,
-                    description: task.description ?? '',
-                    status: task.status,
-                    timeToDo: task.timeToDo,
-                    deadline: new Date().toLocaleDateString(),
-                    routineTaskId: task.id
-                }
-            });
-
-            //bulk insert to tasks table
-            const insertedTasks = await trx
-                .insert(taskTable)
-                .values(tasksToBeInserted)
-                .returning({
-                    id: taskTable.id,
-                    userId: taskTable.userId,
-                    title: taskTable.title,
-                    description: taskTable.description,
-                    status: taskTable.status,
-                    timeToDo: taskTable.timeToDo,
-                    deadline: taskTable.deadline,
-                    routineTasksTableId: taskTable.routineTaskId,
-                })
 
 
-            await Promise.all(insertedTasks.map(async (task) => {
-                await taskTodayCreateService(task.userId, {
-                    id: task.id,
-                    title: task.title,
-                    description: task.description ?? '',
-                    status: task.status,
-                    timeToDo: task.timeToDo,
-                    deadline: task.deadline
+            if (tasks.length > 0) {
+
+                const tasksToBeInserted = tasks.map(task => {
+                    return {
+                        userId: task.userId,
+                        title: task.title,
+                        description: task.description ?? '',
+                        status: task.status,
+                        timeToDo: task.timeToDo,
+                        deadline: new Date().toLocaleDateString(),
+                        routineTaskId: task.id
+                    }
                 });
-            }));
 
-            console.log('taskTodayRecycleRoutine newRoutineTasks', tasksToBeInserted);
+                if (tasksToBeInserted.length === 0) {
+                    return;
+                }
+
+                //bulk insert to tasks table
+                const insertedTasks = await trx
+                    .insert(taskTable)
+                    .values(tasksToBeInserted)
+                    .returning({
+                        id: taskTable.id,
+                        userId: taskTable.userId,
+                        title: taskTable.title,
+                        description: taskTable.description,
+                        status: taskTable.status,
+                        timeToDo: taskTable.timeToDo,
+                        deadline: taskTable.deadline,
+                        routineTasksTableId: taskTable.routineTaskId,
+                    });
+
+                await Promise.all(insertedTasks.map(async (task) => {
+                    await taskTodayCreateService(task.userId, {
+                        id: task.id,
+                        title: task.title,
+                        description: task.description ?? '',
+                        status: task.status,
+                        timeToDo: task.timeToDo,
+                        deadline: task.deadline
+                    });
+                }));
+
+                console.log('taskTodayRecycleRoutine newRoutineTasks', tasksToBeInserted);
+            }
         });
-
 
     } catch (error: unknown) {
         console.error((error as Error));
@@ -371,7 +375,7 @@ export const taskTodaySetNewTask = async (): Promise<void> => {
 };
 
 //seconds minutes hours day month year
-export const taskTodayCronService = cron.schedule('0 13 17 * * * ', async () => {
+export const taskTodayCronService = cron.schedule('0 2 0 * * * ', async () => {
     try {
         //setting overdue tasks
         await taskTodaySetOverdue();
@@ -391,11 +395,6 @@ export const taskTodayCronService = cron.schedule('0 13 17 * * * ', async () => 
         console.log('taskTodayCronService done');
     } catch (error: unknown) {
         console.error((error as Error));
-        if (error instanceof ApiError) {
-            throw error;
-        }
-
-        throw new Error((error as Error).message);
     }
 },
     {
