@@ -15,6 +15,7 @@ import { Amatic_SC } from "next/font/google";
 const amatic = Amatic_SC({
   weight: "700",
   style: "normal",
+  subsets: ["latin", "latin-ext", "cyrillic", "hebrew", "vietnamese"],
 });
 
 export default function Layout({
