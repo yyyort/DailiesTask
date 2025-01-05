@@ -198,13 +198,15 @@ export const userDeleteController = async (req: Request, res: Response): Promise
 */
 export const userLogoutController = async (req: Request, res: Response): Promise<void> => {
     try {
-        const token = req.cookies.refreshToken;
+        const token = req.headers.cookie?.split(' ')[0].split('=')[1];
 
         if (!token) {
+            console.error("No token found");
             throw new ApiError(401, "No token found", {
                 message: "unauthorized"
             });
         }
+
 
         res.clearCookie('refreshToken');
         res.status(200).json({ message: "User logged out successfully" });

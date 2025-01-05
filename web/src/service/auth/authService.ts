@@ -34,6 +34,10 @@ export const getAccessToken = async () => {
     return (await cookies()).get('accessToken')?.value;
 };
 
+export const getRefreshToken = async () => {
+    return (await cookies()).get('refreshToken')?.value;
+}
+
 export const getUserData = async (): Promise<UserReturnType> => {
     return JSON.parse((await cookies()).get('user')?.value || '{}');
 }

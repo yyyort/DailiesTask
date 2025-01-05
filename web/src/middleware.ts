@@ -63,6 +63,14 @@ export async function validateToken(request: NextRequest) {
                 tags: ["token"]
             }
         })
+        if (res.status === 401) {
+            //removes cookies
+            await removeRefreshToken();
+            await removeAccessToken();
+
+            return NextResponse.redirect(new URL('/signin', request.url))
+        }
+
 
         if (res.ok) {
             //set the new access token in the header

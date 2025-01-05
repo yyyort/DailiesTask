@@ -2,8 +2,8 @@
 import React from "react";
 import { Button } from "../ui/button";
 import { LogOutIcon } from "lucide-react";
-import { SignOutApi } from "@/service/auth/userService";
 import { useRouter } from "next/navigation";
+import { SignOutApi } from "@/service/auth/authActions";
 
 export default function LogoutButton({
   expanded = true,
@@ -20,7 +20,7 @@ export default function LogoutButton({
           await SignOutApi();
 
           //redirect to the login page
-          router.push("/");
+          router.push("/signin");
         } catch (error) {
           console.error(error);
         }

@@ -19,8 +19,7 @@ services:
       - REFRESH_TOKEN_SECRET=${REFRESH_TOKEN_SECRET:?}
       - WEB_URL=${WEB_URL:?}
   db:
-    profiles:
-      ['dev']
+    profiles: [dev]
     image: postgres
     restart: always
     ports:
