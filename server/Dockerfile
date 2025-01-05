@@ -36,6 +36,3 @@ RUN --mount=type=bind,source=package.json,target=package.json \
 USER node
 COPY . .
 RUN ["npm", "run", "test"]
-
-# Stage 2: push the database
-CMD ["sh", "-c", "npm run db:push && npm run start"]
