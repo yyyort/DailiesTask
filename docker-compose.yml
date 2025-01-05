@@ -3,7 +3,7 @@ services:
     container_name: dailiestask-server
     build:
       context: ./server
-      target: dev
+      target: ${NODE_ENV:?}
     ports:
       - ${PORT:?}:${PORT:?}
     volumes:
@@ -15,7 +15,7 @@ services:
       - DATABASE_URL=${DATABASE_URL:?}
       - DEV_DATABASE_URL=${DEV_DATABASE_URL:?}
       - PORT=${PORT:?}
-      - NODE_ENV=dev
+      - NODE_ENV=${NODE_ENV:?}
       - ACCESS_TOKEN_SECRET=${ACCESS_TOKEN_SECRET:?}
       - REFRESH_TOKEN_SECRET=${REFRESH_TOKEN_SECRET:?}
       - WEB_URL=${WEB_URL:?}
