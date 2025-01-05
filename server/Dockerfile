@@ -24,6 +24,7 @@ RUN --mount=type=bind,source=package.json,target=package.json \
     npm ci --omit=dev
 USER node
 COPY . .
+RUN npm run db:push
 CMD ["npm", "run", "start"]
 
 # test environment
@@ -35,5 +36,4 @@ RUN --mount=type=bind,source=package.json,target=package.json \
     npm ci --include=dev
 USER node
 COPY . .
-
 RUN ["npm", "run", "test"]

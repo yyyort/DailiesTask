@@ -1,24 +1,11 @@
-//drizzle imports
 import { drizzle } from 'drizzle-orm/node-postgres';
-
-//dotenv
-import dotenv from 'dotenv';
+import 'dotenv/config';
 import { Pool } from 'pg';
 
-dotenv.config();
+const nodeEnv = process.env.NODE_ENV;
 
-const env = process.env.NODE_ENV ?? 'dev';
-
-//db connection
 const pool = new Pool({
-    host: env === 'dev' ? 'host.docker.internal' : process.env.POSTGRES_HOST ?? 'localhost',
-    user: process.env.POSTGRES_USER ?? 'user',
-    password: process.env.POSTGRES_PASSWORD ?? '1234',
-    database: process.env.POSTGRES_DB ?? 'dailiestask',
-    port: Number(process.env.POSTGRES_PORT) ?? 5434,
-})
-
-export const db = drizzle({
-    client: pool,
+    connectionString: nodeEnv === 'dev' ? process.env.DEV_DATABASE_URL : process.env.DATABASE_URL,
 });
 
+export const db = drizzle({ client: pool });
