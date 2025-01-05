@@ -55,8 +55,6 @@ export const SignUpApi = async (data: UserCreateType) => {
 
 export const SignInApi = async (data: UserSignInType) => {
   try {
-    console.log("api", api);
-
     if (!api) {
       throw new Error("Server url not found");
     }

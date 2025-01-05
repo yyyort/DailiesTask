@@ -42,7 +42,6 @@ export default function TaskEditForm({
   const onSubmit: SubmitHandler<TaskUpdateType> = async (data) => {
     try {
       // call the service to create a task
-      console.log(data);
 
       await taskUpdateService(task.id, data);
 
@@ -57,7 +56,6 @@ export default function TaskEditForm({
       if (error instanceof Error) {
         if (error.message === "Unauthorized") {
           // redirect to sign in
-          console.log("redirect to sign in");
         } else {
           console.error(error);
         }

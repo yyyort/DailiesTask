@@ -90,7 +90,7 @@ export async function validateToken(request: NextRequest) {
             return NextResponse.redirect(new URL('/signin', request.url))
         }
     } catch (error) {
-        console.log(error)
+        console.error(error)
     }
 }
 

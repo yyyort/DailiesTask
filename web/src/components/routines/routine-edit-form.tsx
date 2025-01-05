@@ -59,7 +59,6 @@ export default function RoutineEditForm({
           routine.id
         );
       } else {
-        console.log("updating tasks");  
         await routineUpdateService(data, routine.id);
       }
 

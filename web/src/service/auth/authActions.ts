@@ -9,8 +9,6 @@ export const SignOutApi = async () => {
         const accessToken = await getAccessToken();
         const refreshToken = await getRefreshToken();
 
-        console.log("api", api);
-
         if (!api) {
             throw new Error("Server url not found");
         }

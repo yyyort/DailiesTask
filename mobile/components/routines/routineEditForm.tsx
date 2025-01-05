@@ -71,8 +71,6 @@ export default function RoutineEditForm({
     data: RoutineUpdateType
   ) => {
     try {
-        console.log(data);
-    
       // post routine
       const res = await updateRoutine(data, routine.id);
 

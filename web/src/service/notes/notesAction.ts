@@ -14,8 +14,6 @@ const api = process.env.SERVER_URL
 */
 export const notesPostService = async (data: NoteCreateType): Promise<NoteType> => {
     try {
-        console.log('in service', data)
-
         const accessToken = await getAccessToken();
 
         const response = await fetch(api + '/notes', {

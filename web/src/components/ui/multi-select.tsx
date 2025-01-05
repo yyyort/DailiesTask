@@ -375,7 +375,6 @@ export const MultiSelect = React.forwardRef<
                           "
                               onClick={(event) => {
                                 event.stopPropagation();
-                                console.log("delete", option.value);
                               }}
                             >
                               <XCircle

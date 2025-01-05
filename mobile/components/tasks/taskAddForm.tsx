@@ -128,7 +128,7 @@ export default function TaskAddForm({
                   new Date(value).toLocaleTimeString().slice(0, 4) // hh:mm
                 }{" "}
                 {
-                  new Date(value).toLocaleTimeString().slice(8) // AM/PM //q: what is slice number for AM/PM in localeTimeString ? //a: 8
+                  new Date(value).toLocaleTimeString().slice(8) // AM/PM
                 }
               </ThemedText>
             </TouchableOpacity>

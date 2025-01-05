@@ -12,8 +12,6 @@ export const notesGetAllService = async (groups?: string): Promise<NoteType[]> =
         const accessToken = await getAccessToken();
 
         if (groups && groups.length > 1) {
-            console.log('groups filter in service', groups);
-
             const response = await fetch(api + `/notes?groups=${groups}`, {
                 method: 'GET',
                 credentials: 'include',
@@ -175,8 +173,6 @@ export const notesGetGroupsService = async (): Promise<{
                 name: string;
             }[];
         } = await response.json();
-
-        console.log('groups in service', data.groups);
 
         return data.groups;
 

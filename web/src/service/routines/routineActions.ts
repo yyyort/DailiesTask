@@ -57,8 +57,6 @@ export const routineUpdateService = async (data: RoutineUpdateType, id: string):
     try {
         const accessToken = await getAccessToken();
 
-        console.log('data in service', data);
-
         const res = await fetch(api + `/routine/${id}`,
             {
                 method: 'PUT',

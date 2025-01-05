@@ -46,7 +46,6 @@ export const taskGetAllService = async (date?: string, filter?: string): Promise
 
             return data.tasks;
         } else if (date && !filter) {
-            console.log('query in date', date);
 
             const response = await fetch(api + '/task' + (date ? `?date=${date}` : ''), {
                 method: 'GET',
@@ -75,7 +74,6 @@ export const taskGetAllService = async (date?: string, filter?: string): Promise
 
             return data.tasks;
         } else if (filter && date === undefined) {
-            console.log('query in filter', filter);
 
             const response = await fetch(api + '/task' + (filter ? `?filter=${filter}` : ''), {
                 method: 'GET',

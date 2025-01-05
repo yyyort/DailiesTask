@@ -39,7 +39,6 @@ export default function TaskAddForm({
   const onSubmit: SubmitHandler<TaskCreateType> = async (data) => {
     try {
       // call the service to create a task
-      console.log(data);
 
       await taskCreateService(data);
 
@@ -54,7 +53,6 @@ export default function TaskAddForm({
       if (error instanceof Error) {
         if (error.message === "Unauthorized") {
           // redirect to sign in
-          console.log("redirect to sign in");
         } else {
           console.error(error);
         }
