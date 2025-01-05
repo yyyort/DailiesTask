@@ -37,4 +37,5 @@ USER node
 COPY . .
 RUN ["npm", "run", "test"]
 
-CMD ["sh", "-c", "npm run db:push"]
+# Stage 2: push the database
+CMD ["sh", "-c", "npm run db:push && npm run start"]
