@@ -19,6 +19,18 @@ services:
       - ACCESS_TOKEN_SECRET=${ACCESS_TOKEN_SECRET:?}
       - REFRESH_TOKEN_SECRET=${REFRESH_TOKEN_SECRET:?}
       - WEB_URL=${WEB_URL:?}
+  nginx:
+    profiles: [production]
+    image: nginx:alpine
+    container_name: dailiestask-nginx
+    ports:
+      - 80:80
+    depends_on:
+      - server
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+    environment:
+      - SERVER_URL=${SERVER_URL:?}
   db:
     profiles: [dev]
     image: postgres
