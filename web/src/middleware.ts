@@ -50,18 +50,12 @@ export async function validateToken(request: NextRequest) {
     // revalidate the access token
     try {
         const res = await fetch(api + '/user/revalidate', {
-            method: 'GET',
+            method: 'POST',
             credentials: "include",
             headers: {
                 'Content-Type': 'application/json',
                 'Cookie': `refreshToken=${refreshToken}`
             },
-            cache: 'force-cache',
-            next: {
-                // revalidate for 15 minutes as the access token expires in 15 minutes
-                revalidate: 800,
-                tags: ["token"]
-            }
         })
         if (res.status === 401) {
             return NextResponse.redirect(new URL('/signin', request.url))

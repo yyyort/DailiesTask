@@ -12,18 +12,8 @@ export const setAccessToken = async (token: string) => {
     })
 };
 
-export const setRefreshToken = async (token: string) => {
-    (await cookies()).set('refreshToken', token, {
-        httpOnly: true,
-        sameSite: 'none',
-        secure: true,
-        maxAge: 7 * 24 * 60 * 60  // 7 days
-    })
-};
-
 export const setUserData = async (user: UserReturnType) => {
     (await cookies()).set('user', JSON.stringify(user), {
-        httpOnly: true,
         sameSite: 'none',
         secure: true,
         maxAge: 7 * 24 * 60 * 60  // 7 days
