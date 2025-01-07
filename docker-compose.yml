@@ -25,12 +25,24 @@ services:
     container_name: dailiestask-nginx
     ports:
       - 80:80
+      - 443:443
     depends_on:
       - server
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf
+      - ./certbot/conf:/etc/letsencrypt # For SSL certificates
+      - ./certbot/www:/var/www/certbot # For ACME challenge
     environment:
       - SERVER_URL=${SERVER_URL:?}
+      - SERVER_URL_URI=${SERVER_URI:?}
+  certbot:
+    profiles: [production]
+    image: certbot/certbot
+    container_name: dailiestask-certbot
+    volumes:
+      - ./certbot/conf:/etc/letsencrypt
+      - ./certbot/www:/var/www/certbot
+    command: certonly --webroot -w /var/www/certbot --force-renewal --email ${ADMIN_EMAIL:?} -d ${SERVER_URI:?} --agree-tos
   db:
     profiles: [dev]
     image: postgres
