@@ -3,7 +3,7 @@ import { Response, Request } from 'express';
 import bodyParser from 'body-parser';
 import cors from 'cors';
 import 'dotenv/config';
-//import helmet from 'helmet';
+import helmet from 'helmet';
 import morgan from 'morgan';
 import cookieParser from 'cookie-parser';
 
@@ -24,14 +24,25 @@ app.use(cors(
   {
     origin: process.env.WEB_URL,
     credentials: true,
+    allowedHeaders: [
+      'Content-Type',
+      'Authorization',
+      'Cookie',
+      'Accept',
+      'X-Requested-With',
+      'Origin',
+      'Referer',
+      'User-Agent',
+      'Cache-Control',
+    ],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   }
 ));
 app.use(express.json());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
-/* app.use(helmet());
+app.use(helmet());
 app.use(helmet.crossOriginResourcePolicy({ policy: 'cross-origin' }));
- */
 app.use(morgan('common'));
 
 /* routes */
