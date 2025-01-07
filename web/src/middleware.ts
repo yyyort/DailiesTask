@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { removeAccessToken, removeRefreshToken, setAccessToken, setUserData } from "./service/auth/authService";
+import { setAccessToken, setUserData } from "./service/auth/authService";
 
 const api = process.env.SERVER_URL
 
@@ -64,10 +64,6 @@ export async function validateToken(request: NextRequest) {
             }
         })
         if (res.status === 401) {
-            //removes cookies
-            await removeRefreshToken();
-            await removeAccessToken();
-
             return NextResponse.redirect(new URL('/signin', request.url))
         }
 
@@ -83,10 +79,6 @@ export async function validateToken(request: NextRequest) {
             //redirect to the requested page
             return NextResponse.next()
         } else {
-            //removes cookies
-            await removeRefreshToken();
-            await removeAccessToken();
-
             return NextResponse.redirect(new URL('/signin', request.url))
         }
     } catch (error) {
