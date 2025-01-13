@@ -39,7 +39,23 @@ export const routineGetAllService = async (filters?: string): Promise<RoutineRet
             routines: RoutineReturnType[];
         } = await res.json();
 
-        return data.routines;
+        //format date and time from utc to locale
+        const formattedData = data.routines.map(routine => {
+            return {
+                ...routine,
+                tasks: routine.tasks?.map(task => {
+                    return {
+                        ...task,
+                        timeToDo: new Date(`${task.deadline}T${task.timeToDo}.000Z`).toLocaleTimeString("en-US", {
+                            hour12: false,
+                        }),
+                        deadline: new Date(task.deadline).toISOString().split("T")[0]
+                    }
+                })
+            }
+        });
+
+        return formattedData;
     } catch (error: unknown) {
         if (error instanceof Error) {
             console.error(error);

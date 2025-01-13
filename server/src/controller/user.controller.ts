@@ -5,6 +5,7 @@ import { UserCreateType, UserReturnType } from "../model/user.model";
 import { ApiError } from "../util/apiError";
 import jwt from 'jsonwebtoken';
 import { verifyToken } from "../util/jwt.util";
+import 'dotenv/config';
 
 /* 
     user sign up
@@ -35,6 +36,8 @@ export const userSignUpController = async (req: Request, res: Response): Promise
             secure: true,
             sameSite: 'none',
             path: '/',
+            domain: process.env.NODE_ENV === 'production' ? process.env.DOMAIN : 'localhost',
+            priority: 'high',
             maxAge: 7 * 24 * 60 * 60 * 1000 // 7 day,
         });
 
@@ -83,7 +86,8 @@ export const userSignInController = async (req: Request, res: Response): Promise
             secure: true,
             sameSite: 'none',
             path: '/',
-            domain: 'localhost',
+            priority: 'high',
+            domain: process.env.NODE_ENV === 'production' ? process.env.DOMAIN : 'localhost',
             maxAge: 7 * 24 * 60 * 60 * 1000 // 7 day,
         });
 

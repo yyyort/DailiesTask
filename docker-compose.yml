@@ -9,9 +9,6 @@ services:
     volumes:
       - ./server/src:/home/node/app/src
     environment:
-      - POSTGRES_DB=${POSTGRES_DB:?}
-      - POSTGRES_USER=${POSTGRES_USER:?}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:?}
       - DATABASE_URL=${DATABASE_URL:?}
       - DEV_DATABASE_URL=${DEV_DATABASE_URL:?}
       - PORT=${PORT:?}
@@ -19,6 +16,7 @@ services:
       - ACCESS_TOKEN_SECRET=${ACCESS_TOKEN_SECRET:?}
       - REFRESH_TOKEN_SECRET=${REFRESH_TOKEN_SECRET:?}
       - WEB_URL=${WEB_URL:?}
+      - DOMAIN=${DOMAIN:?}
   nginx:
     profiles: [production]
     image: nginx:alpine
@@ -44,7 +42,7 @@ services:
       - ./certbot/www:/var/www/certbot
     command: certonly --webroot -w /var/www/certbot --force-renewal --email ${ADMIN_EMAIL:?} -d ${SERVER_URI:?} --agree-tos
   db:
-    profiles: [dev]
+    profiles: [test]
     image: postgres
     restart: always
     ports:

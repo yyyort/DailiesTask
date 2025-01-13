@@ -9,8 +9,9 @@ export const taskConvertFromDb = async (task: TaskTableReturnType): Promise<Task
         title: task.title,
         description: task.description ?? "",
         status: task.status,
-        timeToDo: new Date(task.timeToDo).toLocaleTimeString(),
-        deadline: new Date(task.deadline).toLocaleDateString()
+        timeToDo: task.timeToDo,
+        deadline: task.deadline,
+        order: task.order
     }
 };
 
@@ -22,8 +23,9 @@ export const tasksConvertFromDb = async (tasks: TaskTableReturnType[]): Promise<
             title: task.title,
             description: task.description ?? "",
             status: task.status,
-            timeToDo: new Date(task.timeToDo).toLocaleTimeString(),
-            deadline: new Date(task.deadline).toLocaleDateString()
+            timeToDo: task.timeToDo,
+            deadline: task.deadline,
+            order: task.order
         }
     });
 };

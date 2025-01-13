@@ -1,59 +1,8 @@
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { db } from "../db/db";
-import { contributionTable, taskTable, taskTodayTable, usersTable } from "../db/schema";
-import { ContributionCreateType, ContributionReturnType } from "../model/contribution.model";
+import { contributionTable } from "../db/schema";
+import { ContributionReturnType } from "../model/contribution.model";
 
-
-/* create */
-export async function contributionCreateService(): Promise<void> {
-    try {
-        //get all users today tasks
-        const usersTodayTasks = await db.select({
-            userId: usersTable.id,
-            taskId: taskTodayTable.taskId,
-            status: taskTable.status,
-        })
-            .from(usersTable)
-            .innerJoin(taskTodayTable, eq(usersTable.id, taskTodayTable.userId))
-            .innerJoin(taskTable, eq(taskTodayTable.taskId, taskTable.id))
-
-        //post processing
-        const usersContributions = usersTodayTasks.reduce<ContributionCreateType[]>(
-            (acc, curr) => {
-                const userContribution = acc.find((contribution) => contribution.userId === curr.userId);
-
-                if (userContribution) {
-                    if (curr.status === "done") {
-                        userContribution.tasksDone += 1;
-                    } else if (curr.status === "overdue") {
-                        userContribution.tasksMissed += 1;
-                    }
-                    userContribution.tasksTotal += 1;
-                } else {
-                    const newUserContribution: ContributionCreateType = {
-                        userId: curr.userId,
-                        tasksDone: curr.status === "done" ? 1 : 0,
-                        tasksMissed: curr.status === "overdue" ? 1 : 0,
-                        tasksTotal: 1,
-                    }
-                    acc.push(newUserContribution);
-                }
-
-                return acc;
-            },
-            []
-        )
-
-        console.log('contri', usersContributions);
-
-        //insert contributions
-        await db.insert(contributionTable).values(usersContributions);
-
-    } catch (error) {
-        console.error((error as Error));
-        throw new Error((error as Error).message);
-    }
-}
 
 /* get */
 export async function contributionGetService(userId: string): Promise<ContributionReturnType[]> {
@@ -61,9 +10,8 @@ export async function contributionGetService(userId: string): Promise<Contributi
         const res = await db.select({
             id: contributionTable.id,
             tasksDone: contributionTable.tasksDone,
-            tasksTotal: contributionTable.tasksTotal,
             tasksMissed: contributionTable.tasksMissed,
-            createdAt: contributionTable.createdAt,
+            date: contributionTable.date,
         })
             .from(contributionTable)
             .where(eq(contributionTable.userId, userId));
@@ -75,17 +23,109 @@ export async function contributionGetService(userId: string): Promise<Contributi
                     id: curr.id,
                     tasksDone: curr.tasksDone,
                     tasksMissed: curr.tasksMissed,
-                    tasksTotal: curr.tasksTotal,
-                    createdAt: curr.createdAt,
+                    date: curr.date
                 }
                 acc.push(newContribution);
                 return acc;
             },
             []
         )
-
-
         return contribution;
+    } catch (error) {
+        console.error((error as Error));
+        throw new Error((error as Error).message);
+    }
+}
+
+/* update when task is updated*/
+export async function contributionUpdateForTaskService(
+    userId: string,
+    date: Date,
+    action: "done" | "delete" | "undo"
+): Promise<void> {
+    try {
+        //check if there is a contribution for the date
+        const res = await db
+            .select({
+                id: contributionTable.id,
+                tasksDone: contributionTable.tasksDone,
+                tasksMissed: contributionTable.tasksMissed,
+                date: contributionTable.date,
+            })
+            .from(contributionTable)
+            .where(
+                and(
+                    eq(contributionTable.userId, userId),
+                    eq(contributionTable.date, new Date(date).toISOString().split('T')[0])
+                )
+            )
+            .limit(1);
+
+        console.log('date', date);
+        console.log('contributionUpdateForTaskService', res);
+        console.log('res length', res.length);
+
+        //if there is no contribution for the date create one
+        if (res.length <= 0 && action === "done") {
+            console.log('create new contribution');
+
+            await db.transaction(async (trx) => {
+                const insertedContri = await trx
+                    .insert(contributionTable)
+                    .values({
+                        userId: userId,
+                        tasksDone: 0,
+                        tasksMissed: 0,
+                        date: new Date(date).toISOString().split('T')[0]
+                    })
+                    .returning({
+                        id: contributionTable.id,
+                        date: contributionTable.date
+                    })
+
+                await trx
+                    .update(contributionTable)
+                    .set({
+                        tasksDone: 1
+                    })
+                    .where(
+                        and(
+                            eq(contributionTable.userId, userId),
+                            eq(contributionTable.date, insertedContri[0].date)
+                        )
+                    )
+            })
+        } else if (res.length >= 1 && res) {
+            console.log('update contribution');
+
+            if (action === "done") {
+                await db
+                    .update(contributionTable)
+                    .set({
+                        tasksDone: res[0].tasksDone + 1
+                    })
+                    .where(
+                        and(
+                            eq(contributionTable.userId, userId),
+                            eq(contributionTable.date, res[0].date)
+                        )
+                    )
+            } else if (action === "delete" || action === "undo") {
+                await db
+                    .update(contributionTable)
+                    .set({
+                        tasksDone: res[0].tasksDone - 1
+                    })
+                    .where(
+                        and(
+                            eq(contributionTable.userId, userId),
+                            eq(contributionTable.date, res[0].date)
+                        )
+                    )
+            }
+        }
+
+
     } catch (error) {
         console.error((error as Error));
         throw new Error((error as Error).message);

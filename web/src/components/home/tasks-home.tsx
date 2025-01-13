@@ -5,7 +5,9 @@ import TaskContainer from "../tasks/task-container";
 import { taskGetAllService } from "@/service/tasks/taskService";
 
 export default async function TasksHome({ date }: { date: string }) {
-  const tasks: TaskReturnType[] = await taskGetAllService(date);
+  const tasks: TaskReturnType[] = await taskGetAllService({
+    date: date,
+  });
   const tasksDoneLength = tasks.filter((task) => task.status === "done").length;
   const tasksLength = tasks.length;
 

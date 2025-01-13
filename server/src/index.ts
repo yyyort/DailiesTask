@@ -10,11 +10,9 @@ import cookieParser from 'cookie-parser';
 import UserRoutes from './route/user.route';
 import TaskRoutes from './route/task.route';
 import RoutineRoutes from './route/routine.route';
-import { taskTodayCronService } from './service/taskToday.service';
+import { taskTodayCronService } from './service/taskCron.service';
 import ContributionRoutes from './route/contribution.route';
 import NotesRouter from './route/notes.route';
-
-
 
 export const app = express();
 
@@ -64,5 +62,5 @@ taskTodayCronService.start();
 
 /* server */
 app.listen(Number(PORT), "0.0.0.0", () => {
-  console.log(`Server is running at http://localhost:${PORT}`);
+  console.log(`Server is running at 0.0.0.0:${PORT}`);
 });

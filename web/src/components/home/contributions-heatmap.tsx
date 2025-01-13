@@ -80,7 +80,7 @@ export default function ContributionsHeatmap({
   // Get contribution level for a date, based on tasks done
   const getContributionLevel = (date: Date) => {
     const contribution = contributions.find((c) =>
-      isSameDay(new Date(c.createdAt), date)
+      isSameDay(new Date(c.date), date)
     );
 
     if (!contribution) return 0;
@@ -97,7 +97,7 @@ export default function ContributionsHeatmap({
 
   const getTasksDone = (date: Date): number => {
     const contribution = contributions.find((c) =>
-      isSameDay(new Date(c.createdAt), date)
+      isSameDay(new Date(c.date), date)
     );
 
     if (!contribution) return 0;

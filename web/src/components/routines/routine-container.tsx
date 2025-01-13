@@ -45,7 +45,7 @@ export default function RoutineContainer({
               status: task.status,
               timeToDo: task.timeToDo,
               deadline: task.deadline,
-              type: task.type,
+              order: 0,
             }}
             variant="routine"
           />

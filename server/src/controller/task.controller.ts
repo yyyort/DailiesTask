@@ -26,20 +26,53 @@ export const taskGetController = async (req: Request, res: Response): Promise<vo
 export const taskGetAllController = async (req: Request, res: Response): Promise<void> => {
     try {
         const userId = req.body.userId;
-        const date = req.query.date;
+        const date = req.query.date as string | undefined;
         const filter = req.query.filter;
+
+        console.log("date: ", date);
+        console.log("filter: ", filter);
+        console.log("userId: ", userId);
+
+        if (userId === undefined) {
+            console.error("No user id provided");
+            throw new ApiError(500, "user id undefined", { userId: "User id is required" });
+        }
 
         if (filter) {
             const splitFilter: TaskStatusType[] = (filter as string).split(" ") as TaskStatusType[];
 
-            const tasks = await taskGetAllService(userId, date as string, splitFilter);
+            if (date) {
+                const tasks = await taskGetAllService({
+                    userId: userId,
+                    date: date,
+                    filter: splitFilter
+                });
 
+                res.status(200).json({ message: "Tasks retrieved successfully", tasks: tasks });
+            } else {
+                const tasks = await taskGetAllService({
+                    userId: userId,
+                    filter: splitFilter
+                });
 
-            res.status(200).json({ message: "Tasks retrieved successfully", tasks: tasks });
+                res.status(200).json({ message: "Tasks retrieved successfully", tasks: tasks });
+            }
+
         } else {
-            const tasks = await taskGetAllService(userId, date as string);
+            if (date) {
+                const tasks = await taskGetAllService({
+                    userId: userId,
+                    date: date
+                });
 
-            res.status(200).json({ message: "Tasks retrieved successfully", tasks: tasks });
+                res.status(200).json({ message: "Tasks retrieved successfully", tasks: tasks });
+            } else {
+                const tasks = await taskGetAllService({
+                    userId: userId
+                });
+
+                res.status(200).json({ message: "Tasks retrieved successfully", tasks: tasks });
+            }
         }
     } catch (error: unknown) {
         console.error((error as Error).message);
@@ -101,7 +134,7 @@ export const taskCreateController = async (req: Request, res: Response): Promise
 export const taskUpdateController = async (req: Request, res: Response): Promise<void> => {
     try {
         const { id } = req.params;
-        const { title, description, status, timeToDo, deadline } = req.body;
+        const { title, description, status, timeToDo, deadline, order } = req.body;
         const userId = req.body.userId;
 
         if (!title && !description && !status && !timeToDo && !deadline) {
@@ -120,7 +153,8 @@ export const taskUpdateController = async (req: Request, res: Response): Promise
             description,
             status,
             timeToDo,
-            deadline
+            deadline,
+            order: order || 0
         };
 
         await taskUpdateService(userId, id, data);

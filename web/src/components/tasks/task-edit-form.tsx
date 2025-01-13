@@ -36,12 +36,14 @@ export default function TaskEditForm({
       status: task.status,
       timeToDo: task.timeToDo,
       deadline: task.deadline,
+      order: task.order,
     },
   });
 
   const onSubmit: SubmitHandler<TaskUpdateType> = async (data) => {
     try {
       // call the service to create a task
+      console.log(data);
 
       await taskUpdateService(task.id, data);
 

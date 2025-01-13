@@ -1,0 +1,1 @@
+ALTER TABLE "contribution_table" ADD COLUMN "date" date NOT NULL;

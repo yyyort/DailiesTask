@@ -3,7 +3,6 @@ import { date } from 'drizzle-orm/pg-core';
 import { boolean } from 'drizzle-orm/pg-core';
 import { time } from 'drizzle-orm/pg-core';
 import { integer } from 'drizzle-orm/pg-core';
-import { serial } from 'drizzle-orm/pg-core';
 import { pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
 
 export const usersTable = pgTable("users_table", {
@@ -62,23 +61,10 @@ export const taskTable = pgTable("task_table", {
     status: taskStatus('status').default('todo').notNull(),
     timeToDo: time('time_to_do').notNull(),
     deadline: date('deadline').notNull(),
+    order: integer('order').notNull().default(0),
     createdAt: timestamp('created_at').defaultNow().notNull(),
     updatedAt: timestamp('updated_at').defaultNow().notNull().$onUpdate(() => new Date()),
 });
-
-export const taskTodayTable = pgTable("task_today_table", {
-    id: serial('id').primaryKey().notNull(),
-    userId: uuid('user_id').notNull().references(() => usersTable.id, {
-        onDelete: 'cascade',
-        onUpdate: 'cascade',
-    }),
-    taskId: uuid('task_id').notNull().references(() => taskTable.id, {
-        onDelete: 'cascade',
-        onUpdate: 'cascade',
-    }).unique(),
-    order: integer('order').notNull(),
-})
-
 
 export const contributionTable = pgTable("contribution_table", {
     id: uuid('id').primaryKey().defaultRandom().notNull(),
@@ -87,8 +73,8 @@ export const contributionTable = pgTable("contribution_table", {
         onUpdate: 'cascade',
     }),
     tasksDone: integer('tasks_done').notNull(),
-    tasksTotal: integer('tasks_total').notNull(),
     tasksMissed: integer('tasks_missed').notNull(),
+    date: date('date').notNull(),
     createdAt: timestamp('created_at').defaultNow().notNull(),
     updatedAt: timestamp('updated_at').defaultNow().notNull().$onUpdate(() => new Date()),
 });

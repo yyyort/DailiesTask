@@ -1,6 +1,6 @@
 {
-  "id": "0b4e7de0-5e73-4b44-9be0-8427d7d57412",
-  "prevId": "00000000-0000-0000-0000-000000000000",
+  "id": "4d726b0d-ba44-4ef6-8852-a2aaafc19c28",
+  "prevId": "0b4e7de0-5e73-4b44-9be0-8427d7d57412",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -30,6 +30,12 @@
         "tasks_missed": {
           "name": "tasks_missed",
           "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "date": {
+          "name": "date",
+          "type": "date",
           "primaryKey": false,
           "notNull": true
         },

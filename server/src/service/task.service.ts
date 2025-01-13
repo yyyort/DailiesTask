@@ -1,53 +1,172 @@
-import { and, eq, inArray, isNull } from "drizzle-orm";
+import { and, asc, desc, eq, inArray, isNull } from "drizzle-orm";
 import { db } from "../db/db";
 import { taskTable } from "../db/schema";
 import { TaskCreateType, TaskReturnType, TaskStatusType, TaskUpdateType, } from "../model/task.model";
 import { ApiError } from "../util/apiError";
-import { taskConvertFromDb } from "../util/task.util";
-import { taskTodayCreateService } from "./taskToday.service";
-import { console } from "inspector";
+import { taskConvertFromDb, tasksConvertFromDb } from "../util/task.util";
+import { contributionUpdateForTaskService } from "./contribution.service";
 
 //read
 /* 
     get all tasks of a user
 */
 export async function taskGetAllService(
-    userId: string,
-    date?: string,
-    filter?: TaskStatusType[]
+    { userId, date, filter }: { userId: string, date?: string, filter?: TaskStatusType[] }
 ): Promise<TaskReturnType[]> {
     try {
-        const res = await db
-            .select({
-                id: taskTable.id,
-                routineTaskId: taskTable.routineTaskId,
-                title: taskTable.title,
-                description: taskTable.description,
-                status: taskTable.status,
-                timeToDo: taskTable.timeToDo,
-                deadline: taskTable.deadline
-            })
-            .from(taskTable)
-            .where(
-                and(
-                    eq(taskTable.userId, userId),
-                    date ? eq(taskTable.deadline, new Date(date).toLocaleDateString()) : eq(taskTable.deadline, new Date().toLocaleDateString()),
-                    filter ? inArray(taskTable.status, filter) : inArray(taskTable.status, ["todo", "done", "overdue"])
+        console.log('date', date);
+        console.log('filter', filter);
+        console.log('userId', userId);
+
+        if (filter && date) {
+            const res = await db
+                .select({
+                    id: taskTable.id,
+                    routineTaskId: taskTable.routineTaskId,
+                    title: taskTable.title,
+                    description: taskTable.description,
+                    status: taskTable.status,
+                    timeToDo: taskTable.timeToDo,
+                    deadline: taskTable.deadline,
+                    order: taskTable.order
+                })
+                .from(taskTable)
+                .where(
+                    and(
+                        eq(taskTable.userId, userId),
+                        inArray(taskTable.status, filter),
+                        eq(taskTable.deadline, new Date(date).toISOString().split('T')[0]),
+                    )
                 )
-            );
+                .orderBy(asc(taskTable.order));
 
-        //convert data to TaskReturnType
-        const tasks: TaskReturnType[] = res.map(task => ({
-            id: task.id,
-            routineTaskId: task.routineTaskId,
-            title: task.title,
-            description: task.description ?? undefined,
-            status: task.status,
-            timeToDo: task.timeToDo,
-            deadline: task.deadline
-        }));
+            //convert data to TaskReturnType
+            const tasks: TaskReturnType[] = res.map(task => ({
+                id: task.id,
+                routineTaskId: task.routineTaskId,
+                title: task.title,
+                description: task.description ?? '',
+                status: task.status,
+                timeToDo: task.timeToDo,
+                deadline: task.deadline,
+                order: task.order
+            }));
 
-        return tasks;
+            console.log('res in with filter and date', res, tasks);
+
+            return tasks;
+        } else if (filter && !date) {
+            const res = await db
+                .select({
+                    id: taskTable.id,
+                    routineTaskId: taskTable.routineTaskId,
+                    title: taskTable.title,
+                    description: taskTable.description,
+                    status: taskTable.status,
+                    timeToDo: taskTable.timeToDo,
+                    deadline: taskTable.deadline,
+                    order: taskTable.order
+                })
+                .from(taskTable)
+                .where(
+                    and(
+                        eq(taskTable.userId, userId),
+                        inArray(taskTable.status, filter),
+                        eq(taskTable.deadline, new Date().toISOString().split('T')[0]),
+                    )
+                )
+                .orderBy(asc(taskTable.order));
+
+            //convert data to TaskReturnType
+            const tasks: TaskReturnType[] = res.map(task => ({
+                id: task.id,
+                routineTaskId: task.routineTaskId,
+                title: task.title,
+                description: task.description ?? '',
+                status: task.status,
+                timeToDo: task.timeToDo,
+                deadline: task.deadline,
+                order: task.order
+            }));
+
+            console.log('res in with filter and no date', res, tasks);
+
+            return tasks;
+        } else if (!filter && date) {
+            const res = await db
+                .select({
+                    id: taskTable.id,
+                    routineTaskId: taskTable.routineTaskId,
+                    title: taskTable.title,
+                    description: taskTable.description,
+                    status: taskTable.status,
+                    timeToDo: taskTable.timeToDo,
+                    deadline: taskTable.deadline,
+                    order: taskTable.order
+                })
+                .from(taskTable)
+                .where(
+                    and(
+                        eq(taskTable.userId, userId),
+                        eq(taskTable.deadline, new Date(date).toISOString().split('T')[0]),
+                    )
+                )
+                .orderBy(asc(taskTable.order));
+
+            //convert data to TaskReturnType
+            const tasks: TaskReturnType[] = res.map(task => ({
+                id: task.id,
+                routineTaskId: task.routineTaskId,
+                title: task.title,
+                description: task.description ?? '',
+                status: task.status,
+                timeToDo: task.timeToDo,
+                deadline: task.deadline,
+                order: task.order
+            }));
+
+            console.log('res in with no filter and date', res, tasks);
+
+            return tasks;
+        } else {
+            const res = await db
+                .select({
+                    id: taskTable.id,
+                    routineTaskId: taskTable.routineTaskId,
+                    title: taskTable.title,
+                    description: taskTable.description,
+                    status: taskTable.status,
+                    timeToDo: taskTable.timeToDo,
+                    deadline: taskTable.deadline,
+                    order: taskTable.order
+                })
+                .from(taskTable)
+                .where(
+                    and(
+                        eq(taskTable.userId, userId),
+                        eq(taskTable.deadline, new Date().toISOString().split('T')[0]),
+                    )
+                )
+                .orderBy(asc(taskTable.order));
+
+            //convert data to TaskReturnType
+            const tasks: TaskReturnType[] = res.map(task => ({
+                id: task.id,
+                routineTaskId: task.routineTaskId,
+                title: task.title,
+                description: task.description ?? '',
+                status: task.status,
+                timeToDo: task.timeToDo,
+                deadline: task.deadline,
+                order: task.order
+            }));
+
+            console.log('res in with no filter and no date', res, tasks);
+
+            return tasks;
+        }
+
+
     } catch (error: unknown) {
         console.error((error as Error));
         if (error instanceof ApiError) {
@@ -107,7 +226,8 @@ export async function taskGetService(
                 description: taskTable.description,
                 status: taskTable.status,
                 timeToDo: taskTable.timeToDo,
-                deadline: taskTable.deadline
+                deadline: taskTable.deadline,
+                order: taskTable.order
             })
             .from(taskTable)
             .where(
@@ -153,71 +273,105 @@ export async function taskCreateService(
         if (data.routineTaskId && data.routineTaskId !== undefined && data.routineTaskId !== null) {
             console.log('routineTaskId findddd meee 2', data.routineTaskId);
 
-            const task = await db.insert(taskTable).values({
-                userId: userId,
-                routineTaskId: data.routineTaskId,
-                title: data.title,
-                description: data.description,
-                status: data.status,
-                timeToDo: data.timeToDo,
-                deadline: data.deadline
-            }).returning({
-                id: taskTable.id,
-                routineTaskId: taskTable.routineTaskId,
-                title: taskTable.title,
-                description: taskTable.description,
-                status: taskTable.status,
-                timeToDo: taskTable.timeToDo,
-                deadline: taskTable.deadline
-            })
 
-            //convert data to TaskReturnType
-            const taskData = await taskConvertFromDb(task[0]);
+            const task: TaskReturnType = await db.transaction(async (trx) => {
+                //get the previos task order
+                const order = await trx
+                    .select({
+                        order: taskTable.order
+                    })
+                    .from(taskTable)
+                    .where(
+                        and(
+                            eq(taskTable.userId, userId),
+                        )
+                    )
+                    .orderBy(desc(taskTable.order))
+                    .limit(1);
 
-            if (taskData.deadline === new Date().toLocaleDateString()) {
-                await taskTodayCreateService(userId, taskData);
-            }
+                console.log('last order', order);
+                const lastOrder = order.length > 0 ? order[0].order : 0;
 
-            console.log('taskData', taskData);
+                const taskRes = await db.insert(taskTable).values({
+                    userId: userId,
+                    routineTaskId: data.routineTaskId,
+                    title: data.title,
+                    description: data.description,
+                    status: data.status,
+                    timeToDo: data.timeToDo,
+                    deadline: data.deadline,
+                    order: lastOrder + 10
+                }).returning({
+                    id: taskTable.id,
+                    routineTaskId: taskTable.routineTaskId,
+                    title: taskTable.title,
+                    description: taskTable.description,
+                    status: taskTable.status,
+                    timeToDo: taskTable.timeToDo,
+                    deadline: taskTable.deadline,
+                    order: taskTable.order
+                })
 
-            return taskData;
+                //convert data to TaskReturnType
+                const taskData = await taskConvertFromDb(taskRes[0]);
+
+                return taskData;
+            });
+
+            console.log('task', task);
+
+            return task;
         } else {
-            console.log('routineTaskId findddd meee 1 aklsdjalsjdlkasjd', data.routineTaskId);
+            const task = await db.transaction(async (trx) => {
+                const order = await trx
+                    .select({
+                        order: taskTable.order
+                    })
+                    .from(taskTable)
+                    .where(
+                        and(
+                            eq(taskTable.userId, userId),
+                        )
+                    )
+                    .orderBy(desc(taskTable.order))
+                    .limit(1);
+
+                const lastOrder = order.length > 0 ? order[0].order : 0;
+
+                const taskRes = await db.insert(taskTable).values({
+                    userId: userId,
+                    title: data.title,
+                    description: data.description,
+                    status: data.status,
+                    timeToDo: data.timeToDo,
+                    deadline: data.deadline,
+                    order: lastOrder + 10
+                }).returning({
+                    id: taskTable.id,
+                    title: taskTable.title,
+                    description: taskTable.description,
+                    status: taskTable.status,
+                    timeToDo: taskTable.timeToDo,
+                    deadline: taskTable.deadline,
+                    order: taskTable.order
+                })
+
+                //convert data to TaskReturnType
+                const taskData: TaskReturnType = {
+                    id: taskRes[0].id,
+                    title: taskRes[0].title,
+                    description: taskRes[0].description ?? "",
+                    status: taskRes[0].status,
+                    timeToDo: taskRes[0].timeToDo,
+                    deadline: taskRes[0].deadline,
+                    order: taskRes[0].order
+                };
+
+                return taskData;
+            });
 
 
-            const task = await db.insert(taskTable).values({
-                userId: userId,
-                title: data.title,
-                description: data.description,
-                status: data.status,
-                timeToDo: data.timeToDo,
-                deadline: data.deadline
-            }).returning({
-                id: taskTable.id,
-                title: taskTable.title,
-                description: taskTable.description,
-                status: taskTable.status,
-                timeToDo: taskTable.timeToDo,
-                deadline: taskTable.deadline
-            })
-
-            //convert data to TaskReturnType
-            const taskData: TaskReturnType = {
-                id: task[0].id,
-                title: task[0].title,
-                description: task[0].description ?? "",
-                status: task[0].status,
-                timeToDo: new Date(task[0].timeToDo).toLocaleTimeString(),
-                deadline: new Date(task[0].deadline).toLocaleDateString()
-            };
-
-            if (taskData.deadline === new Date().toLocaleDateString()) {
-                await taskTodayCreateService(userId, taskData);
-            }
-
-            console.log('taskData', taskData);
-
-            return taskData;
+            return task;
         }
 
     } catch (error: unknown) {
@@ -230,20 +384,11 @@ export async function taskCreateService(
     }
 }
 
-//update
-export async function taskUpdateService(
+export async function taskCreateBulkService(
     userId: string,
-    id: string,
-    data: TaskUpdateType,
-): Promise<TaskReturnType> {
+    data: TaskCreateType[],
+): Promise<TaskReturnType[]> {
     try {
-        if (!id) {
-            console.error("Id is required");
-            throw new ApiError(400, "Id is required", {
-                id: "Id is required"
-            });
-        }
-
         if (!userId) {
             console.error("User Id is required");
             throw new ApiError(400, "User Id is required", {
@@ -251,12 +396,115 @@ export async function taskUpdateService(
             });
         }
 
-        if (data.status && data.status !== "todo" && data.status !== "done" && data.status !== "overdue") {
-            console.error("Invalid status");
-            throw new ApiError(400, "Invalid status", {
-                status: "Invalid status"
+        const task: TaskReturnType[] = await db.transaction(async (trx) => {
+            //get the previos task order
+            const order = await trx
+                .select({
+                    order: taskTable.order
+                })
+                .from(taskTable)
+                .where(
+                    and(
+                        eq(taskTable.userId, userId),
+                    )
+                )
+                .orderBy(desc(taskTable.order))
+                .limit(1);
+
+            console.log('last order', order);
+
+            const taskTobeInserted = data.map((task, index) => {
+                return {
+                    userId: userId,
+                    routineTaskId: task.routineTaskId ?? null,
+                    title: task.title,
+                    description: task.description ?? "",
+                    status: task.status,
+                    timeToDo: task.timeToDo,
+                    deadline: task.deadline,
+                    order: order.length > 0 ? order[0].order + 10 * (index + 1) : 10 * (index + 1)
+                }
             });
+
+            const taskRes = await db
+                .insert(taskTable)
+                .values(
+                    taskTobeInserted
+                ).returning({
+                    id: taskTable.id,
+                    routineTaskId: taskTable.routineTaskId,
+                    title: taskTable.title,
+                    description: taskTable.description,
+                    status: taskTable.status,
+                    timeToDo: taskTable.timeToDo,
+                    deadline: taskTable.deadline,
+                    order: taskTable.order
+                })
+
+            //convert taskRes to TaskReturnType
+            const tasksData: TaskReturnType[] = await tasksConvertFromDb(taskRes);
+
+            return tasksData;
+
+        });
+
+        console.log('task', task);
+
+        return task;
+
+    } catch (error: unknown) {
+        console.error((error as Error));
+        if (error instanceof ApiError) {
+            throw error;
         }
+
+        throw new Error((error as Error).message);
+    }
+
+}
+
+
+//update
+export async function taskUpdateService(
+    userId: string,
+    id: string,
+    data: TaskUpdateType,
+): Promise<TaskReturnType> {
+    try {
+        //if task is updated to done, update the contribution table as well
+        await db.transaction(async (trx) => {
+            //get the previous status
+            const prevStatus = await trx
+                .select({
+                    status: taskTable.status,
+                    createdAt: taskTable.createdAt
+                })
+                .from(taskTable)
+                .where(
+                    and(
+                        eq(taskTable.userId, userId),
+                        eq(taskTable.id, id)
+                    )
+                );
+
+            console.log('prevStatus', prevStatus);
+
+            //if the status is updated to done
+            if (data.status === "done" && prevStatus[0].status !== "done") {
+                //update the contribution table
+                console.log('action done');
+
+                //check if there is a contribution for the day of the task
+                await contributionUpdateForTaskService(userId, prevStatus[0].createdAt, "done");
+            } else if (data.status === "todo" && prevStatus[0].status === "done") {
+                //update the contribution table
+                console.log('action undo');
+
+                //check if there is a contribution for the day of the task
+                await contributionUpdateForTaskService(userId, prevStatus[0].createdAt, "undo");
+            }
+
+        });
 
         if (data.routineTaskId) {
             const task = await db.update(taskTable)
@@ -266,7 +514,8 @@ export async function taskUpdateService(
                     status: data.status,
                     timeToDo: data.timeToDo,
                     deadline: data.deadline,
-                    routineTaskId: data.routineTaskId
+                    routineTaskId: data.routineTaskId,
+                    order: data.order
                 })
                 .where(
                     and(
@@ -281,7 +530,8 @@ export async function taskUpdateService(
                     description: taskTable.description,
                     status: taskTable.status,
                     timeToDo: taskTable.timeToDo,
-                    deadline: taskTable.deadline
+                    deadline: taskTable.deadline,
+                    order: taskTable.order
                 });
 
             if (task.length <= 0) {
@@ -300,6 +550,7 @@ export async function taskUpdateService(
                     status: data.status,
                     timeToDo: data.timeToDo,
                     deadline: data.deadline,
+                    order: data.order
                 })
                 .where(
                     and(
@@ -314,7 +565,8 @@ export async function taskUpdateService(
                     description: taskTable.description,
                     status: taskTable.status,
                     timeToDo: taskTable.timeToDo,
-                    deadline: taskTable.deadline
+                    deadline: taskTable.deadline,
+                    order: taskTable.order
                 });
 
             if (task.length <= 0) {
@@ -345,15 +597,40 @@ export async function taskUpdateStatusService(
     status: TaskStatusType
 ): Promise<TaskReturnType> {
     try {
-        if (!id) {
-            console.error("Id is required");
-            throw new ApiError(400, "Id is required", {});
-        }
+        //if task is updated to done, update the contribution table as well
+        await db.transaction(async (trx) => {
+            //get the previous status
+            const prevStatus = await trx
+                .select({
+                    status: taskTable.status,
+                    createdAt: taskTable.createdAt
+                })
+                .from(taskTable)
+                .where(
+                    and(
+                        eq(taskTable.userId, userId),
+                        eq(taskTable.id, id)
+                    )
+                );
 
-        if (status !== "todo" && status !== "done" && status !== "overdue") {
-            console.error("Invalid status");
-            throw new ApiError(400, "Invalid status", {});
-        }
+            console.log('prevStatus', prevStatus);
+
+            //if the status is updated to done
+            if (status === "done" && prevStatus[0].status !== "done") {
+                //update the contribution table
+                console.log('action done');
+
+                //check if there is a contribution for the day of the task
+                await contributionUpdateForTaskService(userId, prevStatus[0].createdAt, "done");
+            } else if (status === "todo" && prevStatus[0].status === "done") {
+                //update the contribution table
+                console.log('action undo');
+
+                //check if there is a contribution for the day of the task
+                await contributionUpdateForTaskService(userId, prevStatus[0].createdAt, "undo");
+            }
+
+        });
 
         const task = await db.update(taskTable)
             .set({
@@ -372,7 +649,8 @@ export async function taskUpdateStatusService(
                 description: taskTable.description,
                 status: taskTable.status,
                 timeToDo: taskTable.timeToDo,
-                deadline: taskTable.deadline
+                deadline: taskTable.deadline,
+                order: taskTable.order
             });
 
         if (task.length <= 0) {
@@ -415,8 +693,13 @@ export async function taskDeleteService(
                 description: taskTable.description,
                 status: taskTable.status,
                 timeToDo: taskTable.timeToDo,
-                deadline: taskTable.deadline
+                deadline: taskTable.deadline,
+                order: taskTable.order,
+                createdAt: taskTable.createdAt,
             });
+
+        //update contribution table
+        await contributionUpdateForTaskService(userId, task[0].createdAt, "delete");
 
         //if task is not found
         if (task.length <= 0) {

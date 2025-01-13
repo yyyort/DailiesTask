@@ -8,6 +8,7 @@ export const setAccessToken = async (token: string) => {
         httpOnly: true,
         sameSite: 'none',
         secure: true,
+        path: '/',
         maxAge: 15 * 60  // 15 minutes
     })
 };
@@ -16,6 +17,7 @@ export const setUserData = async (user: UserReturnType) => {
     (await cookies()).set('user', JSON.stringify(user), {
         sameSite: 'none',
         secure: true,
+        path: '/',
         maxAge: 7 * 24 * 60 * 60  // 7 days
     })
 };

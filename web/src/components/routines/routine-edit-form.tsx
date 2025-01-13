@@ -1,6 +1,10 @@
 "use client";
 
-import { RoutineReturnType, RoutineUpdateType } from "@/model/routine.model";
+import {
+  RoutineReturnType,
+  RoutineUpdateSchema,
+  RoutineUpdateType,
+} from "@/model/routine.model";
 import React from "react";
 import { SubmitHandler, useFieldArray, useForm } from "react-hook-form";
 import { Form, FormControl, FormField, FormItem, FormLabel } from "../ui/form";
@@ -15,6 +19,7 @@ import {
 import { Textarea } from "../ui/textarea";
 import { Plus, X } from "lucide-react";
 import { routineUpdateService } from "@/service/routines/routineActions";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 export default function RoutineEditForm({
   setSheetOpen,
@@ -23,16 +28,13 @@ export default function RoutineEditForm({
   setSheetOpen: React.Dispatch<React.SetStateAction<boolean>>;
   routine: RoutineReturnType;
 }) {
-  const localTime = new Date()
-    .toLocaleTimeString(navigator.language, {
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit",
-    })
-    .split(" ")[0]; //hh:mm format
+  const localTime = new Date().toLocaleTimeString("en-US", {
+    hour12: false,
+  });
   const localDate = new Date().toISOString().split("T")[0];
 
   const form = useForm<RoutineUpdateType>({
+    resolver: zodResolver(RoutineUpdateSchema),
     defaultValues: {
       title: routine.title,
       description: routine.description,

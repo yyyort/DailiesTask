@@ -34,7 +34,7 @@ export const taskCreateService = async (data: TaskCreateType): Promise<void> => 
         // revalidate the tasks
         revalidateTag('taskGetAll');
         revalidateTag('taskGetAllHeaders');
-        revalidateTag('taskGetToday');
+
 
     } catch (error: unknown) {
         if (error instanceof Error) {
@@ -80,7 +80,7 @@ export const taskUpdateService = async (id: string, data: TaskUpdateType): Promi
         // revalidate the tasks
         revalidateTag('taskGetAll');
         revalidateTag('taskGetAllHeaders');
-        revalidateTag('taskGetToday');
+
 
     } catch (error: unknown) {
         console.error(error);
@@ -104,8 +104,8 @@ export const taskUpdateStatusService = async (id: string, status: TaskStatusType
     try {
         const accessToken = await getAccessToken();
 
-        const response = await fetch(api + `/task/${id}`, {
-            method: 'PUT',
+        const response = await fetch(api + `/task/status/${id}`, {
+            method: 'PATCH',
             credentials: 'include',
             headers: {
                 'Content-Type': 'application/json',
@@ -114,7 +114,6 @@ export const taskUpdateStatusService = async (id: string, status: TaskStatusType
             body: JSON.stringify({
                 status: status
             }),
-            cache: 'no-cache'
         });
 
         if (!response.ok) {
@@ -127,8 +126,7 @@ export const taskUpdateStatusService = async (id: string, status: TaskStatusType
         // revalidate the tasks
         // revalidate the tasks
         revalidateTag('taskGetAll');
-        revalidateTag('taskGetAllHeaders');
-        revalidateTag('taskGetToday');
+
 
     } catch (error: unknown) {
         console.error(error);
@@ -172,7 +170,7 @@ export const taskDeleteService = async (id: string): Promise<void> => {
         // revalidate the tasks
         revalidateTag('taskGetAll');
         revalidateTag('taskGetAllHeaders');
-        revalidateTag('taskGetToday');
+
     } catch (error: unknown) {
         console.error(error);
         if (error instanceof Error) {

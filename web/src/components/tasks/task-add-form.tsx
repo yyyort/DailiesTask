@@ -16,13 +16,9 @@ export default function TaskAddForm({
 }: {
   setSheetOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
-  const localTime = new Date()
-    .toLocaleTimeString(navigator.language, {
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit",
-    })
-    .split(" ")[0]; //hh:mm format
+  const localTime = new Date().toLocaleTimeString("en-US", {
+    hour12: false,
+  });
   const localDate = new Date().toISOString().split("T")[0];
 
   const form = useForm<TaskCreateType>({

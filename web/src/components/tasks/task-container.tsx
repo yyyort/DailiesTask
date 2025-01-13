@@ -7,9 +7,11 @@ import { taskUpdateStatusService } from "@/service/tasks/taskActions";
 export default function TaskContainer({
   task,
   variant = "default",
+  type,
 }: {
   task: TaskReturnType;
   variant?: string;
+  type?: string;
 }) {
   return (
     <div
@@ -57,9 +59,7 @@ export default function TaskContainer({
               {variant === "routine" && (
                 <div>
                   <h3 className="text-muted-foreground text-xs">
-                    {task.type === "routineTask"
-                      ? "task is deleted in today"
-                      : ""}
+                    {type === "routineTask" ? "task is deleted in today" : ""}
                   </h3>
                 </div>
               )}
@@ -69,7 +69,7 @@ export default function TaskContainer({
             {variant === "routine" && (
               <div className="">
                 <p className="text-slate-600 text-sm w-full overflow-auto">
-                  {task.timeToDo?.slice(0, 5)}
+                  {new Date(`${task.deadline}T${task.timeToDo}`).toLocaleTimeString()}
                 </p>
               </div>
             )}
@@ -113,11 +113,11 @@ export default function TaskContainer({
                   //if task is today date, show today instead of date
                   task.deadline === new Date().toISOString().split("T")[0]
                     ? "Today"
-                    : task.deadline.slice(5, 10)
+                    : task.deadline
                 }
               </h3>
               <h3 className="text-slate-600 text-sm font-mono">
-                {task.timeToDo?.slice(0, 5)}
+              {new Date(`${task.deadline}T${task.timeToDo}`).toLocaleTimeString()}
               </h3>
             </div>
           </div>
