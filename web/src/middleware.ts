@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { getAccessToken, setAccessToken, setLastLogin, setUserData } from "./service/auth/authService";
-
+import { getAccessToken, setAccessToken, setLastLogin } from "./service/auth/authService";
 const api = process.env.SERVER_URL
 
 export const config = {
@@ -51,12 +50,18 @@ export async function validateToken(request: NextRequest) {
     // revalidate the access token
     try {
         const res = await fetch(api + '/user/revalidate', {
-            method: 'POST',
+            method: 'GET',
             credentials: "include",
             headers: {
                 'Content-Type': 'application/json',
                 'Cookie': `refreshToken=${refreshToken}`
             },
+            cache: 'force-cache',
+            next: {
+                // revalidate every 13 minutes
+                revalidate: 13 * 60,
+            }
+
         })
         if (res.status === 401) {
             return NextResponse.redirect(new URL('/signin', request.url))
@@ -65,13 +70,11 @@ export async function validateToken(request: NextRequest) {
 
         if (res.ok) {
             //set the new access token in the header
-            const { accessToken, user } = await res.json()
+            const { accessToken } = await res.json()
+
 
             //set the new access token in the cookie
             await setAccessToken(accessToken);
-            await setUserData(user);
-
-
 
             //redirect to the requested page
             return NextResponse.next()
@@ -80,16 +83,19 @@ export async function validateToken(request: NextRequest) {
         }
     } catch (error) {
         console.error(error)
+        return NextResponse.redirect(new URL('/signin', request.url))
     }
 }
 
 export async function taskResets(request: NextRequest) {
     try {
-        const accessToken = await getAccessToken();
         const lastLogin = request.cookies.get('lastLogin')?.value;
 
 
         if (new Date().toISOString().split('T')[0] > (lastLogin ?? '') || !lastLogin) {
+
+            const accessToken = await getAccessToken();
+
             const res = await fetch(api + '/user/tasksReset', {
                 method: 'POST',
                 credentials: 'include',
@@ -113,5 +119,6 @@ export async function taskResets(request: NextRequest) {
 
     } catch (error) {
         console.error(error)
+        return NextResponse.redirect(new URL('/signin', request.url))
     }
 }

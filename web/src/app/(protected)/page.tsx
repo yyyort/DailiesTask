@@ -13,12 +13,22 @@ import HomeCalendar from "@/components/home/homeCalendar";
 
 type SearchParams = Promise<{ [key: string]: string | string[] | undefined }>;
 
+export async function getContribution() {
+  try {
+    const contributions: ContributionReturnType[] =
+      await contributionGetService();
+    return contributions;
+  } catch (error: unknown) {
+    console.error(error as Error);
+    return [];
+  }
+}
+
 export default async function Home(props: { searchParams: SearchParams }) {
   const searchParams = await props.searchParams;
   const date = searchParams.date as string;
 
-  const contributions: ContributionReturnType[] =
-    await contributionGetService();
+  const contributions = await getContribution();
 
   return (
     <div

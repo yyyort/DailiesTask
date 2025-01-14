@@ -4,6 +4,7 @@
 */
 import { ContributionReturnType } from "@/model/contribution.model";
 import { getAccessToken } from "./auth/authService";
+import { redirect } from "next/navigation";
 
 const api = process.env.SERVER_URL
 
@@ -29,10 +30,7 @@ export const contributionGetService = async (): Promise<ContributionReturnType[]
         );
 
         if (!res.ok) {
-            if (res.status === 401) {
-                throw new Error('Unauthorized');
-            }
-            return [];
+            redirect('/signin');
         }
 
         const data: {
@@ -46,7 +44,7 @@ export const contributionGetService = async (): Promise<ContributionReturnType[]
             console.error(error);
         }
 
-        return [];
+        redirect('/signin');
     }
 
 }

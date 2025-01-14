@@ -156,10 +156,7 @@ export const taskGetAllService = async ({
             });
 
             if (!response.ok) {
-                if (response.status === 401) {
-                    throw new Error('Unauthorized');
-                }
-                return [];
+                redirect('/signin');
             }
 
             const data: {
@@ -184,12 +181,7 @@ export const taskGetAllService = async ({
         if (error instanceof Error) {
             console.error(error);
 
-            if (error.message === 'Unauthorized') {
-                redirect('/signin');
-            } else {
-                console.error(error);
-                throw new Error('Failed to get tasks');
-            }
+            redirect('/signin');
         }
 
         return [];
@@ -217,10 +209,7 @@ export const taskGetEverythingService = async (): Promise<{ id: string, date: Da
         });
 
         if (!response.ok) {
-            if (response.status === 401) {
-                throw new Error('Unauthorized');
-            }
-            return [];
+            redirect('/signin');
         }
 
         const data: {
@@ -236,12 +225,8 @@ export const taskGetEverythingService = async (): Promise<{ id: string, date: Da
         if (error instanceof Error) {
             console.error(error);
 
-            if (error.message === 'Unauthorized') {
-                redirect('/signin');
-            } else {
-                console.error(error);
-                throw new Error('Failed to get tasks');
-            }
+            redirect('/signin');
+
         }
 
         return [];
