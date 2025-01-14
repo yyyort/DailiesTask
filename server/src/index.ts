@@ -10,7 +10,6 @@ import cookieParser from 'cookie-parser';
 import UserRoutes from './route/user.route';
 import TaskRoutes from './route/task.route';
 import RoutineRoutes from './route/routine.route';
-import { taskTodayCronService } from './service/taskCron.service';
 import ContributionRoutes from './route/contribution.route';
 import NotesRouter from './route/notes.route';
 
@@ -54,11 +53,6 @@ app.use('/api', TaskRoutes);
 app.use('/api', RoutineRoutes);
 app.use('/api', ContributionRoutes);
 app.use('/api', NotesRouter);
-
-/* 
-  cron job
-*/
-taskTodayCronService.start();
 
 /* server */
 app.listen(Number(PORT), "0.0.0.0", () => {

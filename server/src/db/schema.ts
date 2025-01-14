@@ -10,6 +10,7 @@ export const usersTable = pgTable("users_table", {
     email: text('email').unique().notNull(),
     name: text('name').notNull(),
     password: text('password').notNull(),
+    lastLogin: date('last_login').notNull().defaultNow(),
     createdAt: timestamp('created_at').defaultNow().notNull(),
     updatedAt: timestamp('updated_at').defaultNow().notNull().$onUpdate(() => new Date()),
 });

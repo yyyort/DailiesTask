@@ -15,6 +15,13 @@
       "when": 1736591807401,
       "tag": "0001_slow_iron_fist",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1736769614669,
+      "tag": "0002_medical_albert_cleary",
+      "breakpoints": true
     }
   ]
 }

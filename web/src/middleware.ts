@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { setAccessToken, setUserData } from "./service/auth/authService";
+import { getAccessToken, setAccessToken, setLastLogin, setUserData } from "./service/auth/authService";
 
 const api = process.env.SERVER_URL
 
@@ -30,7 +30,8 @@ export async function middleware(request: NextRequest) {
     );
 
     if (isProtectedRoute) {
-        return validateToken(request)
+        await validateToken(request)
+        await taskResets(request)
         //return NextResponse.next()
     }
 
@@ -70,6 +71,8 @@ export async function validateToken(request: NextRequest) {
             await setAccessToken(accessToken);
             await setUserData(user);
 
+
+
             //redirect to the requested page
             return NextResponse.next()
         } else {
@@ -80,3 +83,35 @@ export async function validateToken(request: NextRequest) {
     }
 }
 
+export async function taskResets(request: NextRequest) {
+    try {
+        const accessToken = await getAccessToken();
+        const lastLogin = request.cookies.get('lastLogin')?.value;
+
+
+        if (new Date().toISOString().split('T')[0] > (lastLogin ?? '') || !lastLogin) {
+            const res = await fetch(api + '/user/tasksReset', {
+                method: 'POST',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${accessToken}`
+                },
+            })
+
+            if (res.ok) {
+
+                await setLastLogin(new Date().toISOString().split('T')[0])
+
+                return NextResponse.next()
+            } else {
+                return NextResponse.redirect(new URL('/signin', request.url))
+            }
+        } else {
+            return NextResponse.next()
+        }
+
+    } catch (error) {
+        console.error(error)
+    }
+}

@@ -3,9 +3,7 @@ import { db } from "../db/db";
 import { routineTable, routineTasksTable, taskTable } from "../db/schema";
 import { RoutineCreateType, RoutineReturnType, RoutineTaskReturnType, RoutineUpdateType } from "../model/routine.model";
 import { TaskCreateType } from "../model/task.model";
-import { taskCreateBulkService, taskCreateService, taskUpdateService } from "./task.service";
-import { ApiError } from "../util/apiError";
-
+import { taskCreateService, taskUpdateService } from "./task.service";
 /* 
     create routine
 */
@@ -624,72 +622,3 @@ export async function routineDeleteService(userId: string, id: string): Promise<
         throw new Error((error as Error).message);
     }
 }
-
-//recycle routine   
-//job for recyling the tasks that are in routine
-export const taskTodayRecycleRoutine = async (
-    userId: string
-): Promise<void> => {
-    try {
-        await db.transaction(async (trx) => {
-
-            //get all routines
-            const routinesTasks = await trx
-                .select({
-                    id: routineTable.id,
-                })
-                .from(routineTable)
-                .where(
-                    eq(routineTable.userId, userId)
-                )
-
-
-            //get all tasks that are in routine in tasksTodayIds
-            /* 
-                PATCH: instead of getting tasks from taskTodayTable, get it from routineTasksTable
-            */
-            const tasksFromRoutine = await trx
-                .select({
-                    id: routineTasksTable.id,
-                    routineId: routineTasksTable.routineId,
-                    title: routineTasksTable.title,
-                    description: routineTasksTable.description,
-                    status: routineTasksTable.status,
-                    timeToDo: routineTasksTable.timeToDo,
-                    deadline: routineTasksTable.deadline
-                })
-                .from(routineTasksTable)
-                .where(
-                    inArray(routineTasksTable.routineId, routinesTasks.map(routine => routine.id))
-                )
-
-            if (tasksFromRoutine.length > 0) {
-
-                const tasksToBeInserted: TaskCreateType[] = tasksFromRoutine.map(task => {
-                    return {
-                        title: task.title,
-                        description: task.description ?? '',
-                        status: task.status,
-                        timeToDo: task.timeToDo,
-                        deadline: new Date().toISOString().split("T")[0],
-                        routineTaskId: task.id
-                    }
-                });
-
-                if (tasksToBeInserted.length === 0) {
-                    return;
-                }
-
-                //bulk insert tasks for each user
-                await taskCreateBulkService(userId, tasksToBeInserted);
-            }
-        });
-
-    } catch (error: unknown) {
-        console.error((error as Error));
-        if (error instanceof ApiError) {
-            throw error;
-        }
-        throw new Error((error as Error).message);
-    }
-};

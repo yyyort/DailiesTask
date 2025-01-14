@@ -1,0 +1,1 @@
+ALTER TABLE "users_table" ADD COLUMN "last_login" date DEFAULT now() NOT NULL;

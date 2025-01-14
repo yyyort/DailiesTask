@@ -6,6 +6,7 @@ import { ApiError } from "../util/apiError";
 import jwt from 'jsonwebtoken';
 import { verifyToken } from "../util/jwt.util";
 import 'dotenv/config';
+import { dailyJobs } from "../service/taskCron.service";
 
 /* 
     user sign up
@@ -262,6 +263,31 @@ export const userRevalidateTokenController = async (req: Request, res: Response)
             /* if (error.status === 401) {
                 res.clearCookie('refreshToken');
             } */
+        } else {
+            res.status(500).json({ message: "Internal Server Error", error: (error as Error).message });
+        }
+
+    }
+
+};
+
+export const userTasksResetsController = async (req: Request, res: Response): Promise<void> => {
+    try {
+       const userId = req.body.userId;
+
+        if (!userId) {
+            console.error("No user id provided");
+            throw new ApiError(500, "user id undefined", { userId: "User id is required" });
+        }
+
+        await dailyJobs(userId);
+
+        res.status(200).json({ message: "User tasks reset successfully" });
+    } catch (error: unknown) {
+        console.error(error);
+        if (error instanceof ApiError) {
+            res.status(error.status).json({ message: error.message });
+
         } else {
             res.status(500).json({ message: "Internal Server Error", error: (error as Error).message });
         }

@@ -22,6 +22,14 @@ export const setUserData = async (user: UserReturnType) => {
     })
 };
 
+export const setLastLogin = async (date: string) => {
+    (await cookies()).set('lastLogin', date, {
+        sameSite: 'none',
+        secure: true,
+        maxAge: Infinity
+    })
+}
+
 export const getAccessToken = async () => {
     return (await cookies()).get('accessToken')?.value;
 };
@@ -32,6 +40,10 @@ export const getRefreshToken = async () => {
 
 export const getUserData = async (): Promise<UserReturnType> => {
     return JSON.parse((await cookies()).get('user')?.value || '{}');
+}
+
+export const getLastLogin = async () => {
+    return (await cookies()).get('lastLogin')?.value;
 }
 
 export const removeAccessToken = async () => {
