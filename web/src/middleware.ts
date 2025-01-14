@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { getAccessToken, setAccessToken, setLastLogin } from "./service/auth/authService";
+import { setAccessToken } from "./service/auth/authService";
 const api = process.env.SERVER_URL
 
 export const config = {
@@ -30,8 +30,6 @@ export async function middleware(request: NextRequest) {
 
     if (isProtectedRoute) {
         await validateToken(request)
-        await taskResets(request)
-        //return NextResponse.next()
     }
 
     return NextResponse.next()
@@ -81,42 +79,6 @@ export async function validateToken(request: NextRequest) {
         } else {
             return NextResponse.redirect(new URL('/signin', request.url))
         }
-    } catch (error) {
-        console.error(error)
-        return NextResponse.redirect(new URL('/signin', request.url))
-    }
-}
-
-export async function taskResets(request: NextRequest) {
-    try {
-        const lastLogin = request.cookies.get('lastLogin')?.value;
-
-
-        if (new Date().toISOString().split('T')[0] > (lastLogin ?? '') || !lastLogin) {
-
-            const accessToken = await getAccessToken();
-
-            const res = await fetch(api + '/user/tasksReset', {
-                method: 'POST',
-                credentials: 'include',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${accessToken}`
-                },
-            })
-
-            if (res.ok) {
-
-                await setLastLogin(new Date().toISOString().split('T')[0])
-
-                return NextResponse.next()
-            } else {
-                return NextResponse.redirect(new URL('/signin', request.url))
-            }
-        } else {
-            return NextResponse.next()
-        }
-
     } catch (error) {
         console.error(error)
         return NextResponse.redirect(new URL('/signin', request.url))

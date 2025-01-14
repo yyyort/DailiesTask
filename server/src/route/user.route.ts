@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { userDeleteController, userGetController, userLogoutController, userRevalidateTokenController, userSignInController, userSignUpController, userTasksResetsController, userUpdateController } from "../controller/user.controller";
+import { userDeleteController, userGetController, userLogoutController, userRevalidateTokenController, userSignInController, userSignUpController, userUpdateController } from "../controller/user.controller";
 import { schemaValidator } from "../middleware/schemaValidator";
 import { UserCreateSchema, UserSignInSchema } from "../model/user.model";
 import { authValidator } from "../middleware/authValidator";
@@ -13,7 +13,6 @@ router.get('/user/revalidate', userRevalidateTokenController);
 
 
 //protected routes
-router.post('/user/tasksReset', authValidator, userTasksResetsController);
 router.get('/user/:id', authValidator, userGetController);
 router.put('/user/:id', authValidator, userUpdateController);
 router.delete('/user/:id', authValidator, userDeleteController);

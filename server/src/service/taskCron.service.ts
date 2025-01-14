@@ -5,22 +5,6 @@ import { ApiError } from "../util/apiError";
 import { TaskCreateType } from "../model/task.model";
 import { taskCreateBulkService } from "./task.service";
 
-//seconds minutes hours day month year
-/* export const taskTodayCronService = cron.schedule('0 2 0 * * * ', async () => {
-    try {
-        //setting overdue tasks
-        await taskTodaySetOverdue();
-
-        console.log('taskTodayCronService done');
-    } catch (error: unknown) {
-        console.error((error as Error));
-    }
-},
-    {
-        scheduled: true,
-        timezone: 'Asia/Manila'
-    }
-); */
 
 //job for making the tasks that is past the deadline overdue
 export const taskTodaySetOverdue = async (userId: string): Promise<void> => {
@@ -143,3 +127,20 @@ export const dailyJobs = async (userId: string): Promise<void> => {
     }
 
 };
+
+//seconds minutes hours day month year
+/* export const taskTodayCronService = cron.schedule('0 2 0 * * * ', async () => {
+    try {
+        //setting overdue tasks
+        await taskTodaySetOverdue();
+
+        console.log('taskTodayCronService done');
+    } catch (error: unknown) {
+        console.error((error as Error));
+    }
+},
+    {
+        scheduled: true,
+        timezone: 'Asia/Manila'
+    }
+); */

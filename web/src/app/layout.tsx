@@ -4,7 +4,6 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 //import Footer from "@/components/footer/footer";
 import { Toaster } from "@/components/ui/toaster";
-import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Suspense } from "react";
 import Loading from "./loading";
 
@@ -43,7 +42,6 @@ export default function RootLayout({
           <Suspense fallback={<Loading />}>{children}</Suspense>
           {/* <Footer /> */}
           <Toaster />
-          <SpeedInsights />
         </ThemeProvider>
       </body>
     </html>
