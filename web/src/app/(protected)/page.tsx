@@ -1,7 +1,4 @@
 import ContributionsHeatmap from "@/components/home/contributions-heatmap";
-
-import { ContributionReturnType } from "@/model/contribution.model";
-
 import { contributionGetService } from "@/service/contributionService";
 
 import PinnedNotes from "@/components/home/pinnedNotes";
@@ -13,22 +10,11 @@ import HomeCalendar from "@/components/home/homeCalendar";
 
 type SearchParams = Promise<{ [key: string]: string | string[] | undefined }>;
 
-export async function getContribution() {
-  try {
-    const contributions: ContributionReturnType[] =
-      await contributionGetService();
-    return contributions;
-  } catch (error: unknown) {
-    console.error(error as Error);
-    return [];
-  }
-}
-
 export default async function Home(props: { searchParams: SearchParams }) {
   const searchParams = await props.searchParams;
   const date = searchParams.date as string;
 
-  const contributions = await getContribution();
+  const contributions = await contributionGetService();
 
   return (
     <div
