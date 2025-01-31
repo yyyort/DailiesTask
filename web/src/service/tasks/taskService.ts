@@ -2,6 +2,7 @@
 import { TaskReturnType } from "@/model/task.model";
 import { redirect } from "next/navigation";
 import { getAccessToken } from "../auth/authService";
+import { convertDateTimeUTCtoLocal } from "@/lib/dateTimeUtil";
 
 const api = process.env.SERVER_URL;
 
@@ -53,9 +54,7 @@ export const taskGetAllService = async ({
             const formattedData = data.tasks.map(task => {
                 return {
                     ...task,
-                    timeToDo: new Date(`${task.deadline}T${task.timeToDo}.000Z`).toLocaleTimeString("en-US", {
-                        hour12: false,
-                    }),
+                    timeToDo: convertDateTimeUTCtoLocal(`${task.deadline}T${task.timeToDo}`),
                     deadline: new Date(task.deadline).toISOString().split("T")[0]
                 }
             });
@@ -92,9 +91,7 @@ export const taskGetAllService = async ({
             const formattedData = data.tasks.map(task => {
                 return {
                     ...task,
-                    timeToDo: new Date(`${task.deadline}T${task.timeToDo}.000Z`).toLocaleTimeString("en-US", {
-                        hour12: false,
-                    }),
+                    timeToDo: convertDateTimeUTCtoLocal(`${task.deadline}T${task.timeToDo}`),
                     deadline: new Date(task.deadline).toISOString().split("T")[0]
                 }
             });
@@ -131,9 +128,7 @@ export const taskGetAllService = async ({
             const formattedData = data.tasks.map(task => {
                 return {
                     ...task,
-                    timeToDo: new Date(`${task.deadline}T${task.timeToDo}.000Z`).toLocaleTimeString("en-US", {
-                        hour12: false,
-                    }),
+                    timeToDo: convertDateTimeUTCtoLocal(`${task.deadline}T${task.timeToDo}`),
                     deadline: new Date(task.deadline).toISOString().split("T")[0]
                 }
             });
@@ -168,9 +163,7 @@ export const taskGetAllService = async ({
             const formattedData = data.tasks.map(task => {
                 return {
                     ...task,
-                    timeToDo: new Date(`${task.deadline}T${task.timeToDo}.000Z`).toLocaleTimeString("en-US", {
-                        hour12: false,
-                    }),
+                    timeToDo: convertDateTimeUTCtoLocal(`${task.deadline}T${task.timeToDo}`),
                     deadline: new Date(task.deadline).toISOString().split("T")[0]
                 }
             });

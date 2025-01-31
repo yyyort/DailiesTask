@@ -6,7 +6,7 @@ export const convertDateTimeUTCtoLocal = (dateTime: string): string => {
     const date = new Date(dateTime);
     const localTime = date.toLocaleTimeString("en-US", {
         timeZone: userTimeZone,
-        hour12: true,
+        hour12: false,
     });
     return localTime;
 
