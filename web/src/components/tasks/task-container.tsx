@@ -3,6 +3,7 @@ import { Checkbox } from "../ui/checkbox";
 import TaskPopOver from "./task-popover";
 import { cn } from "@/lib/utils";
 import { taskUpdateStatusService } from "@/service/tasks/taskActions";
+import { convertDateTimeUTCtoLocal } from "@/lib/dateTimeUtil";
 
 export default function TaskContainer({
   task,
@@ -69,7 +70,10 @@ export default function TaskContainer({
             {variant === "routine" && (
               <div className="">
                 <p className="text-slate-600 text-sm w-full overflow-auto">
-                  {new Date(`${task.deadline}T${task.timeToDo}`).toLocaleTimeString()}
+                  {/* {new Date(`${task.deadline}T${task.timeToDo}`).toLocaleTimeString( 'en-us', {})} */}
+                  {convertDateTimeUTCtoLocal(
+                    `${task.deadline}T${task.timeToDo}`
+                  )}
                 </p>
               </div>
             )}
@@ -117,7 +121,10 @@ export default function TaskContainer({
                 }
               </h3>
               <h3 className="text-slate-600 text-sm font-mono">
-              {new Date(`${task.deadline}T${task.timeToDo}`).toLocaleTimeString()}
+                {/*  {new Date(
+                  `${task.deadline}T${task.timeToDo}`
+                ).toLocaleTimeString()} */}
+                {convertDateTimeUTCtoLocal(`${task.deadline}T${task.timeToDo}`)}
               </h3>
             </div>
           </div>
