@@ -15,6 +15,7 @@ import {
 import { RoutineReturnType } from "@/model/routine.model";
 import RoutineEditForm from "./routine-edit-form";
 import { routineDeleteService } from "@/service/routines/routineActions";
+import { convertDateTimeUTCtoLocal } from "../tasks/task-container";
 
 export default function RoutinePopOver({
   routine,
@@ -22,6 +23,20 @@ export default function RoutinePopOver({
   routine: RoutineReturnType;
 }) {
   const [sheetOpen, setSheetOpen] = React.useState(false);
+
+  const reformattedTasks =
+    routine.tasks?.map((task) => {
+      //convert time to 24 hour format and local time
+      const formattedTime = convertDateTimeUTCtoLocal(
+        `${task.deadline}T${task.timeToDo}`,
+        false
+      );
+
+      return {
+        ...task,
+        timeToDo: formattedTime,
+      };
+    }) ?? [];
 
   return (
     <>
@@ -57,7 +72,13 @@ export default function RoutinePopOver({
               </SheetHeader>
 
               {/* form */}
-              <RoutineEditForm routine={routine} setSheetOpen={setSheetOpen} />
+              <RoutineEditForm
+                routine={{
+                  ...routine,
+                  tasks: reformattedTasks,
+                }}
+                setSheetOpen={setSheetOpen}
+              />
             </SheetContent>
           </Sheet>
           <Button

@@ -46,9 +46,7 @@ export const routineGetAllService = async (filters?: string): Promise<RoutineRet
                 tasks: routine.tasks?.map(task => {
                     return {
                         ...task,
-                        timeToDo: new Date(`${task.deadline}T${task.timeToDo}.000Z`).toLocaleTimeString("en-US", {
-                            hour12: false,
-                        }),
+                        timeToDo: task.timeToDo,
                         deadline: new Date(task.deadline).toISOString().split("T")[0]
                     }
                 })

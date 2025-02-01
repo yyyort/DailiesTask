@@ -2,7 +2,6 @@
 import { TaskReturnType } from "@/model/task.model";
 import { redirect } from "next/navigation";
 import { getAccessToken } from "../auth/authService";
-import { convertDateTimeUTCtoLocal } from "@/lib/dateTimeUtil";
 
 const api = process.env.SERVER_URL;
 
@@ -54,7 +53,7 @@ export const taskGetAllService = async ({
             const formattedData = data.tasks.map(task => {
                 return {
                     ...task,
-                    timeToDo: convertDateTimeUTCtoLocal(`${task.deadline}T${task.timeToDo}`),
+                    timeToDo: task.timeToDo,
                     deadline: new Date(task.deadline).toISOString().split("T")[0]
                 }
             });
@@ -91,7 +90,7 @@ export const taskGetAllService = async ({
             const formattedData = data.tasks.map(task => {
                 return {
                     ...task,
-                    timeToDo: convertDateTimeUTCtoLocal(`${task.deadline}T${task.timeToDo}`),
+                    timeToDo: task.timeToDo,
                     deadline: new Date(task.deadline).toISOString().split("T")[0]
                 }
             });
@@ -128,14 +127,13 @@ export const taskGetAllService = async ({
             const formattedData = data.tasks.map(task => {
                 return {
                     ...task,
-                    timeToDo: convertDateTimeUTCtoLocal(`${task.deadline}T${task.timeToDo}`),
+                    timeToDo: task.timeToDo,
                     deadline: new Date(task.deadline).toISOString().split("T")[0]
                 }
             });
 
             return formattedData;
         } else {
-
 
             const response = await fetch(api + '/task', {
                 method: 'GET',
@@ -159,14 +157,18 @@ export const taskGetAllService = async ({
                 tasks: TaskReturnType[];
             } = await response.json();
 
+            
+
             //convert date and time from utc to local
             const formattedData = data.tasks.map(task => {
                 return {
                     ...task,
-                    timeToDo: convertDateTimeUTCtoLocal(`${task.deadline}T${task.timeToDo}`),
+                    timeToDo: task.timeToDo,
                     deadline: new Date(task.deadline).toISOString().split("T")[0]
                 }
             });
+
+            console.log('formattedData', formattedData);
 
             return formattedData;
         }

@@ -1,3 +1,5 @@
+"use client";
+
 import { TaskReturnType } from "@/model/task.model";
 import { Checkbox } from "../ui/checkbox";
 import TaskPopOver from "./task-popover";
@@ -13,6 +15,14 @@ export default function TaskContainer({
   variant?: string;
   type?: string;
 }) {
+  const formattedTime = convertDateTimeUTCtoLocal(
+    `${task.deadline}T${task.timeToDo}`
+  );
+  const formattedTimeHour24 = convertDateTimeUTCtoLocal(
+    `${task.deadline}T${task.timeToDo}`,
+    false
+  );
+
   return (
     <div
       className={cn(
@@ -27,7 +37,12 @@ export default function TaskContainer({
     >
       {variant === "default" && (
         <div className="flex ml-[-1rem] items-start">
-          <TaskPopOver task={task} />
+          <TaskPopOver
+            task={{
+              ...task,
+              timeToDo: formattedTimeHour24,
+            }}
+          />
         </div>
       )}
 
@@ -70,7 +85,7 @@ export default function TaskContainer({
               <div className="">
                 <p className="text-slate-600 text-sm w-full overflow-auto">
                   {/* {new Date(`${task.deadline}T${task.timeToDo}`).toLocaleTimeString( 'en-us', {})} */}
-                  {task.timeToDo}
+                  {formattedTime}
                 </p>
               </div>
             )}
@@ -90,8 +105,6 @@ export default function TaskContainer({
               checked={task.status === "done"}
               className="size-7 fill-white bg-white border-slate-400 shadow-xl"
               onClick={async () => {
-                "use server";
-
                 await taskUpdateStatusService(
                   task.id,
                   task.status === "done" ? "todo" : "done"
@@ -121,7 +134,7 @@ export default function TaskContainer({
                 {/*  {new Date(
                   `${task.deadline}T${task.timeToDo}`
                 ).toLocaleTimeString()} */}
-                {task.timeToDo}
+                {formattedTime}
               </h3>
             </div>
           </div>
@@ -130,3 +143,22 @@ export default function TaskContainer({
     </div>
   );
 }
+
+export const convertDateTimeUTCtoLocal = (
+  dateTime: string,
+  hour12: boolean = true
+): string => {
+  console.log(dateTime);
+
+  const userTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+  console.log(userTimeZone);
+
+  const localTime = new Date(`${dateTime}Z`).toLocaleTimeString("en-US", {
+    timeZone: "Asia/Manila",
+    hour12: hour12,
+  });
+
+  console.log("localTime", localTime);
+  return localTime;
+};
