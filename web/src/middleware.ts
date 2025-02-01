@@ -29,7 +29,10 @@ export async function middleware(request: NextRequest) {
     );
 
     if (isProtectedRoute) {
-        await validateToken(request)
+        const response = await validateToken(request);
+        if (response) {
+            return response;
+        }
     }
 
     return NextResponse.next()
