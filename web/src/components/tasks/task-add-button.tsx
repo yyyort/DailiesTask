@@ -33,7 +33,7 @@ export default function TaskAddButton() {
         <SheetContent
           side={"right"}
           className="flex flex-col overflow-y-auto
-          tablet:max-w-[30rem]
+          tablet:max-w-120
         "
         >
           <SheetHeader>

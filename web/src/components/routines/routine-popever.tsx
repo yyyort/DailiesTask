@@ -61,8 +61,8 @@ export default function RoutinePopOver({
             <SheetContent
               side={"right"}
               className="flex flex-col h-full overflow-auto
-                      tablet:max-w-[30rem]
-                      laptop:max-w-[40rem]
+                      tablet:max-w-120
+                      laptop:max-w-160
                     "
             >
               <SheetHeader>

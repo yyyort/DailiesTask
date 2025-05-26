@@ -140,7 +140,7 @@ export default function RoutineAddForm({
                             className="
                       shadow-md backdrop-filter backdrop-blur-sm
                       phone-sm:text-2xl p-4 phone-sm:h-32
-                      tablet:h-[20rem]
+                      tablet:h-80
                     "
                           />
                         </FormControl>

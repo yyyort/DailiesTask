@@ -53,7 +53,7 @@ export default function SignUp() {
         alt="bulb"
         width={100}
         height={100}
-        className="relative -z-10 -left-7 bottom-[17rem]
+        className="relative -z-10 -left-7 bottom-68
         dark:hidden
             block
         "
@@ -63,7 +63,7 @@ export default function SignUp() {
         alt="bulb"
         width={100}
         height={100}
-        className="relative -z-10 -left-7 bottom-[17rem]
+        className="relative -z-10 -left-7 bottom-68
         dark:block
             hidden
         "

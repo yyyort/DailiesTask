@@ -36,7 +36,7 @@ export default function TaskContainer({
       )}
     >
       {variant === "default" && (
-        <div className="flex ml-[-1rem] items-start">
+        <div className="flex -ml-4 items-start">
           <TaskPopOver
             task={{
               ...task,

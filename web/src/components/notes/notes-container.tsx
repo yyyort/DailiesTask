@@ -21,8 +21,8 @@ export function NotesContainer({ note }: { note: NoteType }) {
     <Link href={`/notes/${note.id}`} className="z-0">
       <div
         className="p-4 border border-secondary rounded-lg shadow-sm flex flex-col justify-between
-      phone-sm:w-full phone-sm:p-4 phone-sm:mb-4 phone-sm:min-h-[20rem]
-      laptop:min-h-[30rem]
+      phone-sm:w-full phone-sm:p-4 phone-sm:mb-4 phone-sm:min-h-80
+      laptop:min-h-120
       bg-secondary
       hover:shadow-md hover:border-ring
       transition-all
