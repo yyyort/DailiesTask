@@ -1,7 +1,9 @@
+"use server";
+
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { setAccessToken } from "./service/auth/authService";
-const api = process.env.SERVER_URL
+
 
 export const config = {
     matcher: [
@@ -41,6 +43,8 @@ export async function middleware(request: NextRequest) {
 
 // middleware to check if the user is authenticated
 export async function validateToken(request: NextRequest) {
+    const api = process.env.SERVER_URL || 'http://localhost:5000/api';
+
     const refreshToken = request.cookies.get('refreshToken')?.value;
 
     if (!refreshToken) {

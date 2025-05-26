@@ -1,5 +1,6 @@
 services:
   server:
+    profiles: [dev, cloud-dev, test, production]
     container_name: dailiestask-server
     build:
       context: ./server
@@ -42,7 +43,7 @@ services:
       - ./certbot/www:/var/www/certbot
     command: certonly --webroot -w /var/www/certbot --force-renewal --email ${ADMIN_EMAIL:?} -d ${SERVER_URI:?} --agree-tos
   db:
-    profiles: [test]
+    profiles: [dev]
     image: postgres
     restart: always
     ports:

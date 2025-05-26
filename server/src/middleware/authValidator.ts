@@ -19,8 +19,16 @@ export const authValidator = async (req: Request, res: Response, next: NextFunct
         }
 
         const { id } = payload;
+        
+        // Initialize req.body if it doesn't exist
+        if (!req.body) {
+            req.body = {};
+        }
+        
         req.body.userId = id;
-
+        
+        // Alternative approach: use a custom property on req
+        // (req as any).userId = id;
 
         next();
     } catch (error: unknown) {
