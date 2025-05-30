@@ -1,0 +1,37 @@
+{
+  "name": "@repo/database",
+  "version": "0.0.0",
+  "description": "Shared database package with Drizzle ORM",
+  "main": "src/index.js",
+  "exports": {
+    ".": "./src/index.js",
+    "./schema": "./src/schema/index.js",
+    "./postgres": "./src/postgres/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "generate": "drizzle-kit generate",
+    "migrate": "drizzle-kit migrate",
+    "push": "drizzle-kit push",
+    "check-types": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@libsql/client": "^0.15.8",
+    "dotenv": "^16.5.0",
+    "drizzle-orm": "^0.44.0",
+    "drizzle-zod": "^0.8.2",
+    "pg": "^8.16.0",
+    "postgres": "^3.4.7",
+    "zod": "^3.25.42"
+  },
+  "devDependencies": {
+    "@repo/eslint-config": "workspace:*",
+    "@repo/typescript-config": "workspace:*",
+    "@types/node": "^22.15.28",
+    "@types/pg": "^8.15.2",
+    "drizzle-kit": "^0.31.1",
+    "tsx": "^4.19.4",
+    "typescript": "5.8.3"
+  }
+}

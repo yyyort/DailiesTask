@@ -16,6 +16,15 @@
     "dev": {
       "cache": false,
       "persistent": true
+    },
+    "generate": {
+      "cache": false
+    },
+    "migrate:postgres": {
+      "cache": false
+    },
+    "migrate:sqlite": {
+      "cache": false
     }
   }
 }

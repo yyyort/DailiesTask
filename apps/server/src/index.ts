@@ -3,12 +3,18 @@ import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import dotenv from 'dotenv';
+import { createPostgresConnection } from '@repo/database';
 
 // Load environment variables
 dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3001;
+
+// Initialize database
+const db = createPostgresConnection(
+  process.env.DATABASE_URL || 'postgresql://dailies_user:dailies_password@localhost:5432/dailies'
+);
 
 // Middleware
 app.use(helmet()); // Security headers
@@ -26,7 +32,7 @@ app.get('/', (req, res) => {
     uptime: process.uptime(),
     timestamp: new Date().toISOString()
   });
-});``
+}); ``
 
 // Health check endpoint
 app.get('/health', (req, res) => {
@@ -45,16 +51,6 @@ app.get('/api', (req, res) => {
   });
 });
 
-// Example API endpoint
-app.get('/api/users', (req, res) => {
-  // This is where you'd fetch from your PostgreSQL database
-  res.json({
-    users: [
-      { id: 1, name: 'John Doe', email: 'john@example.com' },
-      { id: 2, name: 'Jane Smith', email: 'jane@example.com' }
-    ]
-  });
-});
 
 // 404 handler
 app.use('*', (req, res) => {

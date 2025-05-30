@@ -1,0 +1,11 @@
+{
+  "name": "@repo/docker-dev",
+  "private": true,
+  "scripts": {
+    "dev": "docker compose up",
+    "db:reset": "docker compose rm --force --stop postgres && docker compose up -d"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.4"
+  }
+}
