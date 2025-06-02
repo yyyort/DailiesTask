@@ -1,5 +1,5 @@
 {
-  "name": "@repo/docker-dev",
+  "name": "@workspace/docker-dev",
   "private": true,
   "scripts": {
     "dev": "docker compose up",

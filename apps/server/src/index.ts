@@ -3,7 +3,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import dotenv from 'dotenv';
-import { createPostgresConnection } from '@repo/database';
+import { createPostgresConnection } from '@workspace/database';
 
 // Load environment variables
 dotenv.config();
