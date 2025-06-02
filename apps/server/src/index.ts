@@ -4,6 +4,7 @@ import helmet from 'helmet';
 import morgan from 'morgan';
 import dotenv from 'dotenv';
 import { createPostgresConnection } from '@workspace/database';
+import cookieParser from 'cookie-parser';
 
 // Load environment variables
 dotenv.config();
@@ -17,6 +18,7 @@ const db = createPostgresConnection(
 );
 
 // Middleware
+app.use(cookieParser());
 app.use(helmet()); // Security headers
 app.use(cors()); // CORS
 app.use(morgan('combined')); // Logging
