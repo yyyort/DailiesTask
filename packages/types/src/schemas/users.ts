@@ -16,7 +16,7 @@ export const UserModelSchema = z.object({
 
 export const UserReturnSchema = UserModelSchema.omit({ password: true, createdAt: true, updatedAt: true });
 
-export const UserCreateSchema = UserModelSchema.pick({ email: true, password: true, username: true }).extend({
+export const UserCreateSchema = UserModelSchema.omit({ createdAt: true, updatedAt: true, id: true }).extend({
     confirmPassword: z.string().min(6),
 }).refine(
     data => data.password === data.confirmPassword,
@@ -38,7 +38,6 @@ export const UserUpdateSchema = z.object({
 })
 
 export type UserModelType = z.infer<typeof UserModelSchema>;
-export type UserReturnType = z.infer<typeof UserReturnSchema>;
 export type UserCreateType = z.infer<typeof UserCreateSchema>;
 export type UserSignInType = z.infer<typeof UserSignInSchema>;
 export type UserUpdateType = z.infer<typeof UserUpdateSchema>;

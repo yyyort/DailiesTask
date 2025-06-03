@@ -5,6 +5,7 @@ import morgan from 'morgan';
 import dotenv from 'dotenv';
 import { createPostgresConnection } from '@workspace/database';
 import cookieParser from 'cookie-parser';
+import authRoutes from './routes/auth.route';
 
 // Load environment variables
 dotenv.config();
@@ -13,7 +14,7 @@ const app = express();
 const PORT = process.env.PORT || 3001;
 
 // Initialize database
-const db = createPostgresConnection(
+export const db: ReturnType<typeof createPostgresConnection> = createPostgresConnection(
   process.env.DATABASE_URL || 'postgresql://dailies_user:dailies_password@localhost:5432/dailies'
 );
 
@@ -53,12 +54,17 @@ app.get('/api', (req, res) => {
   });
 });
 
+// Import routes
+app.use('/api/auth', authRoutes);
+
 
 // 404 handler
 app.use('*', (req, res) => {
   res.status(404).json({
     error: 'Route not found',
-    path: req.originalUrl
+    path: req.originalUrl,
+    method: req.method,
+    timestamp: new Date().toISOString()
   });
 });
 

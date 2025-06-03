@@ -1,1 +1,3 @@
-export * from './schemas';
+export * from './schemas/index.js';
+export * from 'zod';
+
